@@ -1,2 +1,1 @@
-# pdsv2_das
-# pds16v2_das
+# PDS16v2 didactic assembler

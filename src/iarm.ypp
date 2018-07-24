@@ -1,0 +1,386 @@
+%{
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "iarm.h"
+
+int yylex (void);
+
+#define LOCATION(l) ast::Location {l.filename, l.first_line, l.first_column, l.last_column }
+#define LOCATION_FROM_TO(l, r) ast::Location {l.filename, l.first_line, l.first_column, r.last_column }
+#define LOCATION_EOL(l) ast::Location {l.filename, l.first_line - 1, l.first_column, l.last_column }
+
+std::list<ast::Statement*> *ast_root;
+
+%}
+
+%code requires {
+
+extern const char *yyfilename;
+
+typedef struct YYLTYPE {
+    int first_line;
+    int first_column;
+    int last_line;
+    int last_column;
+    const char *filename;
+} YYLTYPE;
+
+# define YYLTYPE_IS_DECLARED 1 /* alert the parser that we have our own definition */
+
+# define YYLLOC_DEFAULT(Current, Rhs, N)    \
+    do  \
+        if (N) { \
+            (Current).first_line   = YYRHSLOC (Rhs, 1).first_line; \
+            (Current).first_column = YYRHSLOC (Rhs, 1).first_column; \
+            (Current).last_line    = YYRHSLOC (Rhs, N).last_line; \
+            (Current).last_column  = YYRHSLOC (Rhs, N).last_column; \
+            (Current).filename     = YYRHSLOC (Rhs, 1).filename; \
+        } \
+        else { /* empty RHS */ \
+            (Current).first_line   = (Current).last_line \
+                                   = YYRHSLOC (Rhs, 0).last_line; \
+            (Current).first_column = (Current).last_column \
+                                   = YYRHSLOC (Rhs, 0).last_column; \
+            (Current).filename     = NULL;  /* new */ \
+        } \
+    while (0)
+}
+
+
+%union {
+	std::list<ast::Statement*> *statement_list;
+	ast::Statement* statement;
+	ast::Instruction* instruction;
+	ast::Directive* directive;
+	ast::Expression* expression;
+	std::list<ast::Expression*> *value_list;
+	std::list<std::string> *string_list;
+	std::string *string;
+	ast::Register *rejister;
+	int integer;
+	bool boolean;
+}
+
+%token
+	EQUAL EQUAL_EQUAL NOT_EQUAL LESSER GREATER LESSER_EQUAL GREATER_EQUAL
+	SHIFT_LEFT SHIFT_RIGHT
+	COLON SEMICOLON COMMA AMPERSAND PIPE CIRCUMFLEX
+	TILDE AMPERSAND_AMPERSAND PIPE_PIPE EXCLAMATION QUESTION CARDINAL
+	PLUS MINUS ASTERISK SLASH PERCENT
+	PARENTHESE_LEFT PARENTHESE_RIGHT BRACKET_LEFT BRACKET_RIGHT BRACE_LEFT BRACE_RIGHT
+	EOL
+
+%token ALIGN SECTION EQU TEXT DATA SPACE ASCII
+
+%token CPSR SPSR
+
+%token LDR_STR LDR LDRB STR STRB STACK POP PUSH
+%type <integer> LDR_STR STACK
+
+%token ARITH ADD ADC SUB SBC
+%type <integer> ARITH
+
+%token LOGIC AND ORR EOR
+%type <integer> LOGIC
+
+%token SHIFT LSL LSR ASR ROR
+%type <integer> SHIFT
+
+%token BRANCH ZS ZC CS CC LT GE B BL
+%type <integer> BRANCH
+
+%token MOVS MOV NOT RRX CMP MSR MRS
+
+%token <integer>		INTEGER_LITERAL CHARACTER_LITERAL REGISTER SPECIAL BYTE
+%token <string>			IDENTIFIER STRING_LITERAL LABEL
+
+%type <statement_list>	program;
+%type <instruction> 	instruction;
+%type <directive>		directive;
+%type <statement>		statement;
+%type <rejister>		register;
+
+%type <expression> expression
+	primary_expression
+	unary_expression
+	multiplicative_expression
+	additive_expression
+	shift_expression
+	relational_expression
+	equality_expression
+	and_expression
+	exclusive_or_expression
+	inclusive_or_expression
+	logical_and_expression
+	logical_or_expression
+	conditional_expression;
+
+%type <string_list>	string_list;
+%type <value_list>	value_list;
+
+%start program
+
+%%
+/*----------------------------------------------------------------------------*/
+
+program:					
+    program statement		{ $1->push_back($2); $$ = $1; }
+	|						{ $$ = new std::list<ast::Statement*>; ast_root = $$; }
+	;
+
+statement
+	:	LABEL instruction EOL	{ $2->add_label($1); delete($1); $$ = $2; }
+	|	instruction EOL			{ $$ = $1; }
+	|	LABEL directive	EOL		{ $2->add_label($1); delete($1); $$ = $2; }
+	|	directive EOL			{ $$ = $1; }
+	|	LABEL EOL				{ $$ = new ast::Statement_empty($1, LOCATION(@1)); delete($1); }
+	|	EOL						{ $$ = new ast::Statement_empty(LOCATION_EOL(@1)); }
+	|	error EOL				{ $$ = new ast::Statement_empty(LOCATION_EOL(@1)); }
+	;
+
+/*----------------------------------------------------------------------------*/
+
+instruction
+	:	LDR_STR register COMMA expression
+			{ $$ = new ast::Load_store_direct($1, $2, $4, LOCATION(@1)); }
+
+	|	LDR_STR register COMMA BRACKET_LEFT register BRACKET_RIGHT
+			{ $$ = new ast::Load_store_indirect($1, $2, $5, new ast::Value(0, LOCATION(@6)), LOCATION(@1)); }
+
+	|	LDR_STR register COMMA BRACKET_LEFT register COMMA expression BRACKET_RIGHT
+			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
+
+	|	LDR_STR register COMMA BRACKET_LEFT register COMMA register BRACKET_RIGHT
+			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
+
+	|	STACK BRACE_LEFT register BRACE_RIGHT
+			{ $$ = new ast::Push_pop($1, $3, LOCATION(@1)); }
+	|	STACK register
+			{ $$ = new ast::Push_pop($1, $2, LOCATION(@1)); }
+
+	|	ARITH register COMMA register COMMA register
+			{ $$ = new ast::Arith($1, $2, $4, $6, LOCATION(@1)); }
+	|	ARITH register COMMA register COMMA expression
+			{ $$ = new ast::Arith($1, $2, $4, $6, LOCATION(@1)); }
+	|	ARITH register COMMA register COMMA CARDINAL expression
+			{ $$ = new ast::Arith($1, $2, $4, $7, LOCATION(@1)); }
+
+	|	LOGIC register COMMA register COMMA register
+			{ $$ = new ast::Logic($1, $2, $4, $6, LOCATION(@1)); }
+
+	|	SHIFT register COMMA register COMMA expression
+			{ $$ = new ast::Shift($1, $2, $4, $6, LOCATION(@1)); }
+	|	SHIFT register COMMA register COMMA CARDINAL expression
+			{ $$ = new ast::Shift($1, $2, $4, $7, LOCATION(@1)); }
+
+	|	RRX register COMMA register
+			{ $$ = new ast::Rrx($2, $4, LOCATION(@1)); }
+
+	|	CMP register COMMA register
+			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
+	|	CMP register COMMA expression
+			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
+
+	|	MOV register COMMA register
+			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
+	|	MOV register COMMA expression
+			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
+	|	MOV register COMMA CARDINAL expression
+			{ $$ = new ast::Move($2, $5, LOCATION(@1)); }
+
+	|	MOVS register COMMA register
+			{ $$ = new ast::Moves($2, $4, LOCATION(@1)); }
+
+	|	NOT register COMMA register
+			{ $$ = new ast::Not($2, $4, LOCATION(@1)); }
+
+	|	MSR SPECIAL COMMA register
+			{ $$ = new ast::Msr(new ast::Register($2, LOCATION(@2)), $4, LOCATION(@1)); }
+	|	MRS register COMMA SPECIAL
+			{ $$ = new ast::Mrs($2, new ast::Register($4, LOCATION(@4)), LOCATION(@1)); }
+
+	|	BRANCH expression
+			{ $$ = new ast::Branch($1, $2, LOCATION(@1)); }
+	;
+
+register
+	:	REGISTER
+		{ $$ = new ast::Register($1, LOCATION(@1)); }
+		
+/*----------------------------------------------------------------------------*/
+
+directive
+	:	SECTION IDENTIFIER
+			{ $$ = new ast::DSection(*$2, LOCATION(@1)); delete($2); }
+	|	SECTION IDENTIFIER COMMA STRING_LITERAL
+			{ $$ = new ast::DSection(*$2, LOCATION(@1)); delete($2); delete($4); }
+	|	SECTION TEXT
+			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+	|	SECTION DATA
+			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+	|	TEXT
+			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+	|	DATA
+			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+			
+	|	EQU IDENTIFIER COMMA expression
+			{ $$ = new ast::Equ(*$2, $4, LOCATION(@1)); delete($2); }
+			
+	|	BYTE value_list
+			{ $$ = new ast::Byte($1, $2, LOCATION(@1)); }
+	
+	|	SPACE expression
+			{ $$ = new ast::Space($2, new ast::Value(0, LOCATION(@2)), LOCATION(@1)); }
+			
+	|	SPACE expression COMMA expression
+			{ $$ = new ast::Space($2, $4, LOCATION(@1)); }
+			
+	|	ASCII string_list
+			{ $$ = new ast::Ascii($2, LOCATION(@1)); }
+
+	|	ALIGN expression
+			{ $$ = new ast::Align($2, LOCATION(@1)); }
+			
+	|	ALIGN
+			{ $$ = new ast::Align(new ast::Value(1, LOCATION(@1)), LOCATION(@1)); }
+	;
+
+value_list
+	:	value_list COMMA expression
+			{ $1->push_back($3); $$ = $1; }
+	|	expression
+			{ $$ = new std::list<ast::Expression*>{$1}; }
+	;
+
+string_list
+	:	string_list COMMA STRING_LITERAL
+			{ $1->push_back(*$3); delete($3); $$ = $1; }
+	|	STRING_LITERAL
+			{ $$ = new std::list<std::string>{*$1}; delete($1); }
+	;
+
+/*----------------------------------------------------------------------------*/
+
+primary_expression
+	:	INTEGER_LITERAL
+			{ $$ = new ast::Value($1, LOCATION(@1)); }
+	|	CHARACTER_LITERAL
+			{ $$ = new ast::Value($1, LOCATION(@1)); }
+	|	IDENTIFIER
+			{ $$ = new ast::Identifier(*$1, LOCATION(@1)); delete($1); }
+	|	PARENTHESE_LEFT expression PARENTHESE_RIGHT
+			{ $$ = new ast::Priority($2, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+unary_expression
+	:	primary_expression
+
+	|	PLUS primary_expression
+			{ $$ = new ast::Unary_expression(PLUS, $2, LOCATION_FROM_TO(@1, @2)); }
+	|	MINUS primary_expression
+			{ $$ = new ast::Unary_expression(MINUS, $2, LOCATION_FROM_TO(@1, @2)); }
+	|	TILDE primary_expression
+			{ $$ = new ast::Unary_expression(TILDE, $2, LOCATION_FROM_TO(@1, @2)); }
+	;
+
+multiplicative_expression
+	:	unary_expression
+
+	|	multiplicative_expression ASTERISK unary_expression
+			{ $$ = new ast::Binary_expression($1, ASTERISK, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	multiplicative_expression SLASH unary_expression
+			{ $$ = new ast::Binary_expression($1, SLASH, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	multiplicative_expression PERCENT unary_expression
+			{ $$ = new ast::Binary_expression($1, PERCENT, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+additive_expression
+	:	multiplicative_expression
+
+	|	additive_expression PLUS multiplicative_expression
+			{ $$ = new ast::Binary_expression($1, PLUS, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	additive_expression MINUS multiplicative_expression
+			{ $$ = new ast::Binary_expression($1, MINUS, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+shift_expression
+	:	additive_expression
+
+	|	shift_expression SHIFT_LEFT additive_expression
+			{ $$ = new ast::Binary_expression($1, SHIFT_LEFT, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	shift_expression SHIFT_RIGHT additive_expression
+			{ $$ = new ast::Binary_expression($1, SHIFT_RIGHT, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+relational_expression
+	:	shift_expression
+
+	|	relational_expression LESSER shift_expression
+			{ $$ = new ast::Binary_expression($1, LESSER, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	relational_expression GREATER shift_expression
+			{ $$ = new ast::Binary_expression($1, GREATER, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	relational_expression LESSER_EQUAL shift_expression
+			{ $$ = new ast::Binary_expression($1, LESSER_EQUAL, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	relational_expression GREATER_EQUAL shift_expression
+			{ $$ = new ast::Binary_expression($1, GREATER_EQUAL, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+equality_expression
+	:	relational_expression
+
+	|	equality_expression EQUAL_EQUAL relational_expression
+			{ $$ = new ast::Binary_expression($1, EQUAL_EQUAL, $3, LOCATION_FROM_TO(@1, @3)); }
+	|	equality_expression NOT_EQUAL relational_expression
+			{ $$ = new ast::Binary_expression($1, NOT_EQUAL, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+and_expression
+	:	equality_expression
+
+	|	and_expression AMPERSAND equality_expression
+			{ $$ = new ast::Binary_expression($1, AMPERSAND, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+exclusive_or_expression
+	:	and_expression
+
+	| exclusive_or_expression CIRCUMFLEX and_expression
+			{ $$ = new ast::Binary_expression($1, CIRCUMFLEX, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+inclusive_or_expression
+	: exclusive_or_expression
+
+	| inclusive_or_expression PIPE exclusive_or_expression
+			{ $$ = new ast::Binary_expression($1, PIPE, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+logical_and_expression
+	:	inclusive_or_expression
+
+	|	logical_and_expression AMPERSAND_AMPERSAND inclusive_or_expression
+			{ $$ = new ast::Binary_expression($1, AMPERSAND_AMPERSAND, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+logical_or_expression
+	:	logical_and_expression
+
+	|	logical_or_expression PIPE_PIPE logical_and_expression
+			{ $$ = new ast::Binary_expression($1, PIPE_PIPE, $3, LOCATION_FROM_TO(@1, @3)); }
+	;
+
+conditional_expression
+	:	logical_or_expression
+
+	|	logical_or_expression QUESTION
+			expression COLON conditional_expression
+				{ $$ = new ast::Conditional_expression($1, $3, $5, LOCATION_FROM_TO(@1, @5)); }
+	;
+
+expression
+	:	conditional_expression
+
+	;
+

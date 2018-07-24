@@ -1,0 +1,203 @@
+#ifndef INSTRUCTION_H
+#define INSTRUCTION_H
+
+#include "visitor.h"
+#include "expression.h"
+#include "statement.h"
+
+namespace ast {
+
+std::string register_name(int r);
+std::string register_special_name(int r);
+std::string arith_name(int operation);
+std::string logic_name(int operation);
+std::string shift_name(int operation);
+std::string branch_name(int operation);
+
+struct Register {
+	unsigned n;
+	Location location;
+	Register(unsigned n, Location location): n {n}, location {location} {}
+};
+
+struct Instruction: public Statement {
+	explicit Instruction(Location location) : Statement {location} {
+		section_index = Sections::current_section;
+		section_offset = Sections::current_offset;
+		size_in_memory = 2;
+		Sections::increase(size_in_memory);
+	}
+	
+	string listing() {
+		return string_printf("%4d %04x %02x%02x    \t", location.line,
+							 Sections::get_address(section_index) + section_offset,
+							 Sections::read8(section_index, section_offset),
+							 Sections::read8(section_index, section_offset + 1)
+		);
+	}
+};
+
+struct Load_store_direct: public Instruction {
+	unsigned ldst;
+	Register *rd;
+	Expression *direct;
+	Load_store_direct(unsigned ldst, Register *rd, Expression *d, Location left) :
+		Instruction {left}, ldst {ldst}, rd {rd}, direct {d} { }
+	~Load_store_direct() { delete direct; }
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Load_store_indirect: public Instruction {
+	unsigned ldst;
+	Register *rd, *rn, *rm;
+	Expression *constant;
+	Load_store_indirect(unsigned ldst, Register *rd, Register *rn, Register *rm, Location left) :
+		Instruction {left}, ldst {ldst}, rd {rd}, rn {rn}, rm {rm}, constant {nullptr} { }
+
+	Load_store_indirect(unsigned ldst, Register *rd, Register *rn, Expression *c, Location left) :
+		Instruction {left}, ldst {ldst}, rd {rd}, rn {rn}, constant {c} { }
+
+	~Load_store_indirect() { delete constant; }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Branch: public Instruction {
+	Expression *expression;
+	unsigned condition;
+	Branch(unsigned condition, Expression *e, Location left) :
+		Instruction {left}, expression {e}, condition {condition} { }
+	~Branch() { delete expression; }
+	void accept(Visitor *v) { v->visit(this); }
+};
+ 
+struct Arith: public Instruction {
+	Register *rd, *rn, *rm;
+	Expression *expression;
+	unsigned operation;
+	
+	Arith(unsigned o, Register *rd, Register *rn, Register *rm, Location left) :
+		Instruction {left}, rd {rd}, rn {rn}, rm {rm}, expression {nullptr}, operation {o} { }
+
+	Arith(unsigned o, Register *rd, Register *rn, Expression *e, Location left) :
+		Instruction {left}, rd {rd}, rn {rn}, expression {e}, operation {o} { }
+	
+	~Arith() { delete expression; }
+	
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Compare: public Instruction {
+	Register *rn, *rm;
+	Expression *constant;
+	 
+	Compare(Register *rn, Register *rm, Location left) :
+		Instruction {left}, rn {rn}, rm {rm}, constant {nullptr} { }
+
+	Compare(Register *rn, Expression *c, Location left) :
+		Instruction {left}, rn {rn}, constant {c} { }
+
+	~Compare() { delete constant; }
+			
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Logic: public Instruction {
+	Register *rd, *rn, *rm;
+	unsigned operation;
+
+	Logic(unsigned o, Register *rd, Register *rn, Register *rm, Location left) :
+		Instruction {left}, rd {rd}, rn {rn}, rm {rm}, operation {o} { }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Not: public Instruction {
+	Register *rd, *rn;
+	 
+	Not(Register *rd, Register *rn, Location left) :
+		Instruction {left}, rd {rd}, rn {rn} { }
+	
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+
+struct Shift: public Instruction {
+	Register *rd, *rn;
+	unsigned operation;
+	Expression *position;
+	
+	Shift(unsigned op, Register *rd, Register *rn, Expression *p, Location left) :
+		Instruction {left}, rd {rd}, rn {rn}, operation {op}, position {p} { }
+
+	~Shift() { delete position; }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+
+struct Rrx: public Instruction {
+	Register *rd, *rn;
+	
+	Rrx(Register *rd, Register *rn, Location left) :
+		Instruction {left}, rd {rd}, rn {rn} {	}
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Move: public Instruction {
+	Register *rd, *rn;
+	Expression *constant;
+
+	Move(Register *rd, Register *rn, Location left) :
+		Instruction {left}, rd {rd}, rn {rn}, constant {nullptr} { }
+ 
+ 	Move(Register *rd, Expression *c, Location left) :
+		Instruction {left}, rd {rd}, constant {c} { }
+
+	~Move() { delete constant; }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Moves: public Instruction {
+	Register *rd, *rn;
+
+	Moves(Register *rd, Register *rn, Location left) :
+		Instruction {left}, rd {rd}, rn {rn} { }
+ 
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Msr: public Instruction {
+	Register *rd, *rs;
+
+	Msr(Register *rs, Register *rd, Location left) :
+		Instruction {left}, rd {rd}, rs {rs} { }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Mrs: public Instruction {
+	Register *rd, *rs;
+
+	Mrs(Register *rd, Register *rs, Location left) :
+		Instruction {left}, rd {rd}, rs {rs} { }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+struct Push_pop: public Instruction {
+	unsigned push;
+	Register *r;
+	
+	Push_pop(unsigned push, Register *r, Location left) :
+		Instruction {left}, push {push}, r {r} { }
+
+	void accept(Visitor *v) { v->visit(this); }
+};
+
+}
+
+#endif
+

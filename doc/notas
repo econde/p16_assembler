@@ -1,0 +1,81 @@
+Alterações em relação ao PDS16v1
+----------------------------------
+	- Mais registos disponíveis
+	- Introdução de stack
+	- Mais jumps condicionais e mais alcance.
+	- Carregamento de constantes (sem ldih)
+	- Sem escalamento automatico no acesso indireto (ld	rd, [rbx, rix])
+	- Parâmetro sin suprimido nas instruções shift
+	- little ended
+	- registo de flags fora do banco de registos
+	- introdução das instruções mov e cmp
+	
+
+Incompatibilidade com o ARM-cortex
+----------------------------------
+
+- Dimensão da palavra 16/32
+- Endereçamento direto
+- O salto para label em secção diferente deve ser absoluto
+- Permitir usar o valor de labels como constantes?
+- No endereçamento indexado a questão do escalamento do índice
+- Sintaxe do push e pop	push	{r0}   ou push r0
+- Designação hword ou word para palavras a 16 bits
+- As palavras chave não podem ser identificadores
+- As instruções lógicas e aritméticas afetam as flags por omissão
+- Nem todos os registos podem ser endereçados em todas as direções
+
+Expressões inválidas
+--------------------
+Na altura de gerar código o calculo do valor de uma expressão:
+	- Pode ser feito imediatamente se depender de valores numéricos ou da diferença ou comparação de labels da mesma secção.
+	- Pode resultar da adição de uma constante com o valor de uma label não definida - pode ser calculado em fase de relocação.
+	- Pode depender de operações inválidas sobre labels.
+
+- Símbolo não definido numa expressão absoluta
+- Operação diferente de adição de valor absoluto com label
+- Carregamento de endereços em registos
+
+
+Valor absoluto - que pode ser calculado imediatamente, que só depende de constantes.
+	- valores numéricos
+	- operações entre valores numéricos
+	- diferença ou comparação de labels na mesma secção
+
+	
+validate_constant - validar expressão que pode ser usado como constante
+ - não pode conter operandos indefinidos
+ 
+ validate_address - validar expressão que pode ser usado como endereço
+ - pode conter apenas um valor indefinido numa operação que envolva apenas adições
+
+
+Casos em aberto ou que precisam de atenção
+------------------------------------------
+
+- Testar simbolos não definidos
+
+- Aceitar as palavras chave como identificadores (como labels; o gas suporta)
+
+
+Ambiente de desenvolvimento do assemblador
+------------------------------------------
+
+ - O CMakeLists.txt é apenas usado pelo CLion o Makefile é produzido à mão.
+
+ - O executável pode ser produzido para Linux:
+
+$ make
+
+   ou para Windows:
+
+$ make WINDOWS=1
+
+ - O programa de instalação no Windows é produzido por Inno Setup Compiler 5.5.9
+   sob as definições do ficheiro das_installer.iss
+
+
+
+
+
+
