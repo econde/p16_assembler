@@ -63,7 +63,11 @@ n:
 */
 	.text
 main:
-
+	b	long
+back:
+	.space	1020
+long:
+	b	back
 	/*-------------------------------------------------------------------------
 		loads e stores
 	*/
@@ -181,7 +185,7 @@ label_1:
 //	bl	sort + 333
 //	bl	a
 label_2:
-	bcc	main
+//	bcc	main
 	bcs	label_1 + OFFSET
 //	beq	b
 //	bne	label_b

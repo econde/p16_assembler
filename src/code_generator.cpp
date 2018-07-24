@@ -126,7 +126,7 @@ using namespace std;
                 if ((offset & 1) != 0)
                     warning_report(&s->expression->location, "Odd target address");
 
-                imm10 = offset & MAKE_MASK(10, 0);
+                imm10 = (offset >> 1) & MAKE_MASK(10, 0);
                 if (ABSOLUTE(offset) > MAKE_MASK(10, 0))     //  bit de sinal
                     error_report(&s->expression->location, string_printf(
 							"Interval between PC and target address: %+d (0x%x) "

@@ -17,7 +17,7 @@ das_setup.exe
 *.map
 *.a
 *.sim1
-*.sim2
+*.sim0
 *.pdf
 *.lex.cpp
 *.output
