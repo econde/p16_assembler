@@ -65,14 +65,14 @@ n:
 main:
 	b	long
 back:
-	.space	1020
+	.space	1023
 long:
 	b	back
 	/*-------------------------------------------------------------------------
 		loads e stores
 	*/
-	ldr	r0, m_address
-	ldr	r1, n_address
+//	ldr	r0, m_address
+//	ldr	r1, n_address
 
 //	ldr	r5, 78 - label_a + 8
 //	ldr	r5, label_a + 8
@@ -117,7 +117,7 @@ long:
 	mov	r4, 1 << 33
 	mov	r0, r1
 	mov pc, lr
-	mov	r4, label_a + 2
+//	mov	r4, label_a + 2
 //	mov r3, 34 - xxxxx + 3
 //	mov	r0, label_a >> 8
 //	mov	r0, label_a * 8
@@ -126,7 +126,7 @@ long:
 		stack
 	*/
 
-	mov	sp, stack_end
+//	mov	sp, stack_end
 //	movt	sp, stack_end >> 8
 //	ldr	sp, stack_end_address
 	push	{ r0 }
@@ -179,7 +179,7 @@ long:
 	*/
 label_1:
 	b	.
-	b	ADDRESS1
+//	b	ADDRESS1
 	b	label_2
 //	b	33 - label_2 - 2
 //	bl	sort + 333

@@ -1,3 +1,19 @@
+/*
+Copyright 2018 Ezequiel Conde
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include <cstdlib>
 #include <cassert>
 #include <cstring>
@@ -140,8 +156,8 @@ void Sections::set_section(std::string name) {
 
 
 void Sections::listing(std::ofstream& lst_file) {
-	lst_file << "\nSecções\n";
-	ostream_printf(lst_file, "%s  %-16s%-16s%s\n", "Índice", "Nome", "Endereços", "Dimensão");
+	lst_file << "\nSections\n";
+	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04x - %04x     %04x %d\n", i,
 						table[i]->name.c_str(), table[i]->base_address, table[i]->base_address + table[i]->content_size - 1,

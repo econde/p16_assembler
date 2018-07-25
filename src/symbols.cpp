@@ -1,3 +1,19 @@
+/*
+Copyright 2018 Ezequiel Conde
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "symbols.h"
 
 namespace ast {
@@ -55,8 +71,8 @@ namespace ast {
     }
 
     void Symbols::listing(std::ostream &lst_file) {
-        ostream_printf(lst_file, "\nSímbolos\n");
-        ostream_printf(lst_file, "%-24s%-10s%-11s%s\n", "Nome", "Tipo", "Valor", "Secção");
+        ostream_printf(lst_file, "\nSymbols\n");
+        ostream_printf(lst_file, "%-24s%-10s%-11s%s\n", "Name", "Type", "Value", "Section");
         for (auto pair_symbol: table) {
             Symbol *symbol = pair_symbol.second;
             ostream_printf(lst_file, "%-24s%-10s%04x %-6d%s\n",

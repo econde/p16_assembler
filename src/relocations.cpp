@@ -1,3 +1,19 @@
+/*
+Copyright 2018 Ezequiel Conde
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 #include "relocations.h"
 #include "utils.h"
 #include "error.h"
@@ -30,9 +46,9 @@ void Relocations::relocate() {
 		auto offset = reloc->statement->section_offset;
 		auto content = Sections::read16(section, offset);
         auto mask = MAKE_MASK(reloc->width, 0U);
-        auto symbol_section = Symbols::get_section(reloc->symbol);
+//        auto symbol_section = Symbols::get_section(reloc->symbol);
         //  Saltos para endereços absolutos geram relocations relativas sem simbolo associado
-        auto value = (reloc->symbol.empty() ? 0 : Sections::get_address(symbol_section)) + reloc->addend;
+        auto value = (reloc->symbol.empty() ? 0 : Symbols::get_value(reloc->symbol)) + reloc->addend;
         if (reloc->type == Relocation::Type::RELATIVE) {
 			value -= Sections::get_address(section) + offset;
 			//	Nas instruções branch os offsets são codificados em número de instruções (value / 2)
