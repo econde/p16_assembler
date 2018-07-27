@@ -213,7 +213,7 @@ void Sections::binary_hex_intel(const char *file_name) {
 					ostream_printf(file, "%02X", b);
 					cheksum += b;
 				}
-				ostream_printf(file, "%02X\n", -cheksum);
+				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
 				size -= rec_len;
 			} while (size > 0);
 		}
