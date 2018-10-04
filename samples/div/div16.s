@@ -39,7 +39,7 @@ main:
 	ldr	r1, bb
 	bl	div
 	str	r0, c
-	b	.
+	mov	pc, lr
 
 /*-----------------------------------------------------------------------------
 	
@@ -82,5 +82,5 @@ div_2:
 	mov	r1, r3
 	mov	r0, r4
 	pop	{r4}
-	movs	pc, lr
+	mov	pc, lr
 

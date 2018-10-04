@@ -23,4 +23,4 @@ das_setup.exe
 *.output
 *.tab.cpp
 *.tab.hpp
-
+*.zip

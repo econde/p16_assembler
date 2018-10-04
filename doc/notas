@@ -57,6 +57,8 @@ Casos em aberto ou que precisam de atenção
 
 - Aceitar as palavras chave como identificadores (como labels; o gas suporta)
 
+- A última linha de código se não tiver mudança de linha dá erro sitático.
+
 
 Ambiente de desenvolvimento do assemblador
 ------------------------------------------
@@ -76,6 +78,10 @@ $ make WINDOWS=1
 
 
 
+Erros para corrigir
+-------------------
+
+Se o ficheiro HEX estiver aberto por outra aplicação não gera nova versão nem assinala erro.
 
 
 
