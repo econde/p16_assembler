@@ -19,8 +19,8 @@ limitations under the License.
 */
 %{
 #include <string.h>
-#include "iarm.h"
-#include "iarm.tab.hpp"
+#include "p16.h"
+#include "p16.tab.hpp"
 
 /* handle locations */
 int yycolumn = 0;
@@ -71,7 +71,8 @@ BinDigit			[01]
 ".hword"			{ yylval.integer = 2; return BYTE; }
 ".word"				{ yylval.integer = 2; return BYTE; }
 ".space"			{ return SPACE; }
-".ascii"			{ return ASCII; }
+".ascii"			{ yylval.integer = ASCII; return ASCII; }
+".asciz"			{ yylval.integer = ASCIZ; return ASCII; }
 
 	/* operators */
 "="					{ return EQUAL; }
@@ -140,33 +141,36 @@ BinDigit			[01]
 "push"				{ yylval.integer = PUSH; return STACK; }
 "pop"				{ yylval.integer = POP;  return STACK; }
 
-"add"				{ yylval.integer = ADD; return ARITH; }
-"adc"				{ yylval.integer = ADC; return ARITH; }
-"sub"				{ yylval.integer = SUB; return ARITH; }
-"sbc"				{ yylval.integer = SBC; return ARITH; }
+"add"|"adds"		{ yylval.integer = ADD; return ARITH; }
+"adc"|"adcs"		{ yylval.integer = ADC; return ARITH; }
+"sub"|"subs"		{ yylval.integer = SUB; return ARITH; }
+"sbc"|"sbcs"		{ yylval.integer = SBC; return ARITH; }
 
 "cmp"				{ yylval.integer = CMP; return CMP; }
 
-"and"				{ yylval.integer = AND; return LOGIC; }
-"orr"				{ yylval.integer = ORR; return LOGIC; }
-"eor"				{ yylval.integer = EOR; return LOGIC; }
-"not"|"mvn"			{                       return NOT; }
+"and"|"ands"		{ yylval.integer = AND; return LOGIC; }
+"orr"|"orrs"		{ yylval.integer = ORR; return LOGIC; }
+"eor"|"eors"		{ yylval.integer = EOR; return LOGIC; }
+"not"|"mvn"|"mvns"    {                       return NOT; }
 
-"lsl"				{ yylval.integer = LSL; return SHIFT; }
-"lsr"				{ yylval.integer = LSR; return SHIFT; }
-"asr"				{ yylval.integer = ASR; return SHIFT; }
-"ror"				{ yylval.integer = ROR; return SHIFT; }
-"rrx"				{                       return RRX; }
+"lsl"|"lsls"		{ yylval.integer = LSL; return SHIFT; }
+"lsr"|"lsrs"		{ yylval.integer = LSR; return SHIFT; }
+"asr"|"asrs"		{ yylval.integer = ASR; return SHIFT; }
+"ror"|"rors"		{ yylval.integer = ROR; return SHIFT; }
+"rrx"|"rrxs"		{                       return RRX; }
 
 "movs"				{ return MOVS; }
-"mov"				{ return MOV; }
+"mov"				{ yylval.integer = MOV_LOW; return MOV; }
+"movt"				{ yylval.integer = MOV_HIGH; return MOV; }
 "msr"				{ return MSR; }
 "mrs"				{ return MRS; }
 
-"bzs"				{ yylval.integer = ZS; return BRANCH; }
-"bzc"				{ yylval.integer = ZC; return BRANCH; }
+"beq"				{ yylval.integer = EQ; return BRANCH; }
+"bne"				{ yylval.integer = NE; return BRANCH; }
 "bcs"				{ yylval.integer = CS; return BRANCH; }
+"blo"				{ yylval.integer = LO; return BRANCH; }
 "bcc"				{ yylval.integer = CC; return BRANCH; }
+"bhs"				{ yylval.integer = HS; return BRANCH; }
 "blt"				{ yylval.integer = LT; return BRANCH; }
 "bge"				{ yylval.integer = GE; return BRANCH; }
 "b"					{ yylval.integer = B;  return BRANCH; }
@@ -176,8 +180,8 @@ BinDigit			[01]
 	
 {DecIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 10); return INTEGER_LITERAL; }
 {HexIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 16); return INTEGER_LITERAL; }
-{OctIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 8); return INTEGER_LITERAL; }
-0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext, NULL, 2); return INTEGER_LITERAL; } 
+{OctIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 8);  return INTEGER_LITERAL; }
+0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext, NULL, 2);  return INTEGER_LITERAL; }
 
 	/* identifiers */
 	

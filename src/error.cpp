@@ -18,8 +18,8 @@ limitations under the License.
 #include <vector>
 #include <cstdarg>
 #include "error.h"
-#include "iarm.h"
-#include "iarm.tab.hpp"
+#include "p16.h"
+#include "p16.tab.hpp"
 
 extern std::vector<std::string>	srcfile;
 //extern int yylineno;
@@ -28,6 +28,8 @@ extern std::vector<std::string>	srcfile;
 extern const char *yytext;
 
 using namespace std;
+
+extern "C" int yychar;
 
 int error_count;
 
@@ -57,7 +59,8 @@ static void underline(int offset, int left, int right, const char *text) {
 
 void error_report(ast::Location *location, std::string message) {
 	error_count++;
-	const char *text = srcfile.at(location->line - 1).c_str();
+	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
 	fprintf(stderr, "%s\n", text);
 	underline(offset, location->first_column, location->last_column, text);
@@ -67,7 +70,8 @@ void error_report(ast::Location *location, std::string message) {
 }
 
 void warning_report(ast::Location *location, std::string message) {
-    const char *text = srcfile.at(location->line - 1).c_str();
+	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+	const char *text = srcfile.at(lineno).c_str();
     auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
     fprintf(stderr, "%s\n", text);
     underline(offset, location->first_column, location->last_column, text);
@@ -85,7 +89,8 @@ void error_report(std::string message) {
 }
 
 void yyerror(const char *s, ...) {
-	const char *text = srcfile.at(yylloc.first_line - 1).c_str();
+	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "%s (%d): ", yyfilename, yylloc.first_line);
 	fprintf(stderr, "%s\n", text);
 	underline(offset, yylloc.first_column, yylloc.last_column, text);

@@ -16,8 +16,8 @@ limitations under the License.
 
 #include "cpp_printf.h"
 
-#include "iarm.h"
-#include "iarm.tab.hpp"
+#include "p16.h"
+#include "p16.tab.hpp"
 
 namespace ast {
 
@@ -87,13 +87,12 @@ std::string shift_name(int operation) {
 	return std::string("???");
 }
 
-
 std::string branch_name(int condition) {
 	switch (condition) {
-		case ZC:
-			return std::string("bzc");
-		case ZS:
-			return std::string("bzs");
+		case NE:
+			return std::string("bne");
+		case EQ:
+			return std::string("beq");
 		case CC:
 			return std::string("bcc");
 		case CS:

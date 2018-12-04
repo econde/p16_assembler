@@ -41,7 +41,7 @@ void Section::write8(unsigned offset, uint8_t value) {
 	if (limit_superior > content_capacity)
 		enlarge(limit_superior);
 	content[offset] = value;
-	if (offset > content_size)
+	if (limit_superior > content_size)
 		content_size = offset + 1;
 }
 
@@ -51,7 +51,7 @@ void Section::write16(unsigned offset, uint16_t value) {
 		enlarge(limit_superior);
 	content[offset]     = static_cast<uint8_t >(value);
 	content[offset + 1] = static_cast<uint8_t >(value >> 8);
-	if (offset + 1 > content_size)
+	if (limit_superior >= content_size)
 		content_size = offset + 2;
 }
 
@@ -63,7 +63,7 @@ void Section::write32(unsigned offset, uint32_t value) {
 	content[offset + 1] = static_cast<uint8_t >(value >> 8);
 	content[offset + 2] = static_cast<uint8_t >(value >> 16);
 	content[offset + 3] = static_cast<uint8_t >(value >> 24);
-	if (offset + 1 > content_size)
+	if (limit_superior > content_size)
 		content_size = offset + 4;
 }
 
@@ -131,8 +131,7 @@ void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size) {
 vector<Section*> Sections::table;
 list<Section*> Sections::list;
 
-	unsigned Sections::current_section = 0;
-	unsigned Sections::current_offset = 0;
+Section *Sections::csection = nullptr;
 
 void Sections::deallocate() {
     for (auto s: table) {
@@ -145,23 +144,21 @@ void Sections::set_section(std::string name) {
 	unsigned i;
 	for (i = 0; i < table.size(); ++i)
 		if (name == table.at(i)->name) {
-			current_section = i;
-			current_offset = table.at(i)->content_size;
+	        csection = table.at(i);
 			return;
 		}
-	table.push_back(new Section {name});
-	current_section = i;
-	current_offset = 0;
+	table.push_back(new Section {name, i});
+    csection = table.back();
 }
-
 
 void Sections::listing(std::ofstream& lst_file) {
 	lst_file << "\nSections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04x - %04x     %04x %d\n", i,
-						table[i]->name.c_str(), table[i]->base_address, table[i]->base_address + table[i]->content_size - 1,
-						table[i]->content_size, table[i]->content_size);
+					   table[i]->name.c_str(), table[i]->base_address,
+					   table[i]->base_address + table[i]->content_size - 1,
+					   table[i]->content_size, table[i]->content_size);
 	}
 }
 
@@ -185,10 +182,11 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 		Section *section = table[i];
 		section->base_address = section_addresses->get_property(section->name, current_address);
 		if ( ! address_is_free(section)) {
-			error_report("Section \"" + section->name + string_printf(
-						"\" width size %d (0x%x) can't be located in address %d (0x%x)"
-						", this overlap another section.\n",
-                        section->content_size, section->content_size, section->base_address, section->base_address));
+			error_report("Section \"" + section->name
+						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
+					                     ", this overlap another section.\n",
+										 section->content_size, section->content_size,
+										 section->base_address, section->base_address));
 			exit(1);
 		}
 					//	alinhar o início da secção em endereço par

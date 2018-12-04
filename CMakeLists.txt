@@ -1,22 +1,22 @@
 cmake_minimum_required(VERSION 3.9)
-project(as)
+project(pas)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(das
+add_executable(pas
         src/cpp_printf.cpp
         src/cpp_printf.h
-        src/das.cpp
+        src/pas.cpp
         src/directive.h
         src/directive.cpp
         src/expression_base.h
         src/expression.h
         src/expression.cpp
-        src/iarm.h
-        src/iarm.l
-        src/iarm.ypp
-        src/iarm.tab.cpp
-        src/iarm.lex.cpp
+        src/p16.h
+        src/p16.l
+        src/p16.ypp
+        src/p16.tab.cpp
+        src/p16.lex.cpp
         src/instruction.cpp
         src/instruction.h
         src/listing_generator.h

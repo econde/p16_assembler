@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef IARM_H
-#define IARM_H
+#ifndef P16_H
+#define P16_H
 
 #include <list>
 #include "expression.h"

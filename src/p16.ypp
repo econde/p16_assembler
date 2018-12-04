@@ -19,7 +19,7 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "iarm.h"
+#include "p16.h"
 
 int yylex (void);
 
@@ -88,7 +88,8 @@ typedef struct YYLTYPE {
 	PARENTHESE_LEFT PARENTHESE_RIGHT BRACKET_LEFT BRACKET_RIGHT BRACE_LEFT BRACE_RIGHT
 	EOL
 
-%token ALIGN SECTION EQU TEXT DATA SPACE ASCII
+%token ALIGN SECTION EQU TEXT DATA SPACE ASCII ASCIZ
+%type <integer> ASCII
 
 %token CPSR SPSR
 
@@ -104,10 +105,13 @@ typedef struct YYLTYPE {
 %token SHIFT LSL LSR ASR ROR
 %type <integer> SHIFT
 
-%token BRANCH ZS ZC CS CC LT GE B BL
+%token BRANCH EQ NE CS LO CC HS LT GE B BL
 %type <integer> BRANCH
 
-%token MOVS MOV NOT RRX CMP MSR MRS
+%token MOVS NOT RRX CMP MSR MRS
+
+%token MOV MOV_LOW MOV_HIGH
+%type <integer> MOV
 
 %token <integer>		INTEGER_LITERAL CHARACTER_LITERAL REGISTER SPECIAL BYTE
 %token <string>			IDENTIFIER STRING_LITERAL LABEL
@@ -160,7 +164,7 @@ statement
 
 instruction
 	:	LDR_STR register COMMA expression
-			{ $$ = new ast::Load_store_direct($1, $2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Load_relative($1, $2, $4, LOCATION(@1)); }
 
 	|	LDR_STR register COMMA BRACKET_LEFT register BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, new ast::Value(0, LOCATION(@6)), LOCATION(@1)); }
@@ -202,9 +206,9 @@ instruction
 	|	MOV register COMMA register
 			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
 	|	MOV register COMMA expression
-			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Move($1, $2, $4, LOCATION(@1)); }
 	|	MOV register COMMA CARDINAL expression
-			{ $$ = new ast::Move($2, $5, LOCATION(@1)); }
+			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
 
 	|	MOVS register COMMA register
 			{ $$ = new ast::Moves($2, $4, LOCATION(@1)); }
@@ -254,7 +258,7 @@ directive
 			{ $$ = new ast::Space($2, $4, LOCATION(@1)); }
 			
 	|	ASCII string_list
-			{ $$ = new ast::Ascii($2, LOCATION(@1)); }
+			{ $$ = new ast::Ascii($1, $2, LOCATION(@1)); }
 
 	|	ALIGN expression
 			{ $$ = new ast::Align($2, LOCATION(@1)); }

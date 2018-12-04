@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "iarm.h"
-#include "iarm.tab.hpp"
+#include "p16.h"
+#include "p16.tab.hpp"
 
 namespace ast {
 
@@ -164,10 +164,13 @@ namespace ast {
                    || (left_type == UNDEFINED && right_type == Value_type::ABSOLUTE)) {
             return Value_type::UNDEFINED;
         } else if (left_type == LABEL && right_type == LABEL) {
-            if (operation == MINUS
-                || operation == EQUAL_EQUAL || operation == NOT_EQUAL
-                || operation == GREATER_EQUAL || operation == GREATER
-                || operation == LESSER_EQUAL || operation == LESSER)
+            /*  labels só podem ser operadas se pertencerem à mesma secção */
+            if (Symbols::get_section(expression_left->get_symbol())
+                == Symbols::get_section(expression_right->get_symbol())
+                && (operation == MINUS
+                    || operation == EQUAL_EQUAL || operation == NOT_EQUAL
+                    || operation == GREATER_EQUAL || operation == GREATER
+                    || operation == LESSER_EQUAL || operation == LESSER))
                 return ABSOLUTE;
             else
                 return Value_type::INVALID;

@@ -1,70 +1,80 @@
 	.syntax unified 
 	.thumb
-	
-/*-----------------------------------------------------------------------------
-Usar TAB de 8 espaços
-*/
 
-	.section startup
+	.section .startup, "ax"
 
 	b	_start
 	
 _start:
-	mov	sp, stack_bottom
+str
+	ldr	r0, 2 +
+	ldr	sp, addressof_stack_top
 	bl	main
 	b	.
 
-/*-----------------------------------------------------------------------------
-*/
+addressof_stack_top:
+	.word	stack_top
+
 	.section .stack
 stack:
 	.space 64
-stack_bottom:
-
-	.equ	STACK_SIZE, stack_bottom - stack
+stack_top:
 
 /*-----------------------------------------------------------------------------
+int x = 30, y = 4, z;
+
+int main() {
+	z = div(x, y);
+}
 */
 	.data
-a:
+x:
 	.word	30
-bb:
+y:
 	.word	4
-c:
+z:
 	.word	0
 	
 	.text
 main:
-	ldr	r0, a
-	ldr	r1, bb
+	ldr	r0, addressof_x
+	ldr	r0, [r0]
+	ldr	r1, addressof_y
+	ldr	r1, [r1]
 	bl	div
-	str	r0, c
+	ldr	r1, addressof_z	
+	str	r0, [r1]
+
 	mov	pc, lr
 
-/*-----------------------------------------------------------------------------
+addressof_x:
+	.word	x
+addressof_y:
+	.word	y
+addressof_z:
+	.word	z
 	
-int div(uint16_t d, uint16_t o) {
-r0		 r0	     r1			
-	int r = 0, q = 0;
-	    r3	   r4
-	for (int i = 0; i < 16; ++i) {
-		 r2
-		r <<= 1;
-		r |= d >> 15;
-		d <<= 1;
-		q <<= 1;
-		if (r > o) {
-			r -= o;
-			q |= 1;
+/*-----------------------------------------------------------------------------
+
+(r0) uint16 int div(uint16 dividend (r0), uint16 divisor (r1)) {
+	uint16 rest (r3) = 0, quocient (r4) = 0;
+	for ( int i (r2) = 0; i < 16; ++i) {
+		uint16 dividend_msb = dividend >> 15;
+		dividend <<= 1;
+		rest = (rest << 1) | dividend_msb;
+		quotient <<= 1;
+		if (rest >= divisor) {
+			rest -= divisor;
+			quotient += 1;
 		}
 	}
-	return q;
-		r0
+	return quotient (r0);
 }
-
 */
 
 div:
+	push	{lr}
+	push	{r3}
 	push	{r4}
 	mov	r4, 0
 	mov	r2, 16
@@ -73,14 +83,15 @@ div_1:
 	adc	r3, r3, r3
 	lsl	r4, r4, 1
 	cmp	r3, r1
-	bcs	div_2
+	blo	div_2
 	sub	r3, r3, r1
 	add	r4, r4, 1
 div_2:
 	sub	r2, r2, 1
-	bzc	div_1
+	bne	div_1
 	mov	r1, r3
 	mov	r0, r4
 	pop	{r4}
+	pop	{r3}
+	pop	{lr}
 	mov	pc, lr
-

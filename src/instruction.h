@@ -21,6 +21,7 @@ limitations under the License.
 #include "expression.h"
 #include "statement.h"
 
+
 namespace ast {
 
 std::string register_name(int r);
@@ -38,10 +39,10 @@ struct Register {
 
 struct Instruction: public Statement {
 	explicit Instruction(Location location) : Statement {location} {
-		section_index = Sections::current_section;
-		section_offset = Sections::current_offset;
+		section_index = Sections::csection->number;
+		section_offset = Sections::csection->content_size;
 		size_in_memory = 2;
-		Sections::increase(size_in_memory);
+		Sections::increase(section_index, size_in_memory);
 	}
 	
 	string listing() {
@@ -53,13 +54,13 @@ struct Instruction: public Statement {
 	}
 };
 
-struct Load_store_direct: public Instruction {
+struct Load_relative: public Instruction {
 	unsigned ldst;
 	Register *rd;
-	Expression *direct;
-	Load_store_direct(unsigned ldst, Register *rd, Expression *d, Location left) :
-		Instruction {left}, ldst {ldst}, rd {rd}, direct {d} { }
-	~Load_store_direct() { delete direct; }
+	Expression *constant;
+	Load_relative(unsigned ldst, Register *rd, Expression *d, Location left) :
+		Instruction {left}, ldst {ldst}, rd {rd}, constant {d} { }
+	~Load_relative() { delete constant; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -141,12 +142,12 @@ struct Not: public Instruction {
 struct Shift: public Instruction {
 	Register *rd, *rn;
 	unsigned operation;
-	Expression *position;
+	Expression *constant;
 	
 	Shift(unsigned op, Register *rd, Register *rn, Expression *p, Location left) :
-		Instruction {left}, rd {rd}, rn {rn}, operation {op}, position {p} { }
+		Instruction {left}, rd {rd}, rn {rn}, operation {op}, constant {p} { }
 
-	~Shift() { delete position; }
+	~Shift() { delete constant; }
 
 	void accept(Visitor *v) { v->visit(this); }
 };
@@ -162,14 +163,15 @@ struct Rrx: public Instruction {
 };
 
 struct Move: public Instruction {
-	Register *rd, *rn;
+	Register *rd, *rs;
 	Expression *constant;
+	unsigned high;
 
-	Move(Register *rd, Register *rn, Location left) :
-		Instruction {left}, rd {rd}, rn {rn}, constant {nullptr} { }
+	Move(Register *rd, Register *rs, Location left) :
+		Instruction {left}, rd {rd}, rs {rs}, constant {nullptr} { }
  
- 	Move(Register *rd, Expression *c, Location left) :
-		Instruction {left}, rd {rd}, constant {c} { }
+ 	Move(unsigned high, Register *rd, Expression *c, Location left) :
+		Instruction {left}, rd {rd}, constant {c}, high(high) { }
 
 	~Move() { delete constant; }
 
@@ -188,7 +190,7 @@ struct Moves: public Instruction {
 struct Msr: public Instruction {
 	Register *rd, *rs;
 
-	Msr(Register *rs, Register *rd, Location left) :
+	Msr(Register *rd, Register *rs, Location left) :
 		Instruction {left}, rd {rd}, rs {rs} { }
 
 	void accept(Visitor *v) { v->visit(this); }

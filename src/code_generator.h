@@ -30,7 +30,7 @@ public:
     //------------------------------------------------------------------------------------------
     //	Instruction
 
-    void visit(Load_store_direct *s);
+    void visit(Load_relative *s);
     void visit(Load_store_indirect *s);
     void visit(Branch *s);
     void visit(Shift *s);

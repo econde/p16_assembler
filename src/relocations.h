@@ -22,7 +22,7 @@ limitations under the License.
 namespace ast {
 
 struct Relocation {
-	enum Type { ABSOLUTE, RELATIVE };
+	enum Type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };
 	Statement *statement;
 	Location *exp_location;
 	unsigned position, width;

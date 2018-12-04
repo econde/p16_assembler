@@ -1,32 +1,32 @@
 ifndef WINDOWS
 
-all: das
+all: pas
 
 GPP = g++
 
 GCC = gcc
 
-EXECUTABLE = das
+EXECUTABLE = pas
 
 CFLAGS	= -c -g -Wa,-a=build/$*.lst -Wall
 
-src/iarm.lex.cpp:	src/iarm.l src/iarm.tab.cpp
-	flex -o src/iarm.lex.cpp src/iarm.l
+src/p16.lex.cpp:	src/p16.l src/p16.tab.cpp
+	flex -o src/p16.lex.cpp src/p16.l
 
-src/iarm.tab.cpp src/iarm.tab.hpp: src/iarm.ypp
-	bison --defines=src/iarm.tab.hpp --output=src/iarm.tab.cpp -v -t src/iarm.ypp
+src/p16.tab.cpp src/p16.tab.hpp: src/p16.ypp
+	bison --defines=src/p16.tab.hpp --output=src/p16.tab.cpp -v -t src/p16.ypp
 
 #-------------------------------------------------------------------------------
 
 else
 
-all: das.exe
+all: pas.exe
 
 GPP = /usr/bin/x86_64-w64-mingw32-g++
 
 GCC = /usr/bin/x86_64-w64-mingw32-gcc
 
-EXECUTABLE = das.exe
+EXECUTABLE = pas.exe
 
 CFLAGS	= -c -O3 -Wa,-a=build/$*.lst -Wall
 
@@ -49,7 +49,7 @@ clean:
 
 #-------------------------------------------------------------------------------
 
-OBJECTS = das.o iarm.tab.o iarm.lex.o instruction.o expression.o sections.o symbols.o \
+OBJECTS = pas.o p16.tab.o p16.lex.o instruction.o expression.o sections.o symbols.o \
 	relocations.o cpp_printf.o listing.o code_generator.o error.o value_type.o directive.o
 
 $(EXECUTABLE): $(addprefix build/, $(OBJECTS))

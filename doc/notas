@@ -1,32 +1,28 @@
 Alterações em relação ao PDS16v1
 ----------------------------------
-	- Mais registos disponíveis
-	- Introdução de stack
-	- Mais jumps condicionais e mais alcance.
-	- Carregamento de constantes (sem ldih)
-	- Sem escalamento automatico no acesso indireto (ld	rd, [rbx, rix])
-	- Parâmetro sin suprimido nas instruções shift
-	- little ended
-	- registo de flags fora do banco de registos
-	- introdução das instruções mov e cmp
-	
 
-Incompatibilidade com o ARM-cortex
-----------------------------------
+- mais registos r0-r15
+- introdução de stack
+- mais jumps condicionais e mais alcance
+- sem escalamento automatico no acesso indireto (ld	rd, [rbx, rix])
+- diversas modificações nas instruções shift
+- little ended
+- registo de flags fora do banco de registos
+- introdução das instruções mov e cmp
 
-- Dimensão da palavra 16/32
-- Endereçamento direto
-- O salto para label em secção diferente deve ser absoluto
-- Permitir usar o valor de labels como constantes?
-- No endereçamento indexado a questão do escalamento do índice
-- Sintaxe do push e pop	push	{r0}   ou push r0
-- Designação hword ou word para palavras a 16 bits
-- As palavras chave não podem ser identificadores
-- As instruções lógicas e aritméticas afetam as flags por omissão
-- Nem todos os registos podem ser endereçados em todas as direções
 
-Expressões inválidas
+Incompatibilidade com arquitetura ARM/Cortex
+--------------------------------------------
+
+- dimensão da palavra 16/32; designação hword/word
+- salto para label noutra secção
+- na subtração a flag carry significa borrow
+- flag I habilita a 1
+- no ARM o r15 não pode ser rm em certas operações aritméticas (ou outras?)
+
+Expressões
 --------------------
+
 Na altura de gerar código o calculo do valor de uma expressão:
 	- Pode ser feito imediatamente se depender de valores numéricos ou da diferença ou comparação de labels da mesma secção.
 	- Pode resultar da adição de uma constante com o valor de uma label não definida - pode ser calculado em fase de relocação.
@@ -43,10 +39,10 @@ Valor absoluto - que pode ser calculado imediatamente, que só depende de consta
 	- diferença ou comparação de labels na mesma secção
 
 	
-validate_constant - validar expressão que pode ser usado como constante
+validate_constant - validar expressão que pode ser usada como constante
  - não pode conter operandos indefinidos
  
- validate_address - validar expressão que pode ser usado como endereço
+validate_address - validar expressão que pode ser usado como endereço
  - pode conter apenas um valor indefinido numa operação que envolva apenas adições
 
 
@@ -57,7 +53,7 @@ Casos em aberto ou que precisam de atenção
 
 - Aceitar as palavras chave como identificadores (como labels; o gas suporta)
 
-- A última linha de código se não tiver mudança de linha dá erro sitático.
+- A última linha de código se não tiver mudança de linha dá erro sintático.
 
 
 Ambiente de desenvolvimento do assemblador
@@ -82,6 +78,5 @@ Erros para corrigir
 -------------------
 
 Se o ficheiro HEX estiver aberto por outra aplicação não gera nova versão nem assinala erro.
-
 
 

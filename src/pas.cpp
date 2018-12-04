@@ -20,8 +20,8 @@ limitations under the License.
 #include <getopt.h>
 #include <regex>
 
-#include "iarm.h"
-#include "iarm.tab.hpp"
+#include "p16.h"
+#include "p16.tab.hpp"
 
 #include "code_generator.h"
 #include "relocations.h"
@@ -49,8 +49,8 @@ static void help() {
 }
 
 static void version() {
-	cout << "PDS16v2 assembler v0.0 " << "(" __DATE__ << ")" << endl;
-	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt" << endl;
+	cout << "P16 assembler v0.0 " << "(" __DATE__ << ")" << endl;
+	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
 }
 
 int main(int argc, char **argv) {

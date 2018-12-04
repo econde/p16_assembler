@@ -15,11 +15,11 @@ OutputBaseFilename=das_setup
 PrivilegesRequired=admin
 
 [Files]
-Source: "das.exe"; DestDir: "{app}"
-Source: "doc\linguagem assembly do PDS16.pdf"; DestDir: "{app}"; Flags: isreadme
+Source: "pas.exe"; DestDir: "{app}"
+Source: "doc\linguagem assembly do P16.pdf"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
-Name: "{group}\das"; Filename: "{app}\das.exe"
+Name: "{group}\pas"; Filename: "{app}\pas.exe"
 
 ; NOTE: Most apps do not need registry entries to be pre-created. If you
 ; don't know what the registry is or if you need to use it, then chances are

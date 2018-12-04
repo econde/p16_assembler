@@ -53,8 +53,8 @@ public:
 	Identifier(string name, Location location) :
 		Value {location}, name {name} {
 		if (name.compare(0, 5, "line#") == 0)	//	Simbolo .	 (ponto)
-			Symbols::add(name, Value_type::LABEL, Sections::current_section,
-                         new Value(Sections::current_offset, location));
+			Symbols::add(name, Value_type::LABEL, Sections::csection->number,
+                         new Value(Sections::csection->content_size, location));
 		else if ( ! Symbols::do_exist(name))
 			Symbols::add(name, Value_type::UNDEFINED, 0, 0);
 	}
@@ -140,11 +140,13 @@ public:
 	}
 
 	unsigned get_value() {
-		return logical_expression->get_value() != 0 ? expression->get_value() : conditional_expression->get_value();
+		return logical_expression->get_value() != 0
+               ? expression->get_value() : conditional_expression->get_value();
 	}
 
 	string get_symbol() {	//	É preciso avaliar se se pode faze get_value antes da localização.
-		return logical_expression->get_value() != 0 ? expression->get_symbol() : conditional_expression->get_symbol();
+		return logical_expression->get_value() != 0
+               ? expression->get_symbol() : conditional_expression->get_symbol();
 	}
 
  	Value_type get_type();

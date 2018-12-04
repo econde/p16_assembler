@@ -31,9 +31,8 @@ limitations under the License.
 
 #define MAKE_MASK(width, position) ((~(~0U << static_cast<unsigned>(width)) << static_cast<unsigned>(position)))
 
-#define ABSOLUTE(value) (((value) & (1U << (sizeof(value) * CHAR_BIT - 1))) ? static_cast<unsigned>(-(value)) : (value))
-
-#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+#define ABSOLUTE(value) (((value) & (1U << (sizeof(value) * CHAR_BIT - 1))) \
+                        ? static_cast<unsigned>(-(value)) : (value))
 
 static inline int get_bits(uint32_t value, unsigned bit_first, unsigned bit_last) {
 	return (value >> bit_first) & MAKE_MASK(bit_last - bit_first + 1, 0);

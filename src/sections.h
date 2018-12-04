@@ -30,6 +30,7 @@ namespace ast {
 
 struct Section {
 	std::string name;
+	unsigned number;
 	unsigned content_capacity, content_size;
 	uint8_t *content;
 
@@ -37,7 +38,9 @@ struct Section {
 
     unsigned base_address;
 
-	Section(std::string name) : name {name}, content_capacity {0}, content_size {0}, content(nullptr), base_address {0} { }
+	Section(std::string name, unsigned number)
+			: name {name}, number{number},
+			  content_capacity {0}, content_size {0}, content(nullptr), base_address {0} { }
 	
 	void write8(unsigned offset, uint8_t value);
 	void write16(unsigned offset, uint16_t value);
@@ -48,9 +51,22 @@ struct Section {
 	uint16_t read16(unsigned offset);
 	uint32_t read32(unsigned offset);
 	void read_block(unsigned offset, uint8_t *buffer, unsigned size);
+	void append8(uint8_t value) {
+		write8(content_size, value);
+	}
+	void append16(uint16_t value) {
+		write16(content_size, value);
+	}
+	void append_block(const uint8_t *data, unsigned size) {
+		write_block(content_size, data, size);
+	}
+	void increase(unsigned size) {
+		fill(content_size, 0x55, size);
+	}
 };
 
 class Sections {
+	// Lista das secções por ordem de endereço
 	static std::list<Section*> list;
 public:
 	static int align(unsigned address, unsigned alignment) {
@@ -58,12 +74,13 @@ public:
 					/ (1 << alignment)) * (1 << alignment);
 	}
 
+	//	Tabela das secções existentes
 	static std::vector<Section*> table;
 	
 	static void deallocate();
 	
-	static unsigned current_section;
-	static unsigned current_offset;
+	static Section *csection;
+
 	static void set_section(std::string name);
 
 	static void set_address(unsigned section, unsigned base_address) {
@@ -89,29 +106,25 @@ public:
 	}
 
 	static void append8(unsigned section, uint8_t b) {
-		table.at(section)->write8(current_offset, b);
-		current_offset += 1;
+		table.at(section)->append8(b);
 	}
 
 	static void append16(unsigned section, uint16_t b) {
-		table.at(section)->write16(current_offset, b);
-		current_offset += 2;
+		table.at(section)->append16(b);
 	}
 
 	static void append_block(unsigned section, const uint8_t *data, unsigned size) {
-		table.at(section)->write_block(current_offset, data, size);
-		current_offset += size;
+		table.at(section)->append_block(data, size);
 	}
 	
 	static void fill(unsigned section, unsigned offset, uint8_t data, unsigned size) {
 		table.at(section)->fill(offset, data, size);
-		current_offset += size;
 	}
 	
-	static void increase(unsigned size) {
-		fill(current_section, current_offset, 0x55, size);
+	static void increase(unsigned section, unsigned size) {
+		table.at(section)->increase(size);
 	}
-	
+
 	//	Ler conteúdos de uma dada secção.
 	
 	static uint8_t read8(unsigned section, unsigned offset) {

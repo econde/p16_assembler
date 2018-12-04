@@ -28,7 +28,7 @@ class Conditional_expression;
 
 class Statement_empty;
 
-class Load_store_direct;
+class Load_relative;
 class Load_store_indirect;
 class Branch;
 class Arith;
@@ -57,7 +57,7 @@ public:
 	virtual ~Visitor() { }
 	virtual void visit(ast::Statement_empty *) = 0;
 
-	virtual void visit(ast::Load_store_direct *) = 0;
+	virtual void visit(ast::Load_relative *) = 0;
 	virtual void visit(ast::Load_store_indirect *) = 0;
 	virtual void visit(ast::Branch *) = 0;
 	virtual void visit(ast::Arith *) = 0;
