@@ -350,16 +350,16 @@ size_t strlen(const char *str) {
 strlen:
 	push	{ r1 }
 	push	{ r2 }
-	mov	r1, 0		; i = 0
+	mov	r1, 0		/* i = 0 */
 	b	strlen_cond
 strlen_for:
-	add	r1, r1, 1	; i++
+	add	r1, r1, 1	/* i++ */
 strlen_cond:
 	ldrb	r2, [r0]
 	add	r0, r0, 1
 	sub	r2, r2, 0
 	bne	strlen_for
-	mov	r0, r1		; return i
+	mov	r0, r1		/* return i */
 	pop	{ r2 }
 	pop	{ r1 }
 	mov	pc, lr
@@ -381,7 +381,7 @@ multiply:
 	push	{ r3 }
 	push	{ r4 }
 
-	mov	r3, 0	; result = 0
+	mov	r3, 0	/* result = 0 */
 	mov	r2, 0
 	mov	r4, 0
 	b	multiply_while_cond

@@ -6,8 +6,6 @@
 	b	_start
 	
 _start:
-str
-	ldr	r0, 2 +
 	ldr	sp, addressof_stack_top
 	bl	main
 	b	.
