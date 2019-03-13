@@ -16,9 +16,11 @@ Incompatibilidade com arquitetura ARM/Cortex
 
 - dimensão da palavra 16/32; designação hword/word
 - salto para label noutra secção
+- carregar endereço de uma label num registo com a instrução adr
 - na subtração a flag carry significa borrow
 - flag I habilita a 1
 - no ARM o r15 não pode ser rm em certas operações aritméticas (ou outras?)
+- as instruções aritméticas ou lógicas afetam sempre as flags
 
 Expressões
 --------------------
@@ -79,4 +81,16 @@ Erros para corrigir
 
 Se o ficheiro HEX estiver aberto por outra aplicação não gera nova versão nem assinala erro.
 
+No caso de label repetida assinala o erro na linha seguinte.
 
+Este erro no find_generic.s não é bem assinalado.
+
+	.equ	PERSON_SIZE, (people_0 - peoplexxx)
+
+Coisas chatas
+-------------
+
+Não haver instrução cmp com constante
+Se uma variável for muito usada é preciso carregar muitas vezes o seu endereço.
+Como o endereço tem que estar guardado a uma distância de 128
+é preciso guardar muitas vezes o endereço. Não se pode usar a mesma label.

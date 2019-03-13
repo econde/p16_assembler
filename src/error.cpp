@@ -59,7 +59,8 @@ static void underline(int offset, int left, int right, const char *text) {
 
 void error_report(ast::Location *location, std::string message) {
 	error_count++;
-	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+//	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+	int lineno =  location->line - 1;
 	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
 	fprintf(stderr, "%s\n", text);
@@ -70,7 +71,8 @@ void error_report(ast::Location *location, std::string message) {
 }
 
 void warning_report(ast::Location *location, std::string message) {
-	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+//	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+	int lineno =  location->line - 1;
 	const char *text = srcfile.at(lineno).c_str();
     auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
     fprintf(stderr, "%s\n", text);

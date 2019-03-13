@@ -46,10 +46,11 @@ static void help() {
 	cout << "\t-i, --input \"source filename\"" << endl;
 	cout << "\t-o, --output filename" << endl;
 	cout << "\t-s, --section sectionname=address" << endl;
+	cout << "\t-f, --format \"hexintel\"|\"binary\"|\"logisim\"" << endl;
 }
 
 static void version() {
-	cout << "P16 assembler v0.0 " << "(" __DATE__ << ")" << endl;
+	cout << "P16 assembler v1.0 " << "(build: " __DATE__ << ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
 }
 
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
 	Properties<string, unsigned> section_addresses;
 	int result = 0;
 	int verbose_flag = 0;
+	const char *output_format = "hexintel";
 
 	static struct option long_options[] = {
 		{"verbose", no_argument, &verbose_flag, 1},
@@ -65,12 +67,13 @@ int main(int argc, char **argv) {
 		{"input", required_argument, 0, 'i'},
 		{"output", required_argument, 0, 'o'},
 		{"section", required_argument, 0, 's'},
+		{"format", required_argument, 0, 'f'},
 		{0, 0, 0, 0}
 	};
 	int option_index, error_in_options = 0;
         
 	int c;
-	while ((c = getopt_long(argc, argv, "hvi:o:s:", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "hvi:o:s:f:", long_options, &option_index)) != -1) {
 		switch (c) {
 		case 0:	//	Opções longas com afetação de flag
 			break; 
@@ -79,9 +82,12 @@ int main(int argc, char **argv) {
 			return 0;
 		case 'v':
 			version();
-			return 0;
+			break;
 		case 'i':
 			input_filename = optarg;
+			break;
+		case 'f':
+			output_format = optarg;
 			break;
 		case 'o':
 			output_filename = optarg;
@@ -91,7 +97,8 @@ int main(int argc, char **argv) {
 			cmatch cm;
 			if (regex_match(optarg, cm, re)) {
 				int address;
-				cout << "{" << cm[1] << "} {" << cm[2] << "}" << endl;
+				if (verbose_flag)
+					cout << "{" << cm[1] << "} {" << cm[2] << "}" << endl;
 				sscanf(cm[2].str().c_str(), "%i", &address);
 				section_addresses.set_property(cm[1].str(), address);
 			}
@@ -134,18 +141,8 @@ int main(int argc, char **argv) {
 	if (verbose_flag) {
 		cout << endl;
 		cout << "Source file:    " << input_filename << endl;
-		cout << "Listing file:   " << lst_filename << endl;
-		cout << "Hex Intel file: " << hex_filename << endl;
-		cout << "Binary file:    " << bin_filename << endl;
-		cout << "Logisim files:  " << sim0_filename << ", " << sim1_filename << endl;		
 	}
 	
-	remove(lst_filename.c_str());
-	remove(hex_filename.c_str());
-	remove(bin_filename.c_str());
-	remove(sim0_filename.c_str());
-	remove(sim1_filename.c_str());
-
 	yyin = stdin;
 	if ( ! input_filename.empty()) {
 		yyin = fopen(input_filename.c_str(), "r");
@@ -177,7 +174,7 @@ int main(int argc, char **argv) {
 		Symbols::print(cout);
 
 	if (verbose_flag)
-		cout << endl << "Gerar código" << endl;
+		cout << endl << "Code gneration" << endl;
 	{
 		Code_generator code_gen;
 		for (auto s: *ast_root) {
@@ -190,18 +187,17 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-	if (verbose_flag)
-		cout << endl << "Localizar secções" << endl;
-
 	Sections::locate(&section_addresses);
-
+	if (verbose_flag)
+		Sections::listing(cout);
+	
 	if (error_count > 0) {
 		result = -2;
 		goto exit_error;
 	}
 
 	if (verbose_flag) {
-		cout << endl << "Relocalizar símbolos" << endl;
+		cout << endl << "Relocate symbols" << endl;
 		Relocations::print(cout);
 	}
 	Relocations::relocate();
@@ -211,20 +207,43 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-	if (verbose_flag)
-		cout << endl << "Gerar listagem" << endl;
-
+	if (verbose_flag) {
+		cout << endl << "Generate listing" << endl;
+		cout << "\t filename: " << lst_filename << endl;
+	}
+	remove(lst_filename.c_str());
 	listing(lst_filename.c_str(), ast_root);
 
-	if (verbose_flag)
-		cout << endl << "Gerar binários" << endl;
-	Sections::binary_hex_intel(hex_filename.c_str());
-
-	Sections::binary_raw(bin_filename.c_str());
-
-	Sections::binary_logisim(sim0_filename.c_str(), 2, 0);
-
-	Sections::binary_logisim(sim1_filename.c_str(), 2, 1);
+	if (strcmp(output_format, "binary") == 0) {
+		if (verbose_flag) {
+			cout << endl << "Generate binary output"<< endl;
+			cout <<	"\tformat: " << output_format << endl;
+			cout << "filename: " << bin_filename << endl;
+		}
+		remove(bin_filename.c_str());
+		Sections::binary_raw(bin_filename.c_str());
+	
+	}
+	else if (strcmp(output_format, "logisim") == 0) {
+		if (verbose_flag) {
+			cout << endl << "Generate binary output"<< endl;
+			cout <<	"\tformat: " << output_format << endl;
+			cout << "filenames: " << sim0_filename << ", " << sim1_filename << endl;
+		}
+		remove(sim0_filename.c_str());
+		remove(sim1_filename.c_str());
+		Sections::binary_logisim(sim0_filename.c_str(), 2, 0);
+		Sections::binary_logisim(sim1_filename.c_str(), 2, 1);	
+	}
+	else {
+		if (verbose_flag) {
+			cout << endl << "Generate binary output"<< endl;
+			cout <<	"\tformat: " << output_format << endl;
+			cout << "\tfilename: " << hex_filename << endl;
+		}
+		remove(hex_filename.c_str());
+		Sections::binary_hex_intel(hex_filename.c_str());
+	}
 
 #if 0
 	Listing_generator *listing_gen = new Listing_generator();
@@ -237,9 +256,9 @@ int main(int argc, char **argv) {
 #endif
 	result = warning_count > 0 ? -1 : 0;
 
-	exit_error:
+exit_error:
 
-    //	Eliminar objetos statment
+    //	Eliminar AST (lista de objetos statment)
 	for (auto s: *ast_root)
 		delete s;
 	delete ast_root;

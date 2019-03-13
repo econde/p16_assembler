@@ -44,12 +44,12 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root) {
         std::ofstream lst (lst_filename);
         int current_line = 1;
         std::time_t now = std::time(0);
-        lst << "PDS16 assembler v0.0" << "(" __DATE__ ")\t" << lst_filename << '\t' << ctime(&now) << endl;
+        lst << "P16 assembler v0.0" << "(" __DATE__ ")\t" << lst_filename << '\t' << ctime(&now) << endl;
 
         Sections::listing(lst);
         Symbols::listing(lst);
 
-		lst << "Code listing" << endl;
+	lst << "Code listing" << endl;
         for (auto s: *ast_root) {
             Statement *statement = s;
             std::string line;

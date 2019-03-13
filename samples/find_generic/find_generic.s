@@ -1,26 +1,24 @@
-	.syntax unified 
-	.thumb
-	
-	.section .startup, "ax"
+	.section .startup
 	
 	b	_start
 
 _start:
-	ldr	sp, addressof_stack_top
-	ldr	r0, addressof_main
+	ldr	sp, addr_stack_top
+	ldr	r0, addr_main
 	mov	r1, pc
 	add	lr, r1, 4
 	mov	pc, r0
 	b	.
 	
-addressof_stack_top:
+addr_stack_top:
 	.word	stack_top
 	
-addressof_main:
+addr_main:
 	.word	main
 
 	.section .stack
-	.space	1024
+	.equ	STACK_SIZE, 1024
+	.space	STACK_SIZE
 stack_top:
 
 /*==============================================================================
@@ -89,8 +87,7 @@ people_0:
 	.word	50099
 people_end:
 
-//	.equ	PERSON_SIZE, (people_0 - peolpe)
-	.equ	PERSON_SIZE, 10
+	.equ	PERSON_SIZE, (people_0 - people)
 	.equ	PEOPLE_SIZE, (people_end - people) / PERSON_SIZE
 
 	.equ	RESULT_SIZE, PEOPLE_SIZE
@@ -100,32 +97,34 @@ result:
 
 	.text
 main:
-	push	{ lr }
+	push	lr
 	mov	r0, RESULT_SIZE
-	push	{ r0 }
-	ldr	r0, addressof_result
-	push	{ r0 }
-	ldr	r0, addressof_luis_silva
-	push	{ r0 }		
-	ldr	r0, addressof_people
+	push	r0
+	ldr	r0, addr_result
+	push	r0
+	ldr	r0, addr_luis_silva
+	push	r0	
+	ldr	r0, addr_people
 	mov	r1, PEOPLE_SIZE
 	mov	r2, PERSON_SIZE
-	ldr	r3, addressof_cmp_name
+	ldr	r3, addr_cmp_name
 	bl	find
-	pop	{ pc }
+	mov	r1, 3 *2
+	add	sp, r1, sp 
+	pop	pc
 
-addressof_result:
+addr_result:
 	.word	result
-addressof_people:
+addr_people:
 	.word	people
-addressof_cmp_name:
+addr_cmp_name:
 	.word	cmp_name
-addressof_luis_silva:
+addr_luis_silva:
 	.word	luis_silva
 	
 /*------------------------------------------------------------------------------
 (r0) size_t find (void *array (r0), size_t array_size (r1), size_t elem_size (r2) (r8),
-		int (*cmp (r3))(const void *, const void *), const void *context (r7[2]),
+		int (*cmp (r3)(r10))(const void *, const void *), const void *context (r7[2]),
 		void *result[] (r7[4]), size_t result_size (r7[6]) (r5)) {
 	void **result_iter (r6) = result;
 	void *last (r9) = array + array_size * elem_size;
@@ -138,19 +137,48 @@ addressof_luis_silva:
 	}
 	return result_iter - result;
 }
+	---------
+	|	|
+	---------
+	|result_size|		r7[6]
+	---------
+	|result	|		r7[4]
+	---------
+	|context|	sp	r7[2]
+	---------
+	|r7	|	r7
+	---------
+	|lr	|
+	---------
+	|r4	|
+	---------
+	|r5	|
+	---------
+	|r6	|
+	---------
+	|r8	|
+	---------
+	|r9	|
+	---------
+	|r10	|
+	---------
+	|	|
 */
 	.text
 find:
-	push	{ r7 }
+	mov	r0, people
+	push	r7
 	mov	r7, sp		
-	push	{ lr }
-	push	{ r4 }
-	push	{ r5 }
-	push	{ r6 }
-	push	{ r8 }
-	push	{ r9 }
+	push	lr
+	push	r4
+	push	r5
+	push	r6
+	push	r8
+	push	r9
+	push	r10
 
 	mov	r8, r2
+	mov	r10, r3
 	ldr	r5, [r7, 6]	/* size_t result_size (r7[6]) (r5) */
 
 	ldr	r6, [r7, 4]	/* void **result_iter (r6) = result; */
@@ -161,7 +189,7 @@ find:
 	mov	r0, r1
 	mov	r1, r2
 	bl	multiply	/* array_size * elem_size */
-	add	r9, r0, r9	/* void *last (r10) = array + array_size * elem_size; */
+	add	r9, r0, r9	/* void *last  = array + array_size * elem_size; */
 for:
 	cmp	r4, r9		/* iter < last ;  iter - last */
 	bhs	for_end
@@ -169,7 +197,7 @@ for:
 	ldr	r1, [r7, 2]
 	mov	r2, pc
 	add	lr, r2, 4
-	mov	pc, r3		
+	mov	pc, r10		
 	sub	r0, r0, 0		/* if (cmp(iter, context) == 0) { */
 	bne	if_end
 	str	r4, [r6]	/* *result_iter++ = iter; */
@@ -184,13 +212,14 @@ for_end:
 	sub	r0, r6, r0
 	lsr	r0, r0, 1
 	
-	pop	{ r9 }
-	pop	{ r8 }
-	pop	{ r6 }
-	pop	{ r5 }
-	pop	{ r4 }
-	pop	{ lr }
-	pop	{ r7 }
+	pop	r10
+	pop	r9
+	pop	r8
+	pop	r6
+	pop	r5
+	pop	r4
+	pop	lr
+	pop	r7
 	mov	pc, lr
 
 /*------------------------------------------------------------------------------
@@ -204,10 +233,10 @@ int cmp_name (const void *a, const void *b) {
 */
 
 cmp_name:
-	push	{ lr }
-	push	{ r4 }
-	push	{ r5 }
-	push	{ r6 }
+	push	lr
+	push	r4
+	push	r5
+	push	r6
 	mov	r4, r0
 	mov	r5, r1
 	ldr	r0, [r4, 0]	/* ((Person*)a)->name) */
@@ -224,7 +253,7 @@ cmp_name:
 	ldr	r1, [r4, 0]
 	bl	strcpy		/* strcpy (full_name, ((Person*)a)->name); */
 	mov	r0, sp
-	ldr	r1, addressof_space_string
+	ldr	r1, addr_space_string
 	bl	strcat		/* strcat (full_name, " "); */
 	mov	r0, sp
 	ldr	r1, [r4, 2]
@@ -236,12 +265,12 @@ cmp_name:
 	mov	r1, sp
 	add	r1, r1, r6
 	mov	sp, r1
-	pop	{ r6 }
-	pop	{ r5 }
-	pop	{ r4 }
-	pop	{ pc }
+	pop	r6
+	pop	r5
+	pop	r4
+	pop	pc
 
-addressof_space_string:
+addr_space_string:
 	.word	space_string
 
 	.section .rodata
@@ -257,8 +286,6 @@ int strcmp(const char * str1, const char * str2) {
 */
 	.text
 strcmp:
-	push	{ r2 }
-	push	{ r3 }
 	b	strcmp_for_cond
 strcmp_for:
 	add	r0, r0, 1
@@ -272,8 +299,6 @@ strcmp_for_cond:
 	beq	strcmp_for
 strcmp_for_end:
 	sub	r0, r2, r3
-	pop	{ r3 }
-	pop	{ r2 }
 	mov	pc, lr
 	
 /*------------------------------------------------------------------------------
@@ -288,8 +313,6 @@ char *strcat(char *dst, const char *src) {
 }
 */
 strcat:
-	push	{ r0 }
-	push	{ r2 }
 	b	strcat_while1_cond
 strcat_while1:
 	add	r0, r0, 1
@@ -308,8 +331,6 @@ strcat_while2_cond:
 	bne	strcat_while2
 	mov	r2, 0
 	strb	r2, [r0]
-	pop	{ r2 }
-	pop	{ r0 }
 	mov	pc, lr
 
 /*------------------------------------------------------------------------------
@@ -322,8 +343,6 @@ char *strcpy(char *dst, const char *src) {
 }
 */
 strcpy:
-	push	{ r0 }
-	push	{ r2 }
 	b	strcpy_while_cond
 strcpy_while:
 	strb	r2, [r0]
@@ -335,8 +354,6 @@ strcpy_while_cond:
 	bne	strcpy_while
 	mov	r2, 0
 	strb	r2, [r0]
-	pop	{ r2 }
-	pop	{ r0 }
 	mov	pc, lr
 
 /*------------------------------------------------------------------------------
@@ -348,8 +365,6 @@ size_t strlen(const char *str) {
 }
 */
 strlen:
-	push	{ r1 }
-	push	{ r2 }
 	mov	r1, 0		/* i = 0 */
 	b	strlen_cond
 strlen_for:
@@ -360,8 +375,6 @@ strlen_cond:
 	sub	r2, r2, 0
 	bne	strlen_for
 	mov	r0, r1		/* return i */
-	pop	{ r2 }
-	pop	{ r1 }
 	mov	pc, lr
 	
 /*------------------------------------------------------------------------------
@@ -373,13 +386,11 @@ uint32_t multiply(uint16_t multiplicand, uint16_t multiplier) {
 		multiplier >>= 1;
 		multiplicand <<= 1;
 	}
-	return result;	
+	return result;
 }
 */
 multiply:
-	push	{ r2 }
-	push	{ r3 }
-	push	{ r4 }
+	push	r4
 
 	mov	r3, 0	/* result = 0 */
 	mov	r2, 0
@@ -398,10 +409,5 @@ multiply_while_cond:
 	mov	r1, r3
 	mov	r0, r2
 
-	pop	{ r4 }
-	pop	{ r3 }
-	pop	{ r2 }
+	pop	r4
 	mov	pc, lr
-
-	
-	

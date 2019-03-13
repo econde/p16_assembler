@@ -31,16 +31,17 @@ namespace ast {
 struct Section {
 	std::string name;
 	unsigned number;
+    unsigned base_address;
+    unsigned flags;
+	enum {LOADABLE = 1};
 	unsigned content_capacity, content_size;
 	uint8_t *content;
 
 	void enlarge(unsigned new_capacity);
 
-    unsigned base_address;
-
-	Section(std::string name, unsigned number)
-			: name {name}, number{number},
-			  content_capacity {0}, content_size {0}, content(nullptr), base_address {0} { }
+	Section(std::string name, unsigned number, unsigned flags)
+			: name {name}, number{number}, base_address {0}, flags {flags}, 
+			  content_capacity {0}, content_size {0}, content(nullptr) { }
 	
 	void write8(unsigned offset, uint8_t value);
 	void write16(unsigned offset, uint16_t value);
@@ -79,7 +80,7 @@ public:
 	
 	static void deallocate();
 	
-	static Section *csection;
+	static Section *current_section;
 
 	static void set_section(std::string name);
 
@@ -139,7 +140,7 @@ public:
 		return table.at(section)->read_block(offset, buffer, size);
 	}
 
-	static void listing(std::ofstream& lst_file);
+	static void listing(std::ostream& lst_file);
 
 	//	Coloca as secções em lista ordenada por endereços.
 	static bool address_is_free(Section *s);

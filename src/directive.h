@@ -43,8 +43,8 @@ struct DSection: public Directive {
 	DSection(string name, Location left) :
 		Directive {left}, name {name} {
 		Sections::set_section(name);
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = 0;
 	}
 
@@ -64,8 +64,8 @@ struct Byte: public Directive {
 	 
 	Byte(unsigned s, list<Expression*> *vl, Location left) :
 		Directive {left}, value_list {vl}, grain_size {s} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = grain_size * value_list->size();
 		Sections::increase(section_index, size_in_memory);
 	}
@@ -88,14 +88,14 @@ struct Ascii: public Directive {
 	list<string> *string_list;
 	Ascii(unsigned asciz, list<string> *sl, Location left) :
 		Directive {left}, string_list {sl} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		for (auto s: *string_list) {
-			Sections::append_block(Sections::csection->number, (const uint8_t *)s.data(), s.size());
+			Sections::append_block(Sections::current_section->number, (const uint8_t *)s.data(), s.size());
 		}
 		if (asciz)
-            Sections::append8(Sections::csection->number, 0);
-		size_in_memory = Sections::csection->content_size - section_offset;
+            Sections::append8(Sections::current_section->number, 0);
+		size_in_memory = Sections::current_section->content_size - section_offset;
 	}
 	~Ascii() { delete string_list; }
 
@@ -111,8 +111,8 @@ struct Space: public Directive {
 	Expression *size, *initial;
 	Space (Expression *s, Expression *i, Location left) :
 		Directive {left}, size {s}, initial {i} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = size->get_value();
 		Sections::increase(section_index, size_in_memory);
 	}
@@ -132,10 +132,10 @@ struct Equ: public Directive {
 
 	Equ(string name, Expression *value, Location left) :
 		Directive {left}, name {name}, value {value} {
-		section_index = Sections::csection->number;		/* Um simbolo equ não pertence a uma secção ... */
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;		/* Um simbolo equ não pertence a uma secção ... */
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = 0;
-		if (Symbols::add(name, Sections::csection->number, value) == 0) {
+		if (Symbols::add(name, Sections::current_section->number, value) == 0) {
 			error_report(&location, "Symbol \"" + name + "\" is already defined");
 		}
     }
@@ -156,8 +156,8 @@ struct Align: public Directive {
 	
 	Align (Expression *size, Location left) :
 		Directive {left}, size {size} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = Sections::align(section_offset, size->get_value()) - section_offset;
 		Sections::increase(section_index, size_in_memory);
 	}

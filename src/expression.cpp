@@ -27,7 +27,7 @@ namespace ast {
     unsigned Unary_expression::get_value() {
         switch (operation) {
             case PLUS:
-                return +expression->get_value();
+                return expression->get_value();
             case MINUS:
                 return static_cast<unsigned>(-expression->get_value());
             case TILDE:

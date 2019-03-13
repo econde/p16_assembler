@@ -131,7 +131,7 @@ void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size) {
 vector<Section*> Sections::table;
 list<Section*> Sections::list;
 
-Section *Sections::csection = nullptr;
+Section *Sections::current_section = nullptr;
 
 void Sections::deallocate() {
     for (auto s: table) {
@@ -140,19 +140,23 @@ void Sections::deallocate() {
     }
 }
 
-void Sections::set_section(std::string name) {
-	unsigned i;
-	for (i = 0; i < table.size(); ++i)
-		if (name == table.at(i)->name) {
-	        csection = table.at(i);
+void Sections::set_section(std::string section_name) {
+	unsigned section_number;
+	for (section_number = 0; section_number < table.size(); ++section_number)
+		if (section_name == table.at(section_number)->name) {
+	        current_section = table.at(section_number);
 			return;
 		}
-	table.push_back(new Section {name, i});
-    csection = table.back();
+	unsigned section_flags = 0;
+	if (section_name != ".bss" && section_name != ".stack")
+		section_flags = Section::LOADABLE;
+
+	table.push_back(new Section {section_name, section_number, section_flags});
+    current_section = table.back();
 }
 
-void Sections::listing(std::ofstream& lst_file) {
-	lst_file << "\nSections\n";
+void Sections::listing(std::ostream& lst_file) {
+	lst_file << "Sections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04x - %04x     %04x %d\n", i,
@@ -199,6 +203,8 @@ void Sections::binary_hex_intel(const char *file_name) {
 		std::ofstream file(file_name);
 		for (size_t i = 0; i < table.size(); ++i) {
 			Section *section = table.at(i);
+			if ((section->flags & Section::LOADABLE) == 0)
+				continue;
 			auto size = section->content_size;
 			auto offset = 0U;
 			do {
@@ -245,7 +251,6 @@ void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigne
 		cerr << e.what();
 	}
 }
-
 
 void Sections::binary_raw(const char *file_name) {
 	try {

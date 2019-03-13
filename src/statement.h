@@ -71,8 +71,8 @@ class Statement_empty: public Statement {
 public:
 	Statement_empty(string *l, Location left):
 		Statement {left} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = 0;
 		add_label(l);
 	 }

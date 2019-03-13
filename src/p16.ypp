@@ -99,7 +99,7 @@ typedef struct YYLTYPE {
 %token ARITH ADD ADC SUB SBC
 %type <integer> ARITH
 
-%token LOGIC AND ORR EOR
+%token LOGIC AND OR EOR
 %type <integer> LOGIC
 
 %token SHIFT LSL LSR ASR ROR

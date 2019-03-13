@@ -39,8 +39,8 @@ struct Register {
 
 struct Instruction: public Statement {
 	explicit Instruction(Location location) : Statement {location} {
-		section_index = Sections::csection->number;
-		section_offset = Sections::csection->content_size;
+		section_index = Sections::current_section->number;
+		section_offset = Sections::current_section->content_size;
 		size_in_memory = 2;
 		Sections::increase(section_index, size_in_memory);
 	}

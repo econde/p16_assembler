@@ -149,9 +149,9 @@ BinDigit			[01]
 "cmp"				{ yylval.integer = CMP; return CMP; }
 
 "and"|"ands"		{ yylval.integer = AND; return LOGIC; }
-"orr"|"orrs"		{ yylval.integer = ORR; return LOGIC; }
+"orr"|"orrs"|"or"	{ yylval.integer = OR; return LOGIC; }
 "eor"|"eors"		{ yylval.integer = EOR; return LOGIC; }
-"not"|"mvn"|"mvns"    {                       return NOT; }
+"mvn"|"mvns"|"not"	{                       return NOT; }
 
 "lsl"|"lsls"		{ yylval.integer = LSL; return SHIFT; }
 "lsr"|"lsrs"		{ yylval.integer = LSR; return SHIFT; }
@@ -165,15 +165,15 @@ BinDigit			[01]
 "msr"				{ return MSR; }
 "mrs"				{ return MRS; }
 
-"beq"				{ yylval.integer = EQ; return BRANCH; }
-"bne"				{ yylval.integer = NE; return BRANCH; }
+"beq"|"bzs"			{ yylval.integer = EQ; return BRANCH; }
+"bne"|"bzc"			{ yylval.integer = NE; return BRANCH; }
 "bcs"				{ yylval.integer = CS; return BRANCH; }
 "blo"				{ yylval.integer = LO; return BRANCH; }
 "bcc"				{ yylval.integer = CC; return BRANCH; }
 "bhs"				{ yylval.integer = HS; return BRANCH; }
 "blt"				{ yylval.integer = LT; return BRANCH; }
 "bge"				{ yylval.integer = GE; return BRANCH; }
-"b"					{ yylval.integer = B;  return BRANCH; }
+"b"				{ yylval.integer = B;  return BRANCH; }
 "bl"				{ yylval.integer = BL; return BRANCH; }
 
 	/* numeric literals */

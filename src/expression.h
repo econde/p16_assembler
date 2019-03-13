@@ -53,8 +53,8 @@ public:
 	Identifier(string name, Location location) :
 		Value {location}, name {name} {
 		if (name.compare(0, 5, "line#") == 0)	//	Simbolo .	 (ponto)
-			Symbols::add(name, Value_type::LABEL, Sections::csection->number,
-                         new Value(Sections::csection->content_size, location));
+			Symbols::add(name, Value_type::LABEL, Sections::current_section->number,
+                         new Value(Sections::current_section->content_size, location));
 		else if ( ! Symbols::do_exist(name))
 			Symbols::add(name, Value_type::UNDEFINED, 0, 0);
 	}

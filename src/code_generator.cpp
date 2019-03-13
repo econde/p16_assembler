@@ -27,7 +27,7 @@ enum {
     RD_POSITION = 0,
     RN_POSITION = 4,
     RM_POSITION = 7,
-
+    RS_POSITION = 7,
     LDR_RELATIVE_OPCODE = 0x0c00,
     LDR_RELATIVE_CONSTANT_SIZE = 6,
     LDR_REALTIVE_CONSTANT_POSITION = 4,
@@ -219,7 +219,7 @@ void Code_generator::visit(Branch *s) {
 			symbol = s->expression->get_symbol();
 		}
 		if ((addend & 1) != 0)
-			warning_report(&s->expression->location, "Odd target address");
+			warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
 		auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
 							   Relocation::Type::RELATIVE, symbol, addend};
 		Relocations::add(reloc);
@@ -230,7 +230,7 @@ void Code_generator::visit(Branch *s) {
 		if (s->section_index == Symbols::get_section(symbol)) {
 			offset = s->expression->get_value() - s->section_offset - 2;    //  O PC está dois endereços à frente
 			if ((offset & 1) != 0)
-				warning_report(&s->expression->location, "Odd target address");
+				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), offset));
 			offset >>= 1;
 			if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
 				error_report(&s->expression->location,
@@ -240,7 +240,7 @@ void Code_generator::visit(Branch *s) {
 		} else {    // A Label pertence a outra secção será resolvida na fase de relocalização
 			auto addend = s->expression->get_value() - 2;
 			if ((addend & 1) != 0)
-				warning_report(&s->expression->location, "Odd target address");
+				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
 			auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
                                          Relocation::Type::RELATIVE, symbol, addend};
 			Relocations::add(reloc);
@@ -356,7 +356,7 @@ void Code_generator::visit(Logic *s) {
 
 void Code_generator::visit(Not *s) {
 	Sections::write16(s->section_index, s->section_offset,
-					  static_cast<uint16_t>(NOT_OPCODE + (s->rn->n << RN_POSITION) + (s->rd->n << RD_POSITION)));
+					  static_cast<uint16_t>(NOT_OPCODE + (s->rn->n << RS_POSITION) + (s->rd->n << RD_POSITION)));
 }
 
 void Code_generator::visit(Move *s) {
@@ -368,7 +368,7 @@ void Code_generator::visit(Move *s) {
 		auto const_type= s->constant->get_type();
 		if (const_type == ABSOLUTE ) {
 			auto constant = s->constant->get_value();
-			if ((constant & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
+			if ((abs(static_cast<int>(s->constant->get_value())) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
 				warning_report(&s->constant->location,
                                string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
                                              constant, constant, MOV_CONST_SIZE,
@@ -410,8 +410,8 @@ void Code_generator::visit(Compare *s) {
 }
 
 void Code_generator::visit(Msr *s) {
-	if (s->rs->n != CPSR && s->rs->n != SPSR)
-		error_report(&s->rs->location, "Invalid register");
+	if (s->rd->n != CPSR && s->rd->n != SPSR)
+		error_report(&s->rd->location, "Invalid register");
 
 	Sections::write16(s->section_index, s->section_offset,
                       static_cast<uint16_t>(MSR_OPCODE | ((s->rd->n == SPSR) << SPSR_INDICATION_POSITION)
@@ -450,8 +450,8 @@ void Code_generator::visit(Align *s) {
 void Code_generator::visit(Byte *s) {
 	if ((s->section_offset & (s->grain_size - 1)) != 0)
 		warning_report(&s->location,
-                       string_printf( "Misaligned address - multibyte value (%d bytes) not in an address multiple of %d",
-                                      s->grain_size, s->grain_size));
+                       string_printf( "Misaligned address (0x%x)- multibyte value (%d bytes) not in an address multiple of %d",
+                                      s->section_offset, s->grain_size, s->grain_size));
 	auto i = 0U;
 	auto mask = MAKE_MASK(s->grain_size * 8, 0);
 	for (auto e: *s->value_list) {
