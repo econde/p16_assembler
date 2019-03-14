@@ -65,7 +65,7 @@ std::string logic_name(int operation) {
 	switch (operation) {
 		case AND:
 			return std::string("and");
-		case ORR:
+		case OR:
 			return std::string("orr");
 		case EOR:
 			return std::string("eor");

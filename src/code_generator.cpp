@@ -347,7 +347,7 @@ void Code_generator::visit(Logic *s) {
 
 	Sections::write16(s->section_index, s->section_offset,
                       static_cast<uint16_t>	((s->operation == AND
-                                                 ? AND_OPCODE : s->operation == ORR
+                                                 ? AND_OPCODE : s->operation == OR
                                                                 ? OR_OPCODE : s->operation == EOR ? XOR_OPCODE : 0)
                                                 + (s->rm->n << RM_POSITION)
                                                 + (s->rn->n << RN_POSITION)
