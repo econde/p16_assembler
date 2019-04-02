@@ -301,6 +301,8 @@ unary_expression
 			{ $$ = new ast::Unary_expression(PLUS, $2, LOCATION_FROM_TO(@1, @2)); }
 	|	MINUS primary_expression
 			{ $$ = new ast::Unary_expression(MINUS, $2, LOCATION_FROM_TO(@1, @2)); }
+	|	EXCLAMATION primary_expression
+			{ $$ = new ast::Unary_expression(EXCLAMATION, $2, LOCATION_FROM_TO(@1, @2)); }
 	|	TILDE primary_expression
 			{ $$ = new ast::Unary_expression(TILDE, $2, LOCATION_FROM_TO(@1, @2)); }
 	;

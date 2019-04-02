@@ -32,6 +32,8 @@ namespace ast {
                 return static_cast<unsigned>(-expression->get_value());
             case TILDE:
                 return ~expression->get_value();
+            case EXCLAMATION:
+                return !expression->get_value();
             default:
                 return 0;
         }
@@ -53,6 +55,8 @@ namespace ast {
                 return "-" + expression->to_string();
             case TILDE:
                 return "~" + expression->to_string();
+            case EXCLAMATION:
+                return "!" + expression->to_string();
             default:
                 return string();
         }
