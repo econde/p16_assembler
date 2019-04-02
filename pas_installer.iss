@@ -5,18 +5,19 @@
 
 [Setup]
 AppPublisher=ISEL
-AppName=Didactic Assembler
-AppVersion=0.0
-DefaultDirName={pf}\PDS16v2
-DefaultGroupName=PDS16v2
-UninstallDisplayIcon={app}\das.exe
+AppName=P16 Assembler
+AppVersion=1.1
+DefaultDirName={userdesktop}\P16
+DefaultGroupName=P16
+UninstallDisplayIcon={app}\pas.exe
 OutputDir=.
-OutputBaseFilename=das_setup
+OutputBaseFilename=p16_setup
 PrivilegesRequired=admin
 
 [Files]
+Source: "..\debugger\P16Debugger_v3_9_WinRelease_(bin)\*"; DestDir: "{app}\P16Debugger"
+Source: "..\simulator\P16Simulator_v2_5_WinRelease_(bin)\*"; DestDir: "{app}\P16Simulator"
 Source: "pas.exe"; DestDir: "{app}"
-Source: "doc\linguagem assembly do P16.pdf"; DestDir: "{app}"; Flags: isreadme
 
 [Icons]
 Name: "{group}\pas"; Filename: "{app}\pas.exe"
