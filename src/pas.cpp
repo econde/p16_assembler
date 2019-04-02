@@ -26,6 +26,7 @@ limitations under the License.
 #include "code_generator.h"
 #include "relocations.h"
 #include "listing_generator.h"
+#include "version.h"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ static void help() {
 }
 
 static void version() {
-	cout << "P16 assembler v1.0 " << "(build: " __DATE__ << ")" << endl;
+	cout << "P16 assembler v" VERSION_MAJOR "." VERSION_MINOR " (build: " __DATE__ ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
 }
 

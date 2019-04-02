@@ -19,6 +19,7 @@ limitations under the License.
 #include <string>
 #include <ctime>
 #include "statement.h"
+#include "version.h"
 
 using namespace ast;
 using namespace std;
@@ -44,7 +45,7 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root) {
         std::ofstream lst (lst_filename);
         int current_line = 1;
         std::time_t now = std::time(0);
-        lst << "P16 assembler v0.0" << "(" __DATE__ ")\t" << lst_filename << '\t' << ctime(&now) << endl;
+        lst << "P16 assembler v" VERSION_MAJOR "." VERSION_MINOR " (" __DATE__ ")\t" << lst_filename << '\t' << ctime(&now) << endl;
 
         Sections::listing(lst);
         Symbols::listing(lst);
