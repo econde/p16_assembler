@@ -368,11 +368,11 @@ void Code_generator::visit(Move *s) {
 		auto const_type= s->constant->get_type();
 		if (const_type == ABSOLUTE ) {
 			auto constant = s->constant->get_value();
-			if ((abs(static_cast<int>(s->constant->get_value())) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
+			if ((abs(static_cast<int>(constant)) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
 				warning_report(&s->constant->location,
-                               string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-                                             constant, constant, MOV_CONST_SIZE,
-                                             constant & MAKE_MASK(MOV_CONST_SIZE, 0), constant & MAKE_MASK(MOV_CONST_SIZE, 0)));
+					string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+							constant, constant, MOV_CONST_SIZE,
+							constant & MAKE_MASK(MOV_CONST_SIZE, 0), constant & MAKE_MASK(MOV_CONST_SIZE, 0)));
 			}
 			code |= (constant & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
 		}
@@ -450,8 +450,8 @@ void Code_generator::visit(Align *s) {
 void Code_generator::visit(Byte *s) {
 	if ((s->section_offset & (s->grain_size - 1)) != 0)
 		warning_report(&s->location,
-                       string_printf( "Misaligned address (0x%x)- multibyte value (%d bytes) not in an address multiple of %d",
-                                      s->section_offset, s->grain_size, s->grain_size));
+			string_printf("Misaligned address (0x%x)- multibyte value (%d bytes) not in an address multiple of %d",
+					s->section_offset, s->grain_size, s->grain_size));
 	auto i = 0U;
 	auto mask = MAKE_MASK(s->grain_size * 8, 0);
 	for (auto e: *s->value_list) {
@@ -464,14 +464,14 @@ void Code_generator::visit(Byte *s) {
 				auto symbol = e->get_symbol();
 				auto addend = e->get_value();
 				auto *reloc = new Relocation{s, &e->location, 0, s->grain_size * 8,
-                                             Relocation::Type::ABSOLUTE, symbol, addend};
+							Relocation::Type::ABSOLUTE, symbol, addend};
 				Relocations::add(reloc);
 			}
 
-			if ((value & ~mask) != 0)
+			if ((abs(static_cast<int>(value)) & ~mask) != 0)
 				warning_report(&e->location,
-                               string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-                                             value, value, s->grain_size * 8, value & mask, value & mask));
+					string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+					value, value, s->grain_size * 8, value & mask, value & mask));
 			switch (s->grain_size) {
 				case 1:
 					Sections::write8(s->section_index, s->section_offset + i++, static_cast<uint8_t>(value));
