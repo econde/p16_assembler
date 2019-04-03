@@ -156,10 +156,13 @@ int main(int argc, char **argv) {
 	listing_load_inputfile(input_filename.c_str());
 
 	yyfilename = input_filename.c_str() + input_filename.find_last_of('/') + 1;
-	
+
+	Sections::set_section(".text");
+
 	// yydebug = 1;
 	if (verbose_flag)
 		cout << endl << "Análise sintática e geração da AST" << endl;
+
 	if (yyparse())
 		return -1;
 
