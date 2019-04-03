@@ -144,7 +144,7 @@ void Sections::set_section(std::string section_name) {
 	unsigned section_number;
 	for (section_number = 0; section_number < table.size(); ++section_number)
 		if (section_name == table.at(section_number)->name) {
-	        current_section = table.at(section_number);
+			current_section = table.at(section_number);
 			return;
 		}
 	unsigned section_flags = 0;
@@ -159,7 +159,7 @@ void Sections::listing(std::ostream& lst_file) {
 	lst_file << "Sections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
-		ostream_printf(lst_file, "%-8d%-16s%04x - %04x     %04x %d\n", i,
+		ostream_printf(lst_file, "%-8d%-16s%04X - %04X     %04X %d\n", i,
 					   table[i]->name.c_str(), table[i]->base_address,
 					   table[i]->base_address + table[i]->content_size - 1,
 					   table[i]->content_size, table[i]->content_size);

@@ -75,7 +75,7 @@ namespace ast {
         ostream_printf(lst_file, "%-24s%-10s%-11s%s\n", "Name", "Type", "Value", "Section");
         for (auto pair_symbol: table) {
             Symbol *symbol = pair_symbol.second;
-            ostream_printf(lst_file, "%-24s%-10s%04x %-6d%s\n",
+            ostream_printf(lst_file, "%-24s%-10s%04X %-6d%s\n",
                            symbol->name.c_str(), value_type_name[symbol->type],
                            symbol->get_value(), symbol->get_value(),
                            (symbol->type == Value_type::UNDEFINED) ? "*UNDEF*" : Sections::table.at(

@@ -51,7 +51,7 @@ struct DSection: public Directive {
 	string listing() {
 		return string_printf("%4d%14c\t", location.line, ' ');
 	}
-	
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -61,7 +61,7 @@ struct DSection: public Directive {
 struct Byte: public Directive {
 	list<Expression*> *value_list;
 	unsigned grain_size;
-	 
+
 	Byte(unsigned s, list<Expression*> *vl, Location left) :
 		Directive {left}, value_list {vl}, grain_size {s} {
 		section_index = Sections::current_section->number;
@@ -106,7 +106,7 @@ struct Ascii: public Directive {
 
 //-----------------------------------------------------------------------------	
 //	.space
-	 
+
 struct Space: public Directive {
 	Expression *size, *initial;
 	Space (Expression *s, Expression *i, Location left) :
@@ -125,7 +125,7 @@ struct Space: public Directive {
 
 //-----------------------------------------------------------------------------	
 //	.equ
-	 
+
 struct Equ: public Directive {
 	string name;
 	Expression *value;
@@ -150,10 +150,10 @@ struct Equ: public Directive {
 
 //-----------------------------------------------------------------------------	 
 //	.align
-	 
+
 struct Align: public Directive {
 	Expression *size;
-	
+
 	Align (Expression *size, Location left) :
 		Directive {left}, size {size} {
 		section_index = Sections::current_section->number;

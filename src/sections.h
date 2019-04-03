@@ -77,9 +77,9 @@ public:
 
 	//	Tabela das secções existentes
 	static std::vector<Section*> table;
-	
+
 	static void deallocate();
-	
+
 	static Section *current_section;
 
 	static void set_section(std::string name);

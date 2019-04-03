@@ -25,23 +25,23 @@ class Listing_generator: public Visitor {
 
 	//	Statement
 
-    void visit(Statement_empty *s) {
-    	cout << s->location.line << "\t" << s->to_string() << endl;
-    }
-    
-    //------------------------------------------------------------------------------------------
-    //	Instruction
+	void visit(Statement_empty *s) {
+		cout << s->location.line << "\t" << s->to_string() << endl;
+	}
 
-    void visit(Load_relative *s) {
-    	cout << s->location.line << '\t' << s->Statement::to_string() << 
+	//------------------------------------------------------------------------------------------
+	//	Instruction
+
+	void visit(Load_relative *s) {
+		cout << s->location.line << '\t' << s->Statement::to_string() << 
 			std::string((s->ldst & 2) ? "str" : "ldr") << ((s->ldst & 1) ? 'b' : ' ') <<
 				"\t" << register_name(s->rd->n) << ", ";
 		s->constant->accept(this);
 		cout << endl;
-    }
+	}
 
-    void visit(Load_store_indirect *s) {
-    	cout << s->location.line << '\t' << s->Statement::to_string()
+	void visit(Load_store_indirect *s) {
+	cout << s->location.line << '\t' << s->Statement::to_string()
 			 << std::string((s->ldst & 2) ? "str" : "ldr") << ((s->ldst & 1) ? 'b' : ' ')
 			 <<	"\t" << register_name(s->rd->n) << ", [" << register_name(s->rn->n) << ", ";
 		if (s->constant == nullptr)
