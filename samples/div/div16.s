@@ -4,14 +4,12 @@
 	.section .startup, "ax"
 
 	b	_start
-	
-_start:
-	ldr	sp, addressof_stack_top
-	bl	main
 	b	.
 
-addressof_stack_top:
-	.word	stack_top
+_start:
+	mov	sp, stack_top
+	bl	main
+	b	.
 
 	.section .stack
 stack:
@@ -51,7 +49,7 @@ addressof_y:
 	.word	y
 addressof_z:
 	.word	z
-	
+
 /*-----------------------------------------------------------------------------
 
 (r0) uint16 int div(uint16 dividend (r0), uint16 divisor (r1)) {
@@ -71,9 +69,9 @@ addressof_z:
 */
 
 div:
-	push	{lr}
-	push	{r3}
-	push	{r4}
+	push	lr
+	push	r3
+	push	r4
 	mov	r4, 0
 	mov	r2, 16
 div_1:
@@ -89,7 +87,7 @@ div_2:
 	bne	div_1
 	mov	r1, r3
 	mov	r0, r4
-	pop	{r4}
-	pop	{r3}
-	pop	{lr}
+	pop	r4
+	pop	r3
+	pop	lr
 	mov	pc, lr

@@ -1,5 +1,5 @@
 	.section .startup
-	
+
 	b	_start
 
 _start:
@@ -9,7 +9,7 @@ _start:
 	add	lr, r1, 4
 	mov	pc, r0
 	b	.
-	
+
 addr_stack_top:
 	.word	stack_top
 	

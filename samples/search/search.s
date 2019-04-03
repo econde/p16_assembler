@@ -1,8 +1,8 @@
 	.syntax unified 
 	.thumb
-	
+
 	.section .startup, "ax"
-	
+
 	b	_start
 
 _start:
@@ -58,7 +58,7 @@ q:
 */
 	.text
 main:
-	push	{ lr }
+	push	lr
 	ldr	r0, addressof_table1
 	mov	r1, TABLE1_SIZE
 	mov	r2, 20
@@ -73,7 +73,7 @@ main:
 	ldr	r1, addressof_q
 	str	r0, [r1]
 	mov	r0, 0
-	pop	{ pc }
+	pop	pc
 
 addressof_table1:
 	.word	table1
@@ -96,8 +96,8 @@ addressof_q:
 */
 	.text
 search:
-	push	{r3}
-	push	{r4}
+	push	r3
+	push	r4
 	mov	r3, 0		/* r3 - i	*/
 for:
 	cmp	r3, r1		/* i - array_size	*/
@@ -117,6 +117,6 @@ if_end:
 	mov	r0, 0		/* return -1	*/
 	sub	r0, r0, 1
 search_end:
-	pop	{r4}
-	pop	{r3}
+	pop	r4
+	pop	r3
 	mov	pc, lr
