@@ -39,8 +39,9 @@ namespace ast {
                 return 0;
         } else
             symbol = new Symbol(name);
-        symbol->value_expression = value;
+        symbol->section = section;
         symbol->type = value->get_type();
+        symbol->value_expression = value;
         symbol->value = value->get_value();
         table[name] = symbol;
         return 1;
