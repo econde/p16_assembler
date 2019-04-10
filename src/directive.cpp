@@ -21,7 +21,7 @@ using namespace std;
 using namespace ast;
 
 string Directive::listing() {
-	string tmp = string_printf("%4d %04x ", location.line, 
+	string tmp = string_printf("%4d %04X ", location.line, 
 		Sections::get_address(section_index) + section_offset);
 	unsigned i;
 	for (i = 0; i < min(4U, size_in_memory); ++i)
