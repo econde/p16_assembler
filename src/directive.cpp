@@ -21,33 +21,65 @@ using namespace std;
 using namespace ast;
 
 string Directive::listing() {
-	string tmp = string_printf("%4d %04X ", location.line, 
-		Sections::get_address(section_index) + section_offset);
-	unsigned i;
-	for (i = 0; i < min(4U, size_in_memory); ++i)
-		tmp += string_printf("%02X", Sections::read8(section_index, section_offset + i));
-	for (; i < 4; ++i)
-		tmp += "  ";
-	return tmp + "\t";
+	return string_printf("%4d %04X %02X%2c\t", location.line, 
+		Sections::get_address(section_index) + section_offset,
+		Sections::read8(section_index, section_offset), ' ');
 }
 
-string Directive::more_listing(unsigned size) {
-	string tmp;
-	if (size_in_memory > 4) {
-		int i = 4;
-		int count_bytes = size;
-		for ( ; i < count_bytes - 4; i += 4)
-			tmp += string_printf("%4d %04X %02X%02X%02X%02X\n", location.line,
-								 Sections::get_address(section_index) + section_offset + i,
-								 Sections::read8(section_index, section_offset + i + 0),
-								 Sections::read8(section_index, section_offset + i + 1),
-								 Sections::read8(section_index, section_offset + i + 2),
-								 Sections::read8(section_index, section_offset + i + 3));
-		tmp += string_printf("%4d %04X ", location.line,
-							 Sections::get_address(section_index) + section_offset + i);
-		for (; i < count_bytes; ++i)
-			tmp += string_printf("%02X", Sections::read8(section_index, section_offset + i));
-		return tmp + "\n";
+string Directive::more_listing() {
+	string tmp = string();
+	for (unsigned i = 1; i < size_in_memory; ++i) {
+		tmp += string_printf("%4d %04X %02X\n", location.line, 
+		Sections::get_address(section_index) + section_offset + i,
+		Sections::read8(section_index, section_offset + i));
 	}
 	return tmp;
 }
+
+string Byte::listing() {
+	if (grain_size == 2)
+		return string_printf("%4d %04X %02X%02X\t", location.line, 
+			Sections::get_address(section_index) + section_offset,
+			Sections::read8(section_index, section_offset + 1),
+			Sections::read8(section_index, section_offset));
+	else
+		return string_printf("%4d %04X %02X%2c\t", location.line, 
+			Sections::get_address(section_index) + section_offset,
+			Sections::read8(section_index, section_offset), ' ');
+}
+
+string Byte::more_listing() {
+	string tmp = string();
+	if (grain_size == 2)
+		for (unsigned i = 2; i < size_in_memory; i += 2)
+			tmp += string_printf("%4d %04X %02X%02X", location.line, 
+			Sections::get_address(section_index) + section_offset,
+			Sections::read8(section_index, section_offset + i + 1),
+			Sections::read8(section_index, section_offset + i));
+	else
+		for (unsigned i = 1; i < size_in_memory; ++i) {
+			tmp += string_printf("%4d %04X %02X\n", location.line, 
+			Sections::get_address(section_index) + section_offset + i,
+			Sections::read8(section_index, section_offset + i));
+		}
+	return tmp;
+}
+
+string Space::more_listing() {
+	string tmp = string();
+	if (size_in_memory <= 3)
+		for (unsigned i = 1; i < size_in_memory; ++i) {
+			tmp += string_printf("%4d %04X %02X\n", location.line, 
+				Sections::get_address(section_index) + section_offset + i,
+				Sections::read8(section_index, section_offset + i));
+		}
+	else {
+		tmp += string_printf("%4d .... ..\n", location.line); 
+		tmp += string_printf("%4d %04X %02X\n", location.line, 
+			Sections::get_address(section_index) + section_offset + size_in_memory - 1,
+			Sections::read8(section_index, section_offset + size_in_memory - 1));
+	}
+	return tmp;
+}
+
+

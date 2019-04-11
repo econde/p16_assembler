@@ -46,10 +46,10 @@ struct Instruction: public Statement {
 	}
 	
 	string listing() {
-		return string_printf("%4d %04X %02X%02X    \t", location.line,
+		return string_printf("%4d %04X %02X%02X\t", location.line,
 							 Sections::get_address(section_index) + section_offset,
-							 Sections::read8(section_index, section_offset),
-							 Sections::read8(section_index, section_offset + 1)
+							 Sections::read8(section_index, section_offset + 1),
+							 Sections::read8(section_index, section_offset)
 		);
 	}
 };

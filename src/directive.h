@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,8 +31,8 @@ struct Directive: public Statement {
 	Directive(Location l) : Statement {l} { }
 	virtual void accept(Visitor *v) = 0;
 
-    virtual string listing();
-    virtual string more_listing(unsigned);
+	virtual string listing();
+	virtual string more_listing();
 };
 
 //-----------------------------------------------------------------------------	
@@ -49,7 +49,7 @@ struct DSection: public Directive {
 	}
 
 	string listing() {
-		return string_printf("%4d%14c\t", location.line, ' ');
+		return string_printf("%4d%10c\t", location.line, ' ');
 	}
 
 	void accept(Visitor *v) { v->visit(this); }
@@ -75,10 +75,11 @@ struct Byte: public Directive {
 		delete value_list;
 	}
 
-	string more_listing() { return Directive::more_listing(size_in_memory); }
+	string listing();
+
+	string more_listing();
 
 	void accept(Visitor *v) { v->visit(this); }
-
 };
 
 //-----------------------------------------------------------------------------	
@@ -93,15 +94,14 @@ struct Ascii: public Directive {
 		for (auto s: *string_list) {
 			Sections::append_block(Sections::current_section->number, (const uint8_t *)s.data(), s.size());
 		}
-		if (asciz)
-            Sections::append8(Sections::current_section->number, 0);
+		if (asciz) {
+			Sections::append8(Sections::current_section->number, 0);
+		}
 		size_in_memory = Sections::current_section->content_size - section_offset;
 	}
 	~Ascii() { delete string_list; }
 
-    string more_listing() { return Directive::more_listing(size_in_memory); }
-
-    void accept(Visitor *v) { v->visit(this); }
+	void accept(Visitor *v) { v->visit(this); }
 };
 
 //-----------------------------------------------------------------------------	
@@ -118,9 +118,9 @@ struct Space: public Directive {
 	}
 	~Space() { delete size; delete initial; }
 
-    string more_listing() { return Directive::more_listing(min(size_in_memory, 16U)); }
+	string more_listing();
 
-    void accept(Visitor *v) { v->visit(this); }
+	void accept(Visitor *v) { v->visit(this); }
 };
 
 //-----------------------------------------------------------------------------	
@@ -138,11 +138,11 @@ struct Equ: public Directive {
 		if (Symbols::add(name, Sections::current_section->number, value) == 0) {
 			error_report(&location, "Symbol \"" + name + "\" is already defined");
 		}
-    }
+	}
 	~Equ() { delete value; }
 
 	string listing() {
-		return string_printf("%4d%14c\t", location.line, ' ');
+		return string_printf("%4d%10c\t", location.line, ' ');
 	}
 
 	void accept(Visitor *v) { v->visit(this); }

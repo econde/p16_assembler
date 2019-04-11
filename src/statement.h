@@ -84,7 +84,7 @@ public:
 	 }
 
 	 string listing() {
-		 return string_printf("%4d%14c\t", location.line, ' ');
+		 return string_printf("%4d%10c\t", location.line, ' ');
 	 }
 	 
 	 void accept(Visitor *v) {
