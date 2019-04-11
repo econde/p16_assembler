@@ -1,0 +1,18 @@
+V1.2 (build: Apr 11 2019)
+
+Erros corrigidos ou melhoramentos
+
+- Validação da magnitude de constantes negativas
+- Escrever valores hexadecimais em maiúsculas
+- Correção no processamento de símbolos .equ
+- Correção de erros relativos à não definição de secção
+- Aceitar .asciiz ou .asciz
+- Correção no operador lógico !
+- Aceitar or ou orr
+
+--------------------------------------------------------------------------------
+V1.1 (build: Mar 22 2019)
+
+Primeira versão publicada
+
+Ezequiel Conde (ezeq@cc.isel.ipl.pt)
