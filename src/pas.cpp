@@ -51,7 +51,7 @@ static void help() {
 }
 
 static void version() {
-	cout << "P16 assembler v" VERSION_MAJOR "." VERSION_MINOR " (build: " __DATE__ ")" << endl;
+	cout << "P16 assembler v" VERSION " (" __DATE__ ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
 }
 
