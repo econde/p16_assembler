@@ -38,16 +38,17 @@ extern const char *yytext;
 void listing(const char *lst_filename, std::list<Statement*> *ast_root);
 void listing_load_inputfile(const char *src_filename);
 
-static void help() {
-	cout << "Usage: das <options> \"source filename\"" << endl;
-	cout << "options:" << endl;
-	cout << "\t--verbose" << endl;
-	cout << "\t-h, --help" << endl;
-	cout << "\t-v, --version" << endl;
-	cout << "\t-i, --input \"source filename\"" << endl;
-	cout << "\t-o, --output filename" << endl;
-	cout << "\t-s, --section sectionname=address" << endl;
-	cout << "\t-f, --format \"hexintel\"|\"binary\"|\"logisim\"" << endl;
+static void help(char *prog_name) {
+	ostream_printf(cout, "Usage: %s [options] [<source filename>]\n"
+		"options:\n"
+		"\t--verbose\n"
+		"\t-h, --help\n"
+		"\t-v, --version\n"
+		"\t-i, --input <source filename>\n"
+		"\t-o, --output <filename>\n"
+		"\t-s, --section <section name>=<address>\n"
+		"\t-f, --format hexintel | binary\n",
+		prog_name);
 }
 
 static void version() {
@@ -79,7 +80,7 @@ int main(int argc, char **argv) {
 		case 0:	//	Opções longas com afetação de flag
 			break; 
 		case 'h':
-			help();
+			help(argv[0]);
 			return 0;
 		case 'v':
 			version();
