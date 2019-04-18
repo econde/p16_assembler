@@ -101,6 +101,10 @@ struct Ascii: public Directive {
 	}
 	~Ascii() { delete string_list; }
 
+	string listing();
+
+	string more_listing();
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -162,6 +166,8 @@ struct Align: public Directive {
 		Sections::increase(section_index, size_in_memory);
 	}
 	~Align() { delete size; }
+
+	string listing();
 
 	void accept(Visitor *v) { v->visit(this); }
 };
