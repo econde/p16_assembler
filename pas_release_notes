@@ -1,0 +1,16 @@
+- Correção de erro nas relocations em directiva .word
+- Melhoramento no controlo de versão 
+- Correção de erro na directiva .align
+- Melhoramentos na opção -h
+
+V1.2 (build: Apr 11 2019)
+
+Erros corrigidos ou melhoramentos
+
+- Validação da magnitude de constantes negativas
+- Escrever valores hexadecimais em maiúsculas
+- Correção no processamento de símbolos .equ
+- Correção de erros relativos à não definição de secção
+- Aceitar .asciiz ou .asciz
+- Correção no operador lógico !
+- Aceitar or ou orr
