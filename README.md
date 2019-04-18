@@ -1,1 +1,1 @@
-# PDS16v2 didactic assembler
+# P16 didactic assembler
