@@ -1,3 +1,4 @@
+- Correção de erro nas relocations em directiva .word
 - Melhoramentos na opção -h 
 - Correção de erro na directiva .align
 - Melhorar a legibilidade do conteúdo da memória em .lst
