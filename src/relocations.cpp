@@ -32,8 +32,8 @@ void Relocations::print(ostream & os) {
 	ostream_printf(os, "File       Line Section Offset Pos Mask Type    Addend Symbol\n");
 	for (auto reloc: list) {
 		ostream_printf(os, "%-10s %4d %3d %7d %4d  %04x %s %6d %-10s\n",
-					reloc->statement->location.unit, reloc->statement->location.line,
-					reloc->statement->section_index, reloc->statement->section_offset,
+					reloc->location->unit, reloc->location->line,
+					reloc->section_index, reloc->section_offset,
 					reloc->position, MAKE_MASK(reloc->width, 0),
 					reloc->type == Relocation::Type::ABSOLUTE ? "ABSOLUTE" : "RELATIVE",
 					reloc->addend, reloc->symbol.c_str());
@@ -48,8 +48,8 @@ void Relocations::relocate() {
 				continue;
 			}
 		}
-		auto section = reloc->statement->section_index;
-		auto offset = reloc->statement->section_offset;
+		auto section = reloc->section_index;
+		auto offset = reloc->section_offset;
 		auto content = Sections::read16(section, offset);
 		auto mask = MAKE_MASK(reloc->width, 0U);
 		//  Saltos para endereços absolutos geram relocations relativas sem simbolo associado

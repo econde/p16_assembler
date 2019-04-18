@@ -107,9 +107,9 @@ void Code_generator::visit(Load_relative *s) {
 		else {   // LABEL ou UNDEFINED
 			string symbol = s->constant->get_symbol();
 			auto addend = s->constant->get_value();
-			auto *reloc = new Relocation{s, &s->constant->location,
-										 LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
-                                         Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
+			auto *reloc = new Relocation{&s->location, &s->constant->location, s->section_index, s->section_offset,
+										LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
+										Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
 			Relocations::add(reloc);
 		}
 		if ((constant & ~MAKE_MASK(LDR_RELATIVE_CONSTANT_SIZE, 0)) != 0) {
@@ -220,8 +220,9 @@ void Code_generator::visit(Branch *s) {
 		}
 		if ((addend & 1) != 0)
 			warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-		auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-							   Relocation::Type::RELATIVE, symbol, addend};
+		auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
+									BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
+									Relocation::Type::RELATIVE, symbol, addend};
 		Relocations::add(reloc);
 	}
 	else if (exp_type == Value_type::LABEL) {   //  Label resolvida, distância definida se pertencer à mesma secção
@@ -241,8 +242,9 @@ void Code_generator::visit(Branch *s) {
 			auto addend = s->expression->get_value() - 2;
 			if ((addend & 1) != 0)
 				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-			auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-                                         Relocation::Type::RELATIVE, symbol, addend};
+			auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
+										BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
+										Relocation::Type::RELATIVE, symbol, addend};
 			Relocations::add(reloc);
 		}
 	}
@@ -379,8 +381,9 @@ void Code_generator::visit(Move *s) {
 		else if (const_type == Value_type::LABEL) {
 			auto symbol = s->constant->get_symbol();
 			auto value = s->constant->get_value();
-			auto *reloc = new Relocation {s, &s->constant->location, MOV_CONST_POSITION, MOV_CONST_SIZE,
-                                          Relocation::Type::ABSOLUTE, symbol, value};
+			auto *reloc = new Relocation {&s->location, &s->constant->location, s->section_index, s->section_offset,
+											MOV_CONST_POSITION, MOV_CONST_SIZE,
+											Relocation::Type::ABSOLUTE, symbol, value};
 			Relocations::add(reloc);
 		}
 		else if (const_type == UNDEFINED) {
@@ -442,9 +445,9 @@ void Code_generator::visit(Space *s) {
 }
 
 void Code_generator::visit(Align *s) {
-	auto align = s->size->get_value();
-	Sections::fill(s->section_index, s->section_offset, 0,
-                   ((s->section_offset + ((1 << align) - 1)) / align) * align);
+	if (s->size->get_value() > 1)
+		warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
+	Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
 }
 
 void Code_generator::visit(Byte *s) {
@@ -463,8 +466,9 @@ void Code_generator::visit(Byte *s) {
 			} else {
 				auto symbol = e->get_symbol();
 				auto addend = e->get_value();
-				auto *reloc = new Relocation{s, &e->location, 0, s->grain_size * 8,
-							Relocation::Type::ABSOLUTE, symbol, addend};
+				auto *reloc = new Relocation{&s->location, &e->location, s->section_index, s->section_offset + i,
+											0, s->grain_size * 8,
+											Relocation::Type::ABSOLUTE, symbol, addend};
 				Relocations::add(reloc);
 			}
 
@@ -474,13 +478,13 @@ void Code_generator::visit(Byte *s) {
 					value, value, s->grain_size * 8, value & mask, value & mask));
 			switch (s->grain_size) {
 				case 1:
-					Sections::write8(s->section_index, s->section_offset + i++, static_cast<uint8_t>(value));
+					Sections::write8(s->section_index, s->section_offset + i, static_cast<uint8_t>(value));
 					break;
 				case 2:
-					Sections::write16(s->section_index, s->section_offset + i++ * 2, static_cast<uint16_t>(value));
+					Sections::write16(s->section_index, s->section_offset + i, static_cast<uint16_t>(value));
 					break;
 				case 4:
-					Sections::write32(s->section_index, s->section_offset + i++ * 4, static_cast<uint32_t>(value));
+					Sections::write32(s->section_index, s->section_offset + i, static_cast<uint32_t>(value));
 			}
 		}
 		else if (exp_type == UNDEFINED) {
@@ -489,5 +493,6 @@ void Code_generator::visit(Byte *s) {
 		else {
 			error_report(&e->location, "Invalid expression");
 		}
+		i += s->grain_size;
 	}
 }
