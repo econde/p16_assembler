@@ -22,13 +22,16 @@ limitations under the License.
 namespace ast {
 
 struct Relocation {
+	Location *location;		// local que vai receber o valor
+	Location *exp_location;		// local do simbolo vai fornecer o valor
+	unsigned section_index;		// número da secção
+	unsigned section_offset;	// offset na secção
+	unsigned position;		// offset em bits na palavra
+	unsigned width;			// dimensão em bit
 	enum Type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };
-	Statement *statement;
-	Location *exp_location;
-	unsigned position, width;
 	Type type;
-	string symbol;
-	unsigned addend;
+	string symbol;			// simbolo que vai fornecer o valor
+	unsigned addend;		// valor a adicionar
 };
 
 class Relocations {

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-	http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,75 +24,75 @@ using namespace ast;
 using namespace std;
 
 enum {
-	RD_POSITION = 0,
-	RN_POSITION = 4,
-	RM_POSITION = 7,
-	RS_POSITION = 7,
-	LDR_RELATIVE_OPCODE = 0x0c00,
-	LDR_RELATIVE_CONSTANT_SIZE = 6,
-	LDR_REALTIVE_CONSTANT_POSITION = 4,
+    RD_POSITION = 0,
+    RN_POSITION = 4,
+    RM_POSITION = 7,
+    RS_POSITION = 7,
+    LDR_RELATIVE_OPCODE = 0x0c00,
+    LDR_RELATIVE_CONSTANT_SIZE = 6,
+    LDR_REALTIVE_CONSTANT_POSITION = 4,
 
-	POP_OPCODE = 0x0400,
-	PUSH_OPCODE = 0x2400,
-	PUSH_RS_POSITION = 0,
+    POP_OPCODE = 0x0400,
+    PUSH_OPCODE = 0x2400,
+    PUSH_RS_POSITION = 0,
 
-	LDR_INDIRECT_OPCODE = 0x0000,
-	STR_INDIRECT_OPCODE = 0x2000,
-	LDR_STR_INDIRECT_BYTE_INDICATION_POSITION = 11,
-	LDR_STR_INDIRECT_REG_INDICATION_POSITION = 12,
-	LDR_STR_INDIRECT_CONST_INDEX_SIZE = 3,
-	LDR_STR_INDIRECT_CONST_INDEX_POSITION = 7,
+    LDR_INDIRECT_OPCODE = 0x0000,
+    STR_INDIRECT_OPCODE = 0x2000,
+    LDR_STR_INDIRECT_BYTE_INDICATION_POSITION = 11,
+    LDR_STR_INDIRECT_REG_INDICATION_POSITION = 12,
+    LDR_STR_INDIRECT_CONST_INDEX_SIZE = 3,
+    LDR_STR_INDIRECT_CONST_INDEX_POSITION = 7,
 
-	BEQ_OPCODE = 0x4000,
-	BNE_OPCODE = 0x4400,
-	BCS_OPCODE = 0x4800,
-	BCC_OPCODE = 0x4c00,
-	BGE_OPCODE = 0x5000,
-	BLT_OPCODE = 0x5400,
-	B_OPCODE = 0x5800,
-	BL_OPCODE = 0x5c00,
-	BRANCH_OFFSET_SIZE = 10,
-	BRANCH_OFFSET_POSITION = 0,
+    BEQ_OPCODE = 0x4000,
+    BNE_OPCODE = 0x4400,
+    BCS_OPCODE = 0x4800,
+    BCC_OPCODE = 0x4c00,
+    BGE_OPCODE = 0x5000,
+    BLT_OPCODE = 0x5400,
+    B_OPCODE = 0x5800,
+    BL_OPCODE = 0x5c00,
+    BRANCH_OFFSET_SIZE = 10,
+    BRANCH_OFFSET_POSITION = 0,
 
-	SHIFT_CONST_SIZE = 4,
-	SHIFT_CONST_POSITION = 7,
+    SHIFT_CONST_SIZE = 4,
+    SHIFT_CONST_POSITION = 7,
 
-	LSL_OPCODE = 0xe000,
-	LSR_OPCODE = 0xe800,
-	ASR_OPCODE = 0xf000,
-	ROR_OPCODE = 0xf800,
-	RRX_OPCODE = 0xd800,
+    LSL_OPCODE = 0xe000,
+    LSR_OPCODE = 0xe800,
+    ASR_OPCODE = 0xf000,
+    ROR_OPCODE = 0xf800,
+    RRX_OPCODE = 0xd800,
 
-	ARITH_CONST_SIZE = 4,
-	ARITH_CONST_POSITION = 7,
+    ARITH_CONST_SIZE = 4,
+    ARITH_CONST_POSITION = 7,
 
-	ADD_REG_OPCODE = 0x8000,
-	SUB_REG_OPCODE = 0x8800,
-	ADC_REG_OPCODE = 0x9000,
-	SBC_REG_OPCODE = 0x9800,
-	ADD_CONST_OPCODE = 0xa000,
-	SUB_CONST_OPCODE = 0xa800,
+    ADD_REG_OPCODE = 0x8000,
+    SUB_REG_OPCODE = 0x8800,
+    ADC_REG_OPCODE = 0x9000,
+    SBC_REG_OPCODE = 0x9800,
+    ADD_CONST_OPCODE = 0xa000,
+    SUB_CONST_OPCODE = 0xa800,
 
-	AND_OPCODE = 0xc000,
-	OR_OPCODE = 0xc800,
-	XOR_OPCODE = 0xd000,
+    AND_OPCODE = 0xc000,
+    OR_OPCODE = 0xc800,
+    XOR_OPCODE = 0xd000,
 
-	NOT_OPCODE = 0xb010,
+    NOT_OPCODE = 0xb010,
 
-	MOV_REG_OPCODE = 0xb000,
-	MOV_RS_POSITION = 7,
-	MOV_CONST_OPCODE = 0x6000,
-	MOVT_CONST_OPCODE = 0x7000,
-	MOV_CONST_SIZE = 8,
-	MOV_CONST_POSITION = 4,
+    MOV_REG_OPCODE = 0xb000,
+    MOV_RS_POSITION = 7,
+    MOV_CONST_OPCODE = 0x6000,
+    MOVT_CONST_OPCODE = 0x7000,
+    MOV_CONST_SIZE = 8,
+    MOV_CONST_POSITION = 4,
 
-	MOVS_OPCODE = 0xb020,
+    MOVS_OPCODE = 0xb020,
 
-	MSR_OPCODE = 0xb040,
-	MRS_OPCODE = 0xb060,
-	SPSR_INDICATION_POSITION = 4,
+    MSR_OPCODE = 0xb040,
+    MRS_OPCODE = 0xb060,
+    SPSR_INDICATION_POSITION = 4,
 
-	CMP_OPCODE = 0xb800
+    CMP_OPCODE = 0xb800
 };
 
 //	Instruction
@@ -103,20 +103,20 @@ void Code_generator::visit(Load_relative *s) {
 	if (direct_type == ABSOLUTE || direct_type == Value_type::LABEL || direct_type == UNDEFINED) {
 		auto constant = 0U;
 		if (direct_type == ABSOLUTE)
-			constant = s->constant->get_value();
+            constant = s->constant->get_value();
 		else {   // LABEL ou UNDEFINED
 			string symbol = s->constant->get_symbol();
 			auto addend = s->constant->get_value();
-			auto *reloc = new Relocation{s, &s->constant->location,
-										 LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
-										 Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
+			auto *reloc = new Relocation{&s->location, &s->constant->location, s->section_index, s->section_offset,
+										LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
+										Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
 			Relocations::add(reloc);
 		}
 		if ((constant & ~MAKE_MASK(LDR_RELATIVE_CONSTANT_SIZE, 0)) != 0) {
 			error_report(&s->constant->location,
-						 "Address defined by \"" + s->constant->to_string()
-						 + string_printf("\" PC + %d (0x%x) is out of range for PC-relative addressing",
-										 constant, constant));
+                         "Address defined by \"" + s->constant->to_string()
+                         + string_printf("\" PC + %d (0x%x) is out of range for PC-relative addressing",
+                                         constant, constant));
 		}
 		if ((constant & 1) != 0)
 			warning_report(&s->constant->location,
@@ -141,30 +141,30 @@ void Code_generator::visit(Load_store_indirect *s) {
 		if (constant_type == ABSOLUTE) {
 			auto constant = s->constant->get_value();
 			if (byte) {
-				if ((constant & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-					warning_report(&s->constant->location,
-								   string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
-												 " truncate to %d (0x%x)",
-												 constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-												 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-												 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
-				}
-				code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
-			}
-			else {
+                if ((constant & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+                    warning_report(&s->constant->location,
+                                   string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
+                                                 " truncate to %d (0x%x)",
+                                                 constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+                                                 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+                                                 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+                }
+                code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+            }
+            else {
 				if ((constant & 1) != 0)
 					warning_report(&s->constant->location, string_printf(
 							"Expression's value = %d (0x%x) must be an even value", constant, constant));
-				constant /= 2;
+                constant /= 2;
 				if ((constant & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-					warning_report(&s->constant->location,
-								   string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
-												  "truncate to %d (0x%x)",
-												  constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-												  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-												  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
-				}
-				code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+                    warning_report(&s->constant->location,
+                                   string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
+                                                  "truncate to %d (0x%x)",
+                                                  constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+                                                  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+                                                  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+                }
+                code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
 			}
 		}
 		else if (constant_type == UNDEFINED) {
@@ -187,11 +187,11 @@ void Code_generator::visit(Branch *s) {
 			code = BNE_OPCODE;
 			break;
 		case CS:
-		case LO:
+        case LO:
 			code = BCS_OPCODE;
 			break;
 		case CC:
-		case HS:
+        case HS:
 			code = BCC_OPCODE;
 			break;
 		case GE:
@@ -220,8 +220,9 @@ void Code_generator::visit(Branch *s) {
 		}
 		if ((addend & 1) != 0)
 			warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-		auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-							   Relocation::Type::RELATIVE, symbol, addend};
+		auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
+									BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
+									Relocation::Type::RELATIVE, symbol, addend};
 		Relocations::add(reloc);
 	}
 	else if (exp_type == Value_type::LABEL) {   //  Label resolvida, distância definida se pertencer à mesma secção
@@ -234,15 +235,16 @@ void Code_generator::visit(Branch *s) {
 			offset >>= 1;
 			if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
 				error_report(&s->expression->location,
-							 string_printf( "Interval between PC and target address - %+d (0x%x) words - "
-											"isn't codable in %d bit two's complement",
-											offset, offset, BRANCH_OFFSET_SIZE));
+                             string_printf( "Interval between PC and target address - %+d (0x%x) words - "
+                                            "isn't codable in %d bit two's complement",
+                                            offset, offset, BRANCH_OFFSET_SIZE));
 		} else {    // A Label pertence a outra secção será resolvida na fase de relocalização
 			auto addend = s->expression->get_value() - 2;
 			if ((addend & 1) != 0)
 				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-			auto *reloc = new Relocation{s, &s->expression->location, BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-										 Relocation::Type::RELATIVE, symbol, addend};
+			auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
+										BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
+										Relocation::Type::RELATIVE, symbol, addend};
 			Relocations::add(reloc);
 		}
 	}
@@ -259,19 +261,19 @@ void Code_generator::visit(Shift *s) {
 		auto constant = s->constant->get_value();
 		if ((constant & ~MAKE_MASK(SHIFT_CONST_SIZE, 0)) != 0) {
 			warning_report(&s->constant->location,
-							string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-										 constant, constant, SHIFT_CONST_SIZE,
-										 constant & MAKE_MASK(SHIFT_CONST_SIZE, 0),
-										 constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)));
+                           string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+                                         constant, constant, SHIFT_CONST_SIZE,
+                                         constant & MAKE_MASK(SHIFT_CONST_SIZE, 0),
+                                         constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)));
 		}
 		Sections::write16(s->section_index, s->section_offset,
-						  static_cast<uint16_t>(((s->operation == LSL
-												  ? LSL_OPCODE : s->operation == LSR
-																 ? LSR_OPCODE : s->operation == ASR
-																				? ASR_OPCODE : s->operation == ROR
-																							   ? ROR_OPCODE : 0))
-												+ ((constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)) << SHIFT_CONST_POSITION)
-												+ (s->rn->n << RN_POSITION) + (s->rd->n << RD_POSITION)));
+                          static_cast<uint16_t>(((s->operation == LSL
+                                                  ? LSL_OPCODE : s->operation == LSR
+                                                                 ? LSR_OPCODE : s->operation == ASR
+                                                                                ? ASR_OPCODE : s->operation == ROR
+                                                                                               ? ROR_OPCODE : 0))
+                                                + ((constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)) << SHIFT_CONST_POSITION)
+                                                + (s->rn->n << RN_POSITION) + (s->rd->n << RD_POSITION)));
 	}
 	else if (position_type == UNDEFINED)
 		error_report(&s->constant->location, string_printf("Undefined expression"));
@@ -292,42 +294,42 @@ void Code_generator::visit(Arith *s) {
 
 	auto code = (s->rn->n << RN_POSITION) | (s->rd->n << RD_POSITION);
 	if (s->expression == nullptr) {
-		switch (s->operation) {
-			case ADD:
-				code |= ADD_REG_OPCODE;
-				break;
-			case SUB:
-				code |= SUB_REG_OPCODE;
-				break;
-			case ADC:
-				code |= ADC_REG_OPCODE;
-				break;
-			case SBC:
-				code |= SBC_REG_OPCODE;
-				break;
-		}
+        switch (s->operation) {
+            case ADD:
+                code |= ADD_REG_OPCODE;
+                break;
+            case SUB:
+                code |= SUB_REG_OPCODE;
+                break;
+            case ADC:
+                code |= ADC_REG_OPCODE;
+                break;
+            case SBC:
+                code |= SBC_REG_OPCODE;
+                break;
+        }
 		code |= s->rm->n << RM_POSITION;
 	} else {
-		switch (s->operation) {
-			case ADD:
-				code |= ADD_CONST_OPCODE;
-				break;
-			case SUB:
-				code |= SUB_CONST_OPCODE;
-				break;
-			case ADC:
-			case SBC:
-				error_report(&s->expression->location, "Invalid operand");
-		}
+	    switch (s->operation) {
+            case ADD:
+                code |= ADD_CONST_OPCODE;
+                break;
+            case SUB:
+                code |= SUB_CONST_OPCODE;
+                break;
+            case ADC:
+            case SBC:
+                error_report(&s->expression->location, "Invalid operand");
+	    }
 		auto expression_type = s->expression->get_type();
 		if (expression_type == ABSOLUTE || expression_type == Value_type::LABEL) {
 			auto constant = s->expression->get_value();
 			if ((constant & ~MAKE_MASK(ARITH_CONST_SIZE, 0)) != 0) {
 				warning_report(&s->expression->location,
-							   string_printf( "Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-											  constant, constant, ARITH_CONST_SIZE,
-											  constant & MAKE_MASK(ARITH_CONST_SIZE, 0),
-											  constant & MAKE_MASK(ARITH_CONST_SIZE, 0)));
+                               string_printf( "Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+                                              constant, constant, ARITH_CONST_SIZE,
+                                              constant & MAKE_MASK(ARITH_CONST_SIZE, 0),
+                                              constant & MAKE_MASK(ARITH_CONST_SIZE, 0)));
 			}
 			code |= (constant & MAKE_MASK(ARITH_CONST_SIZE, 0)) << ARITH_CONST_POSITION;
 		}
@@ -346,12 +348,12 @@ void Code_generator::visit(Logic *s) {
 		error_report(&s->rn->location, "Invalid register");
 
 	Sections::write16(s->section_index, s->section_offset,
-					  static_cast<uint16_t>	((s->operation == AND
-												 ? AND_OPCODE : s->operation == OR
-																? OR_OPCODE : s->operation == EOR ? XOR_OPCODE : 0)
-												+ (s->rm->n << RM_POSITION)
-												+ (s->rn->n << RN_POSITION)
-												+ (s->rd->n << RD_POSITION)));
+                      static_cast<uint16_t>	((s->operation == AND
+                                                 ? AND_OPCODE : s->operation == OR
+                                                                ? OR_OPCODE : s->operation == EOR ? XOR_OPCODE : 0)
+                                                + (s->rm->n << RM_POSITION)
+                                                + (s->rn->n << RN_POSITION)
+                                                + (s->rd->n << RD_POSITION)));
 }
 
 void Code_generator::visit(Not *s) {
@@ -360,11 +362,11 @@ void Code_generator::visit(Not *s) {
 }
 
 void Code_generator::visit(Move *s) {
-	auto code = s->rd->n << RD_POSITION;
+    auto code = s->rd->n << RD_POSITION;
 	if (s->constant == nullptr) {
 		code |= MOV_REG_OPCODE | (s->rs->n << MOV_RS_POSITION);
 	} else {
-		code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
+        code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
 		auto const_type= s->constant->get_type();
 		if (const_type == ABSOLUTE ) {
 			auto constant = s->constant->get_value();
@@ -379,8 +381,9 @@ void Code_generator::visit(Move *s) {
 		else if (const_type == Value_type::LABEL) {
 			auto symbol = s->constant->get_symbol();
 			auto value = s->constant->get_value();
-			auto *reloc = new Relocation {s, &s->constant->location, MOV_CONST_POSITION, MOV_CONST_SIZE,
-										  Relocation::Type::ABSOLUTE, symbol, value};
+			auto *reloc = new Relocation {&s->location, &s->constant->location, s->section_index, s->section_offset,
+											MOV_CONST_POSITION, MOV_CONST_SIZE,
+											Relocation::Type::ABSOLUTE, symbol, value};
 			Relocations::add(reloc);
 		}
 		else if (const_type == UNDEFINED) {
@@ -414,8 +417,8 @@ void Code_generator::visit(Msr *s) {
 		error_report(&s->rd->location, "Invalid register");
 
 	Sections::write16(s->section_index, s->section_offset,
-					  static_cast<uint16_t>(MSR_OPCODE | ((s->rd->n == SPSR) << SPSR_INDICATION_POSITION)
-											| (s->rs->n << MOV_RS_POSITION)));
+                      static_cast<uint16_t>(MSR_OPCODE | ((s->rd->n == SPSR) << SPSR_INDICATION_POSITION)
+                                            | (s->rs->n << MOV_RS_POSITION)));
 }
 
 void Code_generator::visit(Mrs *s) {
@@ -424,7 +427,7 @@ void Code_generator::visit(Mrs *s) {
 
 	Sections::write16(s->section_index, s->section_offset,
 					  static_cast<uint16_t>(MRS_OPCODE | ((s->rs->n == SPSR) << SPSR_INDICATION_POSITION)
-											| (s->rd->n << RD_POSITION)));
+                                            | (s->rd->n << RD_POSITION)));
 }
 
 void Code_generator::visit(Push_pop *s) {
@@ -438,7 +441,7 @@ void Code_generator::visit(Push_pop *s) {
 
 void Code_generator::visit(Space *s) {
 	Sections::fill(s->section_index, s->section_offset,
-					static_cast<uint8_t>(s->initial->get_value()), s->size_in_memory);
+				   static_cast<uint8_t>(s->initial->get_value()), s->size->get_value());
 }
 
 void Code_generator::visit(Align *s) {
@@ -463,8 +466,9 @@ void Code_generator::visit(Byte *s) {
 			} else {
 				auto symbol = e->get_symbol();
 				auto addend = e->get_value();
-				auto *reloc = new Relocation{s, &e->location, 0, s->grain_size * 8,
-							Relocation::Type::ABSOLUTE, symbol, addend};
+				auto *reloc = new Relocation{&s->location, &e->location, s->section_index, s->section_offset + i,
+											0, s->grain_size * 8,
+											Relocation::Type::ABSOLUTE, symbol, addend};
 				Relocations::add(reloc);
 			}
 
@@ -474,13 +478,13 @@ void Code_generator::visit(Byte *s) {
 					value, value, s->grain_size * 8, value & mask, value & mask));
 			switch (s->grain_size) {
 				case 1:
-					Sections::write8(s->section_index, s->section_offset + i++, static_cast<uint8_t>(value));
+					Sections::write8(s->section_index, s->section_offset + i, static_cast<uint8_t>(value));
 					break;
 				case 2:
-					Sections::write16(s->section_index, s->section_offset + i++ * 2, static_cast<uint16_t>(value));
+					Sections::write16(s->section_index, s->section_offset + i, static_cast<uint16_t>(value));
 					break;
 				case 4:
-					Sections::write32(s->section_index, s->section_offset + i++ * 4, static_cast<uint32_t>(value));
+					Sections::write32(s->section_index, s->section_offset + i, static_cast<uint32_t>(value));
 			}
 		}
 		else if (exp_type == UNDEFINED) {
@@ -489,5 +493,6 @@ void Code_generator::visit(Byte *s) {
 		else {
 			error_report(&e->location, "Invalid expression");
 		}
+		i += s->grain_size;
 	}
 }
