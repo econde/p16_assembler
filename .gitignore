@@ -1,9 +1,9 @@
 .idea/
 build/
 cmake-build-*/
-das
-das.exe
-das_setup.exe
+pas
+pas.exe
+pas_setup.exe
 *~
 *.o
 *.lst
