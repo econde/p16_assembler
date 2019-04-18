@@ -71,7 +71,8 @@ people:
 	.word	antonio
 	.word	pinto
 	.byte	180
-	.byte	75, 0, 0
+	.byte	75, 0, 0, 77
+	.align
 	.word	50700
 people_0:
 	.word	antonio
@@ -109,7 +110,7 @@ main:
 	mov	r2, PERSON_SIZE
 	ldr	r3, addr_cmp_name
 	bl	find
-	mov	r1, 3 *2
+	mov	r1, 3 * 2
 	add	sp, r1, sp 
 	pop	pc
 
@@ -166,7 +167,6 @@ addr_luis_silva:
 */
 	.text
 find:
-	mov	r0, people
 	push	r7
 	mov	r7, sp		
 	push	lr

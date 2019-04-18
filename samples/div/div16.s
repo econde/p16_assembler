@@ -30,7 +30,7 @@ y:
 	.word	4
 z:
 	.word	0
-	
+
 	.text
 main:
 	ldr	r0, addressof_x
