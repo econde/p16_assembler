@@ -45,8 +45,8 @@ struct Statement {
 
 	//	Localização em memória
 	unsigned section_index;
-    unsigned section_offset;
-    unsigned size_in_memory;
+	unsigned section_offset;
+	unsigned size_in_memory;
 	
 	void add_label(string *l) {
 		label = l->substr(0, l->find(':'));

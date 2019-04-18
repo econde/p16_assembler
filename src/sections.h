@@ -71,8 +71,8 @@ class Sections {
 	static std::list<Section*> list;
 public:
 	static int align(unsigned address, unsigned alignment) {
-		return ((address + (1 << alignment) - 1)
-					/ (1 << alignment)) * (1 << alignment);
+		unsigned mask = ~0 << alignment;
+		return (address + ~mask) & mask;
 	}
 
 	//	Tabela das secções existentes
