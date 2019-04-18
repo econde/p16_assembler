@@ -25,3 +25,8 @@ das_setup.exe
 *.tab.hpp
 *.zip
 a.out
+.gitignore
+doc/
+bugs/
+test/
+
