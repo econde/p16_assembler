@@ -39,7 +39,7 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root);
 void listing_load_inputfile(const char *src_filename);
 
 static void help(char *prog_name) {
-	ostream_printf(cout, "Usage: %s [options] [<source filename>]\n"
+	ostream_printf(cout, "Usage: %s [options] <source filename>\n"
 		"options:\n"
 		"\t--verbose\n"
 		"\t-h, --help\n"
