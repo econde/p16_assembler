@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -134,10 +134,10 @@ list<Section*> Sections::list;
 Section *Sections::current_section = nullptr;
 
 void Sections::deallocate() {
-    for (auto s: table) {
-        free(s->content);
+	for (auto s: table) {
+		free(s->content);
 		delete s;
-    }
+	}
 }
 
 void Sections::set_section(std::string section_name) {
@@ -200,7 +200,7 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 		if ( ! address_is_free(section)) {
 			error_report("Section \"" + section->name
 						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
-					                     ", this overlap another section.\n",
+										 ", this overlap another section.\n",
 										 section->content_size, section->content_size,
 										 section->base_address, section->base_address));
 			exit(1);
@@ -243,7 +243,7 @@ void Sections::binary_hex_intel(const char *file_name) {
 void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigned byte_order) {
 	try {
 		std::ofstream file(file_name);
-        file << "v2.0 raw" << endl;
+		file << "v2.0 raw" << endl;
 		for (auto i = 0U; i < table.size(); ++i) {
 			Section *section = table.at(i);
 			auto size = section->content_size;

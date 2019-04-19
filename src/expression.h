@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,18 +54,18 @@ public:
 		Value {location}, name {name} {
 		if (name.compare(0, 5, "line#") == 0)	//	Simbolo .	 (ponto)
 			Symbols::add(name, Value_type::LABEL, Sections::current_section->number,
-                         new Value(Sections::current_section->content_size, location));
+						 new Value(Sections::current_section->content_size, location));
 		else if ( ! Symbols::do_exist(name))
 			Symbols::add(name, Value_type::UNDEFINED, 0, 0);
 	}
 
 	unsigned get_value() { return Symbols::get_value(name); }
-    Value_type get_type() { return Symbols::get_type(name); }
+	Value_type get_type() { return Symbols::get_type(name); }
 	string get_symbol() { return name; }
 	
 	void set_value(int v) { value = v; }
 
-    string to_string() { return name; }
+	string to_string() { return name; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -80,7 +80,7 @@ public:
 
 	unsigned get_value() { return expression->get_value(); }
 	string get_symbol() { return expression->get_symbol(); }
-    Value_type get_type() { return expression->get_type(); }
+	Value_type get_type() { return expression->get_type(); }
 
 	string to_string() { return "(" + expression->to_string() + ")"; }
 	void accept(Visitor *v) { v->visit(this); }
@@ -141,12 +141,12 @@ public:
 
 	unsigned get_value() {
 		return logical_expression->get_value() != 0
-               ? expression->get_value() : conditional_expression->get_value();
+			   ? expression->get_value() : conditional_expression->get_value();
 	}
 
 	string get_symbol() {	//	É preciso avaliar se se pode faze get_value antes da localização.
 		return logical_expression->get_value() != 0
-               ? expression->get_symbol() : conditional_expression->get_symbol();
+			   ? expression->get_symbol() : conditional_expression->get_symbol();
 	}
 
  	Value_type get_type();

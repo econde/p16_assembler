@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -44,12 +44,12 @@ static void underline(int offset, int left, int right, const char *text) {
 	auto column = offset;
 	while (--offset > 0)
 		fputc('-', stderr);
-    auto column_ref = column;
+	auto column_ref = column;
 	for (auto i = 0; i < left; ++i)
 		column += (text[i] == '\t') ? 8 - column % 8 : 1;
 	fputnc(' ', column - column_ref + 1, stderr);
 
-    column_ref = column;
+	column_ref = column;
 	for (auto i = left; i <= right;  ++i)
 		column += text[i] == '\t' ? 8 - column % 8 : 1;
 	fputnc('^', column - column_ref, stderr);
@@ -74,12 +74,12 @@ void warning_report(ast::Location *location, std::string message) {
 //	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
 	int lineno =  location->line - 1;
 	const char *text = srcfile.at(lineno).c_str();
-    auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
-    fprintf(stderr, "%s\n", text);
-    underline(offset, location->first_column, location->last_column, text);
-    fprintf(stderr, "\nWARNING!\t");
+	auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
+	fprintf(stderr, "%s\n", text);
+	underline(offset, location->first_column, location->last_column, text);
+	fprintf(stderr, "\nWARNING!\t");
 
-    std::cerr << message << std::endl;
+	std::cerr << message << std::endl;
 
 	warning_count++;
 }
@@ -96,12 +96,12 @@ void yyerror(const char *s, ...) {
 	auto offset = fprintf(stderr, "%s (%d): ", yyfilename, yylloc.first_line);
 	fprintf(stderr, "%s\n", text);
 	underline(offset, yylloc.first_column, yylloc.last_column, text);
-    fprintf(stderr, "\nERROR!\t");
+	fprintf(stderr, "\nERROR!\t");
 
-    va_list ap;
-    va_start(ap, s);
-    vfprintf(stderr, s, ap);
-    fprintf(stderr, "\n");
+	va_list ap;
+	va_start(ap, s);
+	vfprintf(stderr, s, ap);
+	fprintf(stderr, "\n");
 
 	error_count++;
 }

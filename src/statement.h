@@ -47,7 +47,7 @@ struct Statement {
 	unsigned section_index;
 	unsigned section_offset;
 	unsigned size_in_memory;
-	
+
 	void add_label(string *l) {
 		label = l->substr(0, l->find(':'));
 		if ( ! Symbols::do_exist(label))
@@ -57,9 +57,9 @@ struct Statement {
 		else
 			error_report(&location, "Symbol \'" + label + "\' is already defined");
 	}
-	
+
 	virtual void accept(Visitor *v) = 0;
-	
+
 	virtual string to_string() {
 		return label.empty() ? string("\t") : label + ':';
 	}
@@ -86,7 +86,7 @@ public:
 	 string listing() {
 		 return string_printf("%4d%10c\t", location.line, ' ');
 	 }
-	 
+
 	 void accept(Visitor *v) {
 		 v->visit(this);
 	 }

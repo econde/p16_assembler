@@ -30,5 +30,5 @@ void warning_report(ast::Location *location, std::string message);
 void error_report(std::string message);
 
 void yyerror(const char *s, ...);
-	
+
 #endif
