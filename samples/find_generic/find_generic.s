@@ -166,9 +166,8 @@ addr_luis_silva:
 */
 	.text
 find:
-	mov	r0, people
 	push	r7
-	mov	r7, sp		
+	mov	r7, sp
 	push	lr
 	push	r4
 	push	r5

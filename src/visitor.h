@@ -18,7 +18,7 @@ limitations under the License.
 #define VISITOR_H
 
 namespace ast {
-	
+
 class Value;
 class Identifier;
 class Priority;

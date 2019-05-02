@@ -1,7 +1,8 @@
+- Ordenar o simbolos por ordem alfabética em .lst
 - Correção de erro nas relocations em directiva .word
 - Melhoramentos na opção -h 
 - Correção de erro na directiva .align
-- Melhorar a legibilidade do conteúdo da memória em .lst
+- Melhoramentos na legibilidade do conteúdo da memória em .lst
 
 V1.2 (build: Apr 11 2019)
 
