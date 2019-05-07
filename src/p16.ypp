@@ -110,8 +110,8 @@ typedef struct YYLTYPE {
 
 %token MOVS NOT RRX CMP MSR MRS
 
-%token MOV MOV_LOW MOV_HIGH
-%type <integer> MOV
+%token MOV MOVT MOV_LOW MOV_HIGH
+%type <integer> MOV MOVT
 
 %token <integer>		INTEGER_LITERAL CHARACTER_LITERAL REGISTER SPECIAL BYTE
 %token <string>			IDENTIFIER STRING_LITERAL LABEL
@@ -205,6 +205,10 @@ instruction
 
 	|	MOV register COMMA register
 			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
+	|	MOVT register COMMA expression
+			{ $$ = new ast::Move($1, $2, $4, LOCATION(@1)); }
+	|	MOVT register COMMA CARDINAL expression
+			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
 	|	MOV register COMMA expression
 			{ $$ = new ast::Move($1, $2, $4, LOCATION(@1)); }
 	|	MOV register COMMA CARDINAL expression

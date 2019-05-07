@@ -1,3 +1,4 @@
+- Distinguir sintaticamente mov de movt - assinalar erro em movt rd, rs
 - Ordenar o simbolos por ordem alfabética em .lst
 - Correção de erro nas relocations em directiva .word
 - Melhoramentos na opção -h 
