@@ -98,25 +98,33 @@ enum {
 //	Instruction
 
 void Code_generator::visit(Load_relative *s) {
+	if ((s->ldst & 2) != 0)	// is a STR
+		error_report(&s->location, "str instructions with PC relative address doesn't exist, only ldr exists");
+	if (s->ldst == 1)	// is a LDRB
+		error_report(&s->location, "ldrb instruction with PC relative address doesn't exist, only ldr exists");
 	unsigned code = LDR_RELATIVE_OPCODE + (s->rd->n << RD_POSITION);
 	Value_type direct_type = s->constant->get_type();
 	if (direct_type == ABSOLUTE || direct_type == Value_type::LABEL || direct_type == UNDEFINED) {
-		auto constant = 0U;
+		auto constant = 0;
 		if (direct_type == ABSOLUTE)
-            constant = s->constant->get_value();
+			constant = s->constant->get_value();
 		else {   // LABEL ou UNDEFINED
 			string symbol = s->constant->get_symbol();
-			auto addend = s->constant->get_value();
+			auto addend = s->constant->get_value() - 2;
 			auto *reloc = new Relocation{&s->location, &s->constant->location, s->section_index, s->section_offset,
 										LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
 										Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
 			Relocations::add(reloc);
 		}
+		if (constant < 0)
+			error_report(&s->constant->location,
+						"Address defined by \"" + s->constant->to_string()
+						+ "must be higher than current location");
 		if ((constant & ~MAKE_MASK(LDR_RELATIVE_CONSTANT_SIZE, 0)) != 0) {
 			error_report(&s->constant->location,
-                         "Address defined by \"" + s->constant->to_string()
-                         + string_printf("\" PC + %d (0x%x) is out of range for PC-relative addressing",
-                                         constant, constant));
+						"Address defined by \"" + s->constant->to_string()
+						+ string_printf("\" PC + %d (0x%x) is out of range for PC-relative addressing",
+						constant, constant));
 		}
 		if ((constant & 1) != 0)
 			warning_report(&s->constant->location,
@@ -124,7 +132,7 @@ void Code_generator::visit(Load_relative *s) {
 		code |= constant << LDR_REALTIVE_CONSTANT_POSITION;
 	}
 	else
-		error_report(&s->constant->location, string_printf("Invalid expression"));
+		error_report(&s->constant->location, "Invalid expression");
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
 }
 

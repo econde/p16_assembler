@@ -73,7 +73,10 @@ void Relocations::relocate() {
 			if (value & 1)
 				warning_report(reloc->exp_location,
 					string_printf("Target address is odd: %+d (0x%x)", value, value));
-			value -= Sections::get_address(section) + offset + 2;
+			value -= Sections::get_address(section) + offset;
+			if (value < 0)
+				error_report(reloc->exp_location,
+							"Indicated address must be higher than current location");
 			value >>= 1;
 			if (ABSOLUTE(value) > mask)
 				error_report(reloc->exp_location,
