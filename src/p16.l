@@ -161,7 +161,7 @@ BinDigit			[01]
 
 "movs"				{ return MOVS; }
 "mov"				{ yylval.integer = MOV_LOW; return MOV; }
-"movt"				{ yylval.integer = MOV_HIGH; return MOV; }
+"movt"				{ yylval.integer = MOV_HIGH; return MOVT; }
 "msr"				{ return MSR; }
 "mrs"				{ return MRS; }
 

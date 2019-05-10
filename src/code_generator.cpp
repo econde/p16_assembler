@@ -371,9 +371,9 @@ void Code_generator::visit(Not *s) {
 
 void Code_generator::visit(Move *s) {
     auto code = s->rd->n << RD_POSITION;
-	if (s->constant == nullptr) {
+	if (s->constant == nullptr) {	//	mov	rd, rs
 		code |= MOV_REG_OPCODE | (s->rs->n << MOV_RS_POSITION);
-	} else {
+	} else {						//	mov | movt	rd, constant
         code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
 		auto const_type= s->constant->get_type();
 		if (const_type == ABSOLUTE ) {
