@@ -181,7 +181,7 @@ BinDigit			[01]
 {DecIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 10); return INTEGER_LITERAL; }
 {HexIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 16); return INTEGER_LITERAL; }
 {OctIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 8);  return INTEGER_LITERAL; }
-0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext, NULL, 2);  return INTEGER_LITERAL; }
+0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext + 2, NULL, 2);  return INTEGER_LITERAL; }
 
 	/* identifiers */
 	
