@@ -1,3 +1,13 @@
+- Correção de erros:
+	- deixa de assinalar erro se a label não começar na primeira coluna
+	- os valores expressos em binário davam sempre zero
+	- na instrução ldr rd, [pc, <imm6>] :
+		- assinalar erro se imm6 for negativo
+		- assinalar erro se for ldrb
+		- assinalar erro se se escrever str rd, [pc, <imm6>]
+	- assinalar erro na instrução movt rd, rs
+
+v1.2.1
 - Correção de erro nas relocations em directiva .word
 - Melhoramento no controlo de versão 
 - Correção de erro na directiva .align
