@@ -21,15 +21,16 @@ limitations under the License.
 #ifndef AS_UTILS_H
 #define AS_UTILS_H
 
-/*			|<-width->|<--offset-->|
-	0000000011111111110000000000000
-	|<----------mask------------->|
+/*             |<-width->|<--offset-->|
+        0000000011111111110000000000000
+        |<----------mask------------->|
 */
 
 #include <limits.h>
 #include <stdint.h>
 
-#define MAKE_MASK(width, position) ((~(~0U << static_cast<unsigned>(width)) << static_cast<unsigned>(position)))
+#define MAKE_MASK(width, position) \
+	((~(~0U << static_cast<unsigned>(width)) << static_cast<unsigned>(position)))
 
 #define ABSOLUTE(value) (((value) & (1U << (sizeof(value) * CHAR_BIT - 1))) \
                         ? static_cast<unsigned>(-(value)) : (value))

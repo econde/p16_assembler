@@ -57,9 +57,9 @@ struct Statement {
 		else
 			error_report(&location, "Symbol \'" + label + "\' is already defined");
 	}
-	
+
 	virtual void accept(Visitor *v) = 0;
-	
+
 	virtual string to_string() {
 		return label.empty() ? string("\t") : label + ':';
 	}

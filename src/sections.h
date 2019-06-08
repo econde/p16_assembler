@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,8 +31,8 @@ namespace ast {
 struct Section {
 	std::string name;
 	unsigned number;
-    unsigned base_address;
-    unsigned flags;
+	unsigned base_address;
+	unsigned flags;
 	enum {LOADABLE = 1};
 	unsigned content_capacity, content_size;
 	uint8_t *content;
@@ -97,7 +97,7 @@ public:
 	static void write8(unsigned section, unsigned offset, uint8_t b) {
 		table.at(section)->write8(offset, b);
 	}
-	
+
 	static void write16(unsigned section, unsigned offset, uint16_t b) {
 		table.at(section)->write16(offset, b);
 	}
@@ -117,11 +117,11 @@ public:
 	static void append_block(unsigned section, const uint8_t *data, unsigned size) {
 		table.at(section)->append_block(data, size);
 	}
-	
+
 	static void fill(unsigned section, unsigned offset, uint8_t data, unsigned size) {
 		table.at(section)->fill(offset, data, size);
 	}
-	
+
 	static void increase(unsigned section, unsigned size) {
 		table.at(section)->increase(size);
 	}
@@ -131,7 +131,7 @@ public:
 	static uint8_t read8(unsigned section, unsigned offset) {
 		return table.at(section)->read8(offset);
 	}
-	
+
 	static uint16_t read16(unsigned section, unsigned offset) {
 		return table.at(section)->read16(offset);
 	}
@@ -144,13 +144,13 @@ public:
 
 	//	Coloca as secções em lista ordenada por endereços.
 	static bool address_is_free(Section *s);
-	
+
 	//	Localiza as secções.
 	static void locate(Properties<std::string, unsigned> *section_addresses);
-	
+
 	//	Produz um ficheiro em formato Hex Intel com o conteúdo das secções.
 	static void binary_hex_intel(const char *file_name);
-	
+
 	//	Produz um ficheiro em formato Logisim com o conteúdo das secções.
 	static void binary_logisim(const char *file_name, unsigned word_size, unsigned byte_order);
 	static void binary_raw(const char *file_name);

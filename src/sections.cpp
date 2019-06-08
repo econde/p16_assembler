@@ -172,9 +172,9 @@ void Sections::listing(std::ostream& lst_file) {
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04X - %04X     %04X %d\n", i,
-						table[i]->name.c_str(), table[i]->base_address,
-						table[i]->base_address + table[i]->content_size - 1,
-						table[i]->content_size, table[i]->content_size);
+				table[i]->name.c_str(), table[i]->base_address,
+				table[i]->base_address + table[i]->content_size - 1,
+				table[i]->content_size, table[i]->content_size);
 	}
 }
 
@@ -183,7 +183,7 @@ bool Sections::address_is_free(Section *s) {
 	for (; iter != list.end(); ++iter) {
 		Section *r = *iter;
 		if (s->base_address + s->content_size > r->base_address
-				&& r->base_address + r->content_size > s->base_address)
+			&& r->base_address + r->content_size > s->base_address)
 			return false;
 		if (s->base_address + s->content_size <= r->base_address)
 			break;
@@ -199,10 +199,10 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 		section->base_address = section_addresses->get_property(section->name, current_address);
 		if ( ! address_is_free(section)) {
 			error_report("Section \"" + section->name
-						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
-					                     ", this overlap another section.\n",
-										 section->content_size, section->content_size,
-										 section->base_address, section->base_address));
+					+ string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
+							", this overlap another section.\n",
+							section->content_size, section->content_size,
+							section->base_address, section->base_address));
 			exit(1);
 		}
 					//	alinhar o início da secção em endereço par

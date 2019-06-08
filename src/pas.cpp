@@ -20,7 +20,7 @@ limitations under the License.
 #include <getopt.h>
 #include <regex>
 
-#include "p16.h"
+#include "pas.h"
 #include "p16.tab.hpp"
 
 #include "code_generator.h"
@@ -119,13 +119,13 @@ int main(int argc, char **argv) {
 			break;
 		}
 	}
-	
+
 	if (error_in_options)
 		return -2;
-		
+
 	if (argc > optind)
 		input_filename = argv[optind];
-	
+
 	if (input_filename.empty()) {
 		cerr << "Missing input file" << endl;
 		return -2;
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 		cout << endl;
 		cout << "Source file:    " << input_filename << endl;
 	}
-	
+
 	yyin = stdin;
 	if ( ! input_filename.empty()) {
 		yyin = fopen(input_filename.c_str(), "r");
@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
 	Sections::locate(&section_addresses);
 	if (verbose_flag)
 		Sections::listing(cout);
-	
+
 	if (error_count > 0) {
 		result = -2;
 		goto exit_error;
@@ -227,7 +227,7 @@ int main(int argc, char **argv) {
 		}
 		remove(bin_filename.c_str());
 		Sections::binary_raw(bin_filename.c_str());
-	
+
 	}
 	else if (strcmp(output_format, "logisim") == 0) {
 		if (verbose_flag) {

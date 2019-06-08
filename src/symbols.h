@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,70 +24,70 @@ limitations under the License.
 
 namespace ast {
 
-    struct Symbol {
-        //  Tipo do valor associado ao simbolo:
-        //      - ABSOLUTE - valores absolutos calculáveis imediatamente
-        //      - LABEL - label cujo valor é relativo à secção a que pertence
-        //      - UNDEFINED - simbolo apenas referido;
-        //          pode ser uma expressão da forma (label + ADDEND) em que ADDEND é uma constante
-        //      - INVALID - expressão que envolve operações invalidas sobre labels;
-        //          (label * CONST) (label + label) ...
+	struct Symbol {
+		//  Tipo do valor associado ao simbolo:
+		//      - ABSOLUTE - valores absolutos calculáveis imediatamente
+		//      - LABEL - label cujo valor é relativo à secção a que pertence
+		//      - UNDEFINED - simbolo apenas referido;
+		//          pode ser uma expressão da forma (label + ADDEND) em que ADDEND é uma constante
+		//      - INVALID - expressão que envolve operações invalidas sobre labels;
+		//          (label * CONST) (label + label) ...
 
-        std::string name;
-        Value_type type;
-        unsigned section;
-        Expression *value_expression;
-        unsigned value;
+		std::string name;
+		Value_type type;
+		unsigned section;
+		Expression *value_expression;
+		unsigned value;
 
-        Symbol(std::string name) : name{name} { }
-        Symbol(std::string name, Value_type type, unsigned section, Expression *value) :
-                name{name}, type{type}, section{section}, value_expression{value} { }
+		Symbol(std::string name) : name{name} { }
+		Symbol(std::string name, Value_type type, unsigned section, Expression *value) :
+				name{name}, type{type}, section{section}, value_expression{value} { }
 
-        unsigned get_value();
+		unsigned get_value();
 
-        Value_type get_type();
-    };
+		Value_type get_type();
+	};
 
-    class Symbols {
-        static std::unordered_map<std::string, Symbol *> table;
-    public:
-        static void deallocate();
+	class Symbols {
+		static std::unordered_map<std::string, Symbol *> table;
+	public:
+		static void deallocate();
 
-        static bool do_exist(std::string name) {
-            return table.find(name) != table.end();
-        }
+		static bool do_exist(std::string name) {
+			return table.find(name) != table.end();
+		}
 
-        static void add(std::string name, Value_type type, unsigned section, Expression *value);
+		static void add(std::string name, Value_type type, unsigned section, Expression *value);
 
-        static int add(std::string name, unsigned section, Expression *value);
+		static int add(std::string name, unsigned section, Expression *value);
 
-        static void set_properties(std::string name, Value_type type, unsigned section, Expression *value);
+		static void set_properties(std::string name, Value_type type, unsigned section, Expression *value);
 
-        static unsigned get_section(std::string name) {
-            auto pair_symbol = table.find(name);
-            if (pair_symbol != table.end())
-                return pair_symbol->second->section;
-            return Sections::table.size();  //  Secção inexistente
-        }
+		static unsigned get_section(std::string name) {
+			auto pair_symbol = table.find(name);
+			if (pair_symbol != table.end())
+				return pair_symbol->second->section;
+			return Sections::table.size();  //  Secção inexistente
+		}
 
-        static unsigned get_value(std::string name) {
-            auto pair_symbol = table.find(name);
-            if (pair_symbol != table.end())
-                return pair_symbol->second->get_value();
-            return 0;
-        }
+		static unsigned get_value(std::string name) {
+			auto pair_symbol = table.find(name);
+			if (pair_symbol != table.end())
+				return pair_symbol->second->get_value();
+			return 0;
+		}
 
-        static Value_type get_type(std::string name) {
-            auto pair_symbol = table.find(name);
-            if (pair_symbol != table.end())
-                return pair_symbol->second->get_type();
-            return Value_type::UNDEFINED;
-        }
+		static Value_type get_type(std::string name) {
+			auto pair_symbol = table.find(name);
+			if (pair_symbol != table.end())
+				return pair_symbol->second->get_type();
+			return Value_type::UNDEFINED;
+		}
 
-        static void print(std::ostream &os);
+		static void print(std::ostream &os);
 
-        static void listing(std::ostream &lst_file);
-    };
+		static void listing(std::ostream &lst_file);
+	};
 }
 
 #endif

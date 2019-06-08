@@ -26,7 +26,6 @@ struct Relocation {
 	Location *exp_location;		// local do simbolo vai fornecer o valor
 	unsigned section_index;		// número da secção
 	unsigned section_offset;	// offset na secção
-//	Statement *statement;	
 	unsigned position;		// offset em bits na palavra
 	unsigned width;			// dimensão em bit
 	enum Type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };

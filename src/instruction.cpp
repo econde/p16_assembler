@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "cpp_printf.h"
 
-#include "p16.h"
+#include "pas.h"
 #include "p16.tab.hpp"
 
 namespace ast {
@@ -60,7 +60,7 @@ std::string arith_name(int operation) {
 	}
 	return std::string("???");
 }
-	 
+
 std::string logic_name(int operation) {
 	switch (operation) {
 		case AND:
