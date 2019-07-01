@@ -1,3 +1,10 @@
+- na instrução ldr rd, [pc, <imm6>] :
+  - assinalar erro se imm6 for negativo
+  - assinalar erro se for ldrb
+  - assinalar erro se se escrever str rd, [pc, <imm6>]
+
+- valores expressos em binário davam sempre zero
+- deixa de assinalar erro se a label não começar na primeira coluna
 - Distinguir sintaticamente mov de movt - assinalar erro em movt rd, rs
 - Ordenar o simbolos por ordem alfabética em .lst
 - Correção de erro nas relocations em directiva .word
