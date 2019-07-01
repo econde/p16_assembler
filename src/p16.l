@@ -161,7 +161,7 @@ BinDigit			[01]
 
 "movs"				{ return MOVS; }
 "mov"				{ yylval.integer = MOV_LOW; return MOV; }
-"movt"				{ yylval.integer = MOV_HIGH; return MOVT; }
+"movt"				{ yylval.integer = MOV_HIGH; return MOV; }
 "msr"				{ return MSR; }
 "mrs"				{ return MRS; }
 
@@ -177,19 +177,19 @@ BinDigit			[01]
 "bl"				{ yylval.integer = BL; return BRANCH; }
 
 	/* numeric literals */
-	
+
 {DecIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 10); return INTEGER_LITERAL; }
 {HexIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 16); return INTEGER_LITERAL; }
 {OctIntegerLiteral}	{ yylval.integer = strtoul(yytext, NULL, 8);  return INTEGER_LITERAL; }
-0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext, NULL, 2);  return INTEGER_LITERAL; }
+0[bB]0*[01]{1,32}	{ yylval.integer = strtoul(yytext + 2, NULL, 2);  return INTEGER_LITERAL; }
 
 	/* identifiers */
-	
+
 [.a-zA-Z_][.a-zA-Z0-9_]*	{ yylval.string = new std::string(yytext); return IDENTIFIER; }
 
 	/* label */
 
-^[a-zA-Z0-9_]+":"	{ yylval.string = new std::string(yytext); return LABEL; }
+[a-zA-Z0-9_]+":"	{ yylval.string = new std::string(yytext); return LABEL; }
 
 {LineTerminator}	{ yycolumn = 0; return EOL; }
 
@@ -212,7 +212,7 @@ BinDigit			[01]
 ".global".*\n
 
 	/* -------------------- string literal -----------------------------------*/
-	
+
 \"							{ BEGIN STRING; yylval.string = new std::string(); }
 <STRING>\"					{ BEGIN INITIAL; yylval.string->append(yytext, strlen(yytext) - 1); return STRING_LITERAL; }
 <STRING>[^\n\r\"\\]+		{ yylval.string->append(yytext); }
@@ -226,7 +226,7 @@ BinDigit			[01]
 
 
 	/* ------------------------ character literal ----------------------------*/
-	
+
 \'										{ BEGIN CHARLITERAL; }
 <CHARLITERAL>[^\n\r\'\\]?\'				{ BEGIN INITIAL; yylval.integer = yytext[0]; return CHARACTER_LITERAL; }
   
