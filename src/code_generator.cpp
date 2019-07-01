@@ -448,14 +448,41 @@ void Code_generator::visit(Push_pop *s) {
 //	Directive
 
 void Code_generator::visit(Space *s) {
-	Sections::fill(s->section_index, s->section_offset,
+	auto size_type = s->size->get_type();
+	auto initial_type = s->initial->get_type();
+	if (size_type == ABSOLUTE) {
+		if (initial_type == ABSOLUTE) {
+			Sections::fill(s->section_index, s->section_offset,
 				   static_cast<uint8_t>(s->initial->get_value()), s->size->get_value());
+		}
+		else if (initial_type == UNDEFINED) {
+			error_report(&s->initial->location, "Undefined expression");
+		}
+		else {
+			error_report(&s->initial->location, "Invalid expression");
+		}
+	}
+	else if (size_type == UNDEFINED) {
+		error_report(&s->size->location, "Undefined expression");
+	}
+	else {
+		error_report(&s->size->location, "Invalid expression");
+	}
 }
 
 void Code_generator::visit(Align *s) {
-	if (s->size->get_value() > 1)
-		warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
-	Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
+	auto exp_type = s->size->get_type();
+	if (exp_type == ABSOLUTE) {
+		if (s->size->get_value() > 1)
+			warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
+		Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
+	}
+	else if (exp_type == UNDEFINED) {
+		error_report(&s->size->location, "Undefined expression");
+	}
+	else {
+		error_report(&s->size->location, "Invalid expression");
+	}
 }
 
 void Code_generator::visit(Byte *s) {

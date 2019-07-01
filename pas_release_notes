@@ -1,8 +1,8 @@
+- assinalar erro em constantes não definidas nas diretivas .space e .align
 - na instrução ldr rd, [pc, <imm6>] :
   - assinalar erro se imm6 for negativo
   - assinalar erro se for ldrb
   - assinalar erro se se escrever str rd, [pc, <imm6>]
-
 - valores expressos em binário davam sempre zero
 - deixa de assinalar erro se a label não começar na primeira coluna
 - Distinguir sintaticamente mov de movt - assinalar erro em movt rd, rs

@@ -35,7 +35,7 @@ struct Directive: public Statement {
 	virtual string more_listing();
 };
 
-//-----------------------------------------------------------------------------	
+//------------------------------------------------------------------------------
 //	.section
 
 struct DSection: public Directive {
@@ -55,7 +55,7 @@ struct DSection: public Directive {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-//-----------------------------------------------------------------------------	
+//------------------------------------------------------------------------------
 //	.byte .hword .word
 
 struct Byte: public Directive {
@@ -82,7 +82,7 @@ struct Byte: public Directive {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-//-----------------------------------------------------------------------------	
+//------------------------------------------------------------------------------
 //	.ascii
 
 struct Ascii: public Directive {
@@ -108,7 +108,7 @@ struct Ascii: public Directive {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-//-----------------------------------------------------------------------------	
+//------------------------------------------------------------------------------
 //	.space
 
 struct Space: public Directive {
@@ -127,7 +127,7 @@ struct Space: public Directive {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-//-----------------------------------------------------------------------------	
+//------------------------------------------------------------------------------
 //	.equ
 
 struct Equ: public Directive {
@@ -152,7 +152,7 @@ struct Equ: public Directive {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-//-----------------------------------------------------------------------------	 
+//------------------------------------------------------------------------------
 //	.align
 
 struct Align: public Directive {
