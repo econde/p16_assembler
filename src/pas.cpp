@@ -38,7 +38,7 @@ extern const char *yytext;
 void listing(const char *lst_filename, std::list<Statement*> *ast_root);
 void listing_load_inputfile(const char *src_filename);
 
-static void help(char *prog_name) {
+ static void help(char *prog_name) {
 	ostream_printf(cout, "Usage: %s [options] <source filename>\n"
 		"options:\n"
 		"\t--verbose\n"
@@ -50,7 +50,7 @@ static void help(char *prog_name) {
 		"\t-f, --format hexintel | binary\n",
 		prog_name);
 }
-
+ 
 static void version() {
 	cout << "P16 assembler v" VERSION " (" __DATE__ ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;

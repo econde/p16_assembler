@@ -68,11 +68,9 @@ BinDigit			[01]
 ".equ"				{ return EQU; }
 ".align"			{ return ALIGN; }
 ".byte"				{ yylval.integer = 1; return BYTE; }
-".hword"			{ yylval.integer = 2; return BYTE; }
 ".word"				{ yylval.integer = 2; return BYTE; }
 ".space"			{ return SPACE; }
 ".ascii"			{ yylval.integer = ASCII; return ASCII; }
-".asciiz"			{ yylval.integer = ASCIZ; return ASCII; }
 ".asciz"			{ yylval.integer = ASCIZ; return ASCII; }
 	/* operators */
 "="					{ return EQUAL; }
@@ -149,9 +147,9 @@ BinDigit			[01]
 "cmp"				{ yylval.integer = CMP; return CMP; }
 
 "and"|"ands"		{ yylval.integer = AND; return LOGIC; }
-"orr"|"orrs"|"or"	{ yylval.integer = OR; return LOGIC; }
+"orr"|"orrs"		{ yylval.integer = OR; return LOGIC; }
 "eor"|"eors"		{ yylval.integer = EOR; return LOGIC; }
-"mvn"|"mvns"|"not"	{                       return NOT; }
+"mvn"|"mvns"		{                       return NOT; }
 
 "lsl"|"lsls"		{ yylval.integer = LSL; return SHIFT; }
 "lsr"|"lsrs"		{ yylval.integer = LSR; return SHIFT; }
@@ -173,7 +171,7 @@ BinDigit			[01]
 "bhs"				{ yylval.integer = HS; return BRANCH; }
 "blt"				{ yylval.integer = LT; return BRANCH; }
 "bge"				{ yylval.integer = GE; return BRANCH; }
-"b"				{ yylval.integer = B;  return BRANCH; }
+"b"					{ yylval.integer = B;  return BRANCH; }
 "bl"				{ yylval.integer = BL; return BRANCH; }
 
 	/* numeric literals */
@@ -198,7 +196,7 @@ BinDigit			[01]
 "/*"				{ BEGIN COMMENT; }
 <COMMENT>"*/"		{ BEGIN INITIAL; }
 <COMMENT>([^*]|\n)+|.
-<COMMENT><<EOF>>	{ yyerror("Unterminated comment\n"); } 	
+<COMMENT><<EOF>>	{ yyerror("Unterminated comment\n"); }
 
 "//".*\n			{ yycolumn = 0; return EOL; }
 ";".*\n				{ yycolumn = 0; return EOL; }
@@ -220,7 +218,7 @@ BinDigit			[01]
 <STRING>\\n					{ yylval.string->push_back('\n'); }
 <STRING>\\r					{ yylval.string->push_back('\r'); }
 <STRING>\\\"				{ yylval.string->push_back('\"'); }
-<STRING>\\					{ yylval.string->push_back('\\'); }	
+<STRING>\\					{ yylval.string->push_back('\\'); }
 
 <STRING>{LineTerminator}	{ yyerror("Unterminated string at end of line"); }
 
@@ -229,7 +227,7 @@ BinDigit			[01]
 
 \'										{ BEGIN CHARLITERAL; }
 <CHARLITERAL>[^\n\r\'\\]?\'				{ BEGIN INITIAL; yylval.integer = yytext[0]; return CHARACTER_LITERAL; }
-  
+
 	/* escape sequences */
 <CHARLITERAL>\\b\'						{ BEGIN INITIAL; yylval.integer = '\b'; return CHARACTER_LITERAL; }
 <CHARLITERAL>\\t\'						{ BEGIN INITIAL; yylval.integer = '\t'; return CHARACTER_LITERAL; }

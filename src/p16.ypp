@@ -145,7 +145,7 @@ typedef struct YYLTYPE {
 %%
 /*----------------------------------------------------------------------------*/
 
-program:					
+program:
     program statement		{ $1->push_back($2); $$ = $1; }
 	|						{ $$ = new std::list<ast::Statement*>; ast_root = $$; }
 	;
@@ -171,6 +171,9 @@ instruction
 
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA expression BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
+
+	|	LDR_STR register COMMA BRACKET_LEFT register COMMA CARDINAL expression BRACKET_RIGHT
+			{ $$ = new ast::Load_store_indirect($1, $2, $5, $8, LOCATION(@1)); }
 
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA register BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
@@ -232,7 +235,7 @@ instruction
 register
 	:	REGISTER
 		{ $$ = new ast::Register($1, LOCATION(@1)); }
-		
+
 /*----------------------------------------------------------------------------*/
 
 directive
@@ -248,25 +251,25 @@ directive
 			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
 	|	DATA
 			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
-			
+
 	|	EQU IDENTIFIER COMMA expression
 			{ $$ = new ast::Equ(*$2, $4, LOCATION(@1)); delete($2); }
-			
+
 	|	BYTE value_list
 			{ $$ = new ast::Byte($1, $2, LOCATION(@1)); }
-	
+
 	|	SPACE expression
 			{ $$ = new ast::Space($2, new ast::Value(0, LOCATION(@2)), LOCATION(@1)); }
-			
+
 	|	SPACE expression COMMA expression
 			{ $$ = new ast::Space($2, $4, LOCATION(@1)); }
-			
+
 	|	ASCII string_list
 			{ $$ = new ast::Ascii($1, $2, LOCATION(@1)); }
 
 	|	ALIGN expression
 			{ $$ = new ast::Align($2, LOCATION(@1)); }
-			
+
 	|	ALIGN
 			{ $$ = new ast::Align(new ast::Value(1, LOCATION(@1)), LOCATION(@1)); }
 	;
@@ -409,4 +412,3 @@ expression
 	:	conditional_expression
 
 	;
-
