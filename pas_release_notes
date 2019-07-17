@@ -1,11 +1,11 @@
-- não aceitar mnemónicas alternativas not, or, asciiz
-- assinalar erro em constantes não definidas nas diretivas .space e .align
-- na instrução ldr rd, [pc, <imm6>] :
-  - assinalar erro se imm6 for negativo
-  - assinalar erro se for ldrb
-  - assinalar erro se se escrever str rd, [pc, <imm6>]
-- valores expressos em binário davam sempre zero
-- deixa de assinalar erro se a label não começar na primeira coluna
+- Não aceitar mnemónicas alternativas not, or, asciiz
+- Assinalar erro em constantes não definidas nas diretivas .space e .align
+- Na instrução ldr rd, [pc, <imm6>] :
+  - Assinalar erro se imm6 for negativo
+  - Assinalar erro se for ldrb
+  - Assinalar erro se se escrever str rd, [pc, <imm6>]
+- Valores expressos em binário davam sempre zero
+- Deixa de assinalar erro se a label não começar na primeira coluna
 - Distinguir sintaticamente mov de movt - assinalar erro em movt rd, rs
 - Ordenar o simbolos por ordem alfabética em .lst
 - Correção de erro nas relocations em directiva .word

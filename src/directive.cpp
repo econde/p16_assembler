@@ -41,6 +41,51 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 	assert(unit == 1 || (unit == 2 && (size & 1) == 0));
 	string tmp = string();
 	string interval = string(unit == 1 ? "   " : "     ");
+	auto address = Sections::get_address(section) + offset;
+	auto remainder_bytes = size;
+	//--------------------------------------------------------------------------
+	//	Linhas completas
+	auto nlines = remainder_bytes / 16;
+	for (auto l = 0U; l < nlines; ++l) {
+		tmp += string_printf("%4d %04X     \t", line, address);
+		if (unit == 1)
+			for (auto i = 0U; i < 16U; i++)
+				tmp += string_printf(" %02X",
+					Sections::read8(section, offset + i));
+		else if (unit == 2)
+			for (auto i = 0U; i < 16U; i += 2)
+				tmp += string_printf(" %02X%02X",
+					Sections::read8(section, offset + i + 1),
+					Sections::read8(section, offset + i));
+		tmp	+= "  ";
+		offset += 16;
+		address += 16;
+		remainder_bytes -= 16;
+		tmp += '\n';
+	}
+	//--------------------------------------------------------------------------
+	//	Última linha
+	if (remainder_bytes > 0) {
+		tmp += string_printf("%4d %04X     \t", line, address);
+		if (unit == 1)
+			for (auto i = 0U; i < remainder_bytes; i++)
+				tmp += string_printf(" %02X",
+					Sections::read8(section, offset + i));
+		else if (unit == 2)
+			for (auto i = 0U; i < remainder_bytes; i += 2)
+				tmp += string_printf(" %02X%02X",
+					Sections::read8(section, offset + i + 1),
+					Sections::read8(section, offset + i));
+		tmp += '\n';
+	}
+	return tmp;
+}
+
+#if 0
+static string hex_dump(int line, unsigned section, unsigned offset, unsigned size, int unit) {
+	assert(unit == 1 || (unit == 2 && (size & 1) == 0));
+	string tmp = string();
+	string interval = string(unit == 1 ? "   " : "     ");
 	if (unit == 1)
 		tmp += string_printf("%4d          \t"
 				"  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF\n", line);
@@ -158,6 +203,8 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 	}
 	return tmp;
 }
+
+#endif
 
 string Ascii::listing() {
 	if (size_in_memory < 4)

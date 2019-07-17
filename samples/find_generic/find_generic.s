@@ -65,7 +65,7 @@ luis:
 	.asciz	"luis"
 luis_silva:
 	.asciz	"luis silva"
-		
+
 	.data
 people:
 	.word	antonio
