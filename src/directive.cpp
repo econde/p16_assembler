@@ -40,6 +40,38 @@ string Directive::more_listing() {
 static string hex_dump(int line, unsigned section, unsigned offset, unsigned size, int unit) {
 	assert(unit == 1 || (unit == 2 && (size & 1) == 0));
 	string tmp = string();
+	auto address = Sections::get_address(section) + offset;
+	auto remainder_bytes = size;
+	//--------------------------------------------------------------------------
+	//	Linhas completas
+	auto nlines = remainder_bytes / 16;
+	for (auto l = 0U; l < nlines; ++l) {
+		tmp += string_printf("%4d %04X", line, address);
+		for (auto i = 0U; i < 16U; i++)
+			tmp += string_printf(" %02X",
+				Sections::read8(section, offset + i));
+		offset += 16;
+		address += 16;
+		remainder_bytes -= 16;
+		tmp += '\n';
+	}
+	//--------------------------------------------------------------------------
+	//	Última linha
+	if (remainder_bytes > 0) {
+		tmp += string_printf("%4d %04X", line, address);
+		for (auto i = 0U; i < remainder_bytes; i++)
+			tmp += string_printf(" %02X",
+				Sections::read8(section, offset + i));
+		tmp += '\n';
+	}
+	return tmp;
+}
+
+#if 0
+
+static string hex_dump(int line, unsigned section, unsigned offset, unsigned size, int unit) {
+	assert(unit == 1 || (unit == 2 && (size & 1) == 0));
+	string tmp = string();
 	string interval = string(unit == 1 ? "   " : "     ");
 	auto address = Sections::get_address(section) + offset;
 	auto remainder_bytes = size;
@@ -81,7 +113,7 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 	return tmp;
 }
 
-#if 0
+
 static string hex_dump(int line, unsigned section, unsigned offset, unsigned size, int unit) {
 	assert(unit == 1 || (unit == 2 && (size & 1) == 0));
 	string tmp = string();
@@ -207,26 +239,27 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 #endif
 
 string Ascii::listing() {
-	if (size_in_memory < 4)
-		return string_printf("%4d %04X %02X  \t", location.line, 
-			Sections::get_address(section_index) + section_offset,
-			Sections::read8(section_index, section_offset), ' ');
-	else
-		return string_printf("%4d          \t", location.line);
+	switch (size_in_memory) {
+		case 1:
+			return string_printf("%4d %04X %02X\t", location.line, 
+				Sections::get_address(section_index) + section_offset,
+				Sections::read8(section_index, section_offset));
+		case 2:
+			return string_printf("%4d %04X %02X %02X\t", location.line, 
+				Sections::get_address(section_index) + section_offset,
+				Sections::read8(section_index, section_offset),
+				Sections::read8(section_index, section_offset + 1));
+		default:
+			return string_printf("%4d          \t", location.line);
+		break;
+
+	}
 }
 
 string Ascii::more_listing() {
-	if (size_in_memory < 4) {
-		string tmp = string();
-		for (unsigned i = 1; i < size_in_memory; ++i) {
-			tmp += string_printf("%4d %04X %02X\n", location.line, 
-			Sections::get_address(section_index) + section_offset + i,
-			Sections::read8(section_index, section_offset + i));
-		}
-		return tmp;
-	}
-	else
+	if (size_in_memory > 2)
 		return hex_dump(location.line, section_index, section_offset, size_in_memory, 1);
+	return string();
 }
 
 #if 0
@@ -261,7 +294,7 @@ string Byte::more_listing() {
 #endif
 
 
-#if 1
+#if 0
 string Byte::listing() {
 	if (grain_size == 2)
 		if (size_in_memory < 8)
@@ -303,6 +336,30 @@ string Byte::more_listing() {
 	return tmp;
 }
 #endif
+
+string Byte::listing() {
+	switch (size_in_memory) {
+		case 1:
+			return string_printf("%4d %04X %02X\t", location.line, 
+				Sections::get_address(section_index) + section_offset,
+				Sections::read8(section_index, section_offset));
+		case 2:
+			return string_printf("%4d %04X %02X %02X\t", location.line, 
+				Sections::get_address(section_index) + section_offset,
+				Sections::read8(section_index, section_offset),
+				Sections::read8(section_index, section_offset + 1));
+		default:
+			return string_printf("%4d          \t", location.line);
+		break;
+
+	}
+}
+
+string Byte::more_listing() {
+	if (size_in_memory > 2)
+		return hex_dump(location.line, section_index, section_offset, size_in_memory, 1);
+	return string();
+}
 
 string Space::more_listing() {
 	string tmp = string();

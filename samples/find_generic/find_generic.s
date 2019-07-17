@@ -65,6 +65,8 @@ luis:
 	.asciz	"luis"
 luis_silva:
 	.asciz	"luis silva"
+xx:
+	.ascii	"ab"
 
 	.data
 people:

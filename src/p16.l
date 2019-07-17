@@ -70,8 +70,8 @@ BinDigit			[01]
 ".byte"				{ yylval.integer = 1; return BYTE; }
 ".word"				{ yylval.integer = 2; return BYTE; }
 ".space"			{ return SPACE; }
-".ascii"			{ yylval.integer = ASCII; return ASCII; }
-".asciz"			{ yylval.integer = ASCIZ; return ASCII; }
+".ascii"			{ yylval.integer = 0; return ASCII; }
+".asciz"			{ yylval.integer = 1; return ASCII; }
 	/* operators */
 "="					{ return EQUAL; }
 "=="				{ return EQUAL_EQUAL; }

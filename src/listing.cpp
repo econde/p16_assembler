@@ -58,7 +58,7 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root) {
 			for (; current_line < statement->location.line; ++current_line) {
 			//	linhas em branco e comentários 
 				line = srcfile[current_line - 1];
-				ostream_printf(lst, "%4d%10c\t", current_line, ' ') << line << endl;
+				ostream_printf(lst, "%4d%11c\t", current_line, ' ') << line << endl;
 			}
 			line = srcfile[current_line - 1];
 			lst << statement->listing() << line << endl;

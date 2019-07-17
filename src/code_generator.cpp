@@ -531,3 +531,4 @@ void Code_generator::visit(Byte *s) {
 		i += s->grain_size;
 	}
 }
+
