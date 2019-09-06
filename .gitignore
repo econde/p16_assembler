@@ -28,3 +28,6 @@ a.out
 doc/
 test/
 bugs/
+.vscode/
+*.cson
+*.code-workspace
