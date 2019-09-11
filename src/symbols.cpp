@@ -82,16 +82,6 @@ static bool cmp(Symbol *a, Symbol *b) {
 	void Symbols::listing(std::ostream &lst_file) {
 		ostream_printf(lst_file, "\nSymbols\n");
 		ostream_printf(lst_file, "%-24s%-10s%-11s%s\n", "Name", "Type", "Value", "Section");
-#if 0
-		for (auto pair_symbol: table) {
-			Symbol *symbol = pair_symbol.second;
-			ostream_printf(lst_file, "%-24s%-10s%04X %-6d%s\n",
-							symbol->name.c_str(), value_type_name[symbol->type],
-							symbol->get_value(), symbol->get_value(),
-							(symbol->type == Value_type::UNDEFINED)
-								? "*UNDEF*" : Sections::table.at(symbol->section)->name.c_str());
-		}
-#endif
 		vector<Symbol*>table_sort;
 		for (auto pair_symbol: table)
 			table_sort.push_back(pair_symbol.second);
@@ -103,6 +93,7 @@ static bool cmp(Symbol *a, Symbol *b) {
 							(symbol->type == Value_type::UNDEFINED)
 								? "*UNDEF*" : Sections::table.at(symbol->section)->name.c_str());
 		}
+		ostream_printf(lst_file, "\n");
 	}
 
 	unsigned Symbol::get_value() {
