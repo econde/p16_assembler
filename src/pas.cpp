@@ -47,7 +47,8 @@ void listing_load_inputfile(const char *src_filename);
 		"\t-i, --input <source filename>\n"
 		"\t-o, --output <filename>\n"
 		"\t-s, --section <section name>=<address>\n"
-		"\t-f, --format hexintel | binary\n",
+		"\t-f, --format hexintel | binary | logisim\n"
+		"\t-l, --interleave\n",
 		prog_name);
 }
  
@@ -62,6 +63,7 @@ int main(int argc, char **argv) {
 	int result = 0;
 	int verbose_flag = 0;
 	const char *output_format = "hexintel";
+	int interleave = 1;
 
 	static struct option long_options[] = {
 		{"verbose", no_argument, &verbose_flag, 1},
@@ -70,12 +72,13 @@ int main(int argc, char **argv) {
 		{"output", required_argument, 0, 'o'},
 		{"section", required_argument, 0, 's'},
 		{"format", required_argument, 0, 'f'},
+		{"interleve", no_argument, 0, 'l'},
 		{0, 0, 0, 0}
 	};
 	int option_index, error_in_options = 0;
         
 	int c;
-	while ((c = getopt_long(argc, argv, "hvi:o:s:f:", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "hvli:o:s:f:", long_options, &option_index)) != -1) {
 		switch (c) {
 		case 0:	//	Opções longas com afetação de flag
 			break; 
@@ -87,6 +90,9 @@ int main(int argc, char **argv) {
 			break;
 		case 'i':
 			input_filename = optarg;
+			break;
+		case 'l':
+			interleave = 2;
 			break;
 		case 'f':
 			output_format = optarg;
@@ -135,10 +141,12 @@ int main(int argc, char **argv) {
 		output_filename = input_filename.substr(0, input_filename.find_last_of('.'));
 
 	string lst_filename = output_filename + ".lst";
-	string hex_filename = output_filename + ".hex";
 	string bin_filename = output_filename + ".bin";
-	string sim0_filename = output_filename + ".sim0";
-	string sim1_filename = output_filename + ".sim1";
+	string sim0_filename = output_filename + "_0.sim";
+	string sim1_filename = output_filename + "_1.sim";
+	string hex_filename = output_filename + ".hex";
+	string hex0_filename = output_filename + "_0.hex";
+	string hex1_filename = output_filename + "_1.hex";
 
 	if (verbose_flag) {
 		cout << endl;
@@ -241,13 +249,26 @@ int main(int argc, char **argv) {
 		Sections::binary_logisim(sim1_filename.c_str(), 2, 1);	
 	}
 	else {
-		if (verbose_flag) {
-			cout << endl << "Generate binary output"<< endl;
-			cout <<	"\tformat: " << output_format << endl;
-			cout << "\tfilename: " << hex_filename << endl;
+		if (interleave == 1) {
+			if (verbose_flag) {
+				cout << endl << "Generate binary output"<< endl;
+				cout <<	"\tformat: " << output_format << endl;
+				cout << "\tfilename: " << hex_filename << endl;
+			}
+			remove(hex_filename.c_str());
+			Sections::binary_hex_intel(hex_filename.c_str());
 		}
-		remove(hex_filename.c_str());
-		Sections::binary_hex_intel(hex_filename.c_str());
+		else {	// interleave == 2
+			if (verbose_flag) {
+				cout << endl << "Generate interleaved binary output"<< endl;
+				cout <<	"\tformat: " << output_format << endl;
+				cout << "\tfilenames: " << hex0_filename << "' " << hex1_filename << endl;
+			}
+			remove(hex0_filename.c_str());
+			remove(hex1_filename.c_str());
+			Sections::binary_hex_intel(hex0_filename.c_str(), 2, 0);
+			Sections::binary_hex_intel(hex1_filename.c_str(), 2, 1);
+		}
 	}
 
 #if 0

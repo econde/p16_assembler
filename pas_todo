@@ -1,0 +1,4 @@
+- Generalizar a geração de ficheiros binários.
+	Acrescentar as opções --interleave <n> e --byte <p>
+	A opção interleave define a largura da palavra ou o ciclo de repetição.
+	A opção byte define a posição do byte a extrair.

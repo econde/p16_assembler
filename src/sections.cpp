@@ -240,6 +240,36 @@ void Sections::binary_hex_intel(const char *file_name) {
 	}
 }
 
+void Sections::binary_hex_intel(const char *file_name, unsigned word_size, unsigned byte_position) {
+	try {
+		std::ofstream file(file_name);
+		for (size_t i = 0; i < table.size(); ++i) {
+			Section *section = table.at(i);
+			if ((section->flags & Section::LOADABLE) == 0)
+				continue;
+			auto size = section->content_size / word_size + byte_position;
+			auto offset = byte_position;
+			do {
+				auto rec_len = min(16U, size);
+				auto load_offset = (section->base_address + offset) / word_size;
+				uint8_t cheksum = (rec_len + load_offset + (load_offset >> 8));
+				ostream_printf(file, ":%02X%04X00", rec_len, load_offset);
+				for (auto j = 0U; j < rec_len; ++j, offset += word_size) {
+					uint8_t b = read8(i, offset);
+					ostream_printf(file, "%02X", b);
+					cheksum += b;
+				}
+				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
+				size -= rec_len;
+			} while (size > 0);
+		}
+		ostream_printf(file, ":00000001FF");
+		file.close();
+	} catch (ios_base::failure &e) {
+		cerr << e.what();
+	}
+}
+
 void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigned byte_order) {
 	try {
 		std::ofstream file(file_name);

@@ -1,3 +1,9 @@
+V1.3.2 (build: Apr 13 2020)
+
+- Acrescentada opção -l para gerar Hex Intel com apenas o byte de endereço par ou apenas o byte de endereço impar
+
+V1.3.1 (build: Sep 11 2019)
+
 - Não aceitar mnemónicas alternativas not, or, asciiz
 - Assinalar erro em constantes não definidas nas diretivas .space e .align
 - Na instrução ldr rd, [pc, <imm6>] :
