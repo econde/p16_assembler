@@ -149,7 +149,6 @@ public:
 	static void locate(Properties<std::string, unsigned> *section_addresses);
 
 	//	Produz um ficheiro em formato Hex Intel com o conteúdo das secções.
-	static void binary_hex_intel(const char *file_name);
 	static void binary_hex_intel(const char *file_name, unsigned word_size, unsigned byte_position);
 
 	//	Produz um ficheiro no formato usado no Logisim com o conteúdo das secções.

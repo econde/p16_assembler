@@ -210,36 +210,6 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 	}
 }
 
-void Sections::binary_hex_intel(const char *file_name) {
-	try {
-		std::ofstream file(file_name);
-		for (size_t i = 0; i < table.size(); ++i) {
-			Section *section = table.at(i);
-			if ((section->flags & Section::LOADABLE) == 0)
-				continue;
-			auto size = section->content_size;
-			auto offset = 0U;
-			do {
-				auto rec_len = min(16U, size);
-				auto load_offset = section->base_address + offset;
-				uint8_t cheksum = (rec_len + load_offset + (load_offset >> 8));
-				ostream_printf(file, ":%02X%04X00", rec_len, load_offset);
-				for (auto j = 0U; j < rec_len; ++j, ++offset) {
-					uint8_t b = read8(i, offset);
-					ostream_printf(file, "%02X", b);
-					cheksum += b;
-				}
-				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
-				size -= rec_len;
-			} while (size > 0);
-		}
-		ostream_printf(file, ":00000001FF");
-		file.close();
-	} catch (ios_base::failure &e) {
-		cerr << e.what();
-	}
-}
-
 void Sections::binary_hex_intel(const char *file_name, unsigned word_size, unsigned byte_position) {
 	try {
 		std::ofstream file(file_name);
@@ -247,7 +217,8 @@ void Sections::binary_hex_intel(const char *file_name, unsigned word_size, unsig
 			Section *section = table.at(i);
 			if ((section->flags & Section::LOADABLE) == 0)
 				continue;
-			auto size = section->content_size / word_size + byte_position;
+			auto size = section->content_size / word_size
+							+ (byte_position < section->content_size % word_size);
 			auto offset = byte_position;
 			do {
 				auto rec_len = min(16U, size);
@@ -276,16 +247,21 @@ void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigne
 		file << "v2.0 raw" << endl;
 		for (auto i = 0U; i < table.size(); ++i) {
 			Section *section = table.at(i);
+			if ((section->flags & Section::LOADABLE) == 0)
+				continue;
 			auto size = section->content_size;
-			unsigned j;
-			for (auto offset = byte_order; offset < size; offset += j * word_size) {
+			// Uma secção começa sempre num endereço múltiplo de word_size
+			for (auto offset = byte_order; offset < size; ) {
 				uint8_t c = read8(i, offset);
-				for (j = 1U; offset + j * word_size < size && c == read8(i, offset + j * word_size); j++)
-					;
-				if (j > 1)
+				offset += word_size;
+				//	Quantos bytes iguais a este?
+				if (read8(i, offset) == c) {
+					auto j = 2U;
+					for (offset += word_size; offset < size && c == read8(i, offset); offset += word_size, j++)
+						;
 					ostream_printf(file, " %d*%02x", j, static_cast<uint8_t >(c));
-				else
-					ostream_printf(file, " %02x", static_cast<uint8_t >(c));
+				}
+				ostream_printf(file, " %02x", static_cast<uint8_t >(c));
 			}
 		}
 		file.close();

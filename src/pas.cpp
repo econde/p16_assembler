@@ -256,7 +256,7 @@ int main(int argc, char **argv) {
 				cout << "\tfilename: " << hex_filename << endl;
 			}
 			remove(hex_filename.c_str());
-			Sections::binary_hex_intel(hex_filename.c_str());
+			Sections::binary_hex_intel(hex_filename.c_str(), 1, 0);
 		}
 		else {	// interleave == 2
 			if (verbose_flag) {
