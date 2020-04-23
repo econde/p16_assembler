@@ -22,6 +22,7 @@ limitations under the License.
 #include "sections.h"
 #include "cpp_printf.h"
 #include "error.h"
+#include "memory_space.h"
 
 namespace ast {
 
@@ -210,30 +211,42 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 	}
 }
 
-void Sections::binary_hex_intel(const char *file_name, unsigned word_size, unsigned byte_position) {
+//	(Provisório, se as secções forem implementadas sobre esta estrutura, esta operação é desnecessária)
+//	Espaço de memória virtual 
+//	page_size = 4K
+//	address space = 64K
+static	Memory_space memory = Memory_space(4 * 1024, 64 * 1024);
+
+void Sections::fill_memory_space() {
+	for (auto i = 0U; i < Sections::table.size(); ++i) {
+		Section *section = Sections::table.at(i);
+		if ((section->flags & Section::LOADABLE) == 0)
+			continue;
+		memory.write(section->base_address, section->content, section->content_size);
+	}
+
+}
+
+void Sections::binary_hex_intel(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address) {
 	try {
 		std::ofstream file(file_name);
-		for (size_t i = 0; i < table.size(); ++i) {
-			Section *section = table.at(i);
-			if ((section->flags & Section::LOADABLE) == 0)
-				continue;
-			auto size = section->content_size / word_size
-							+ (byte_position < section->content_size % word_size);
-			auto offset = byte_position;
-			do {
-				auto rec_len = min(16U, size);
-				auto load_offset = (section->base_address + offset) / word_size;
-				uint8_t cheksum = (rec_len + load_offset + (load_offset >> 8));
-				ostream_printf(file, ":%02X%04X00", rec_len, load_offset);
-				for (auto j = 0U; j < rec_len; ++j, offset += word_size) {
-					uint8_t b = read8(i, offset);
-					ostream_printf(file, "%02X", b);
-					cheksum += b;
-				}
-				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
-				size -= rec_len;
-			} while (size > 0);
-		}
+		auto size = (higher_address - lower_address) / word_size;
+		auto address = lower_address + byte_order;
+		do {
+			auto rec_len = min(16U, size);
+			auto load_address = address / word_size;
+			uint8_t cheksum = (rec_len + load_address + (load_address >> 8));
+			ostream_printf(file, ":%02X%04X00", rec_len, load_address);
+			for (auto j = 0U; j < rec_len; ++j, address += word_size) {
+				uint8_t b = memory.read8(address);
+				ostream_printf(file, "%02X", b);
+				cheksum += b;
+			}
+			ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
+			size -= rec_len;
+		} while (size > 0);
 		ostream_printf(file, ":00000001FF");
 		file.close();
 	} catch (ios_base::failure &e) {
@@ -241,28 +254,27 @@ void Sections::binary_hex_intel(const char *file_name, unsigned word_size, unsig
 	}
 }
 
-void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigned byte_order) {
+
+void Sections::binary_logisim(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address) {
 	try {
 		std::ofstream file(file_name);
 		file << "v2.0 raw" << endl;
-		for (auto i = 0U; i < table.size(); ++i) {
-			Section *section = table.at(i);
-			if ((section->flags & Section::LOADABLE) == 0)
-				continue;
-			auto size = section->content_size;
-			// Uma secção começa sempre num endereço múltiplo de word_size
-			for (auto offset = byte_order; offset < size; ) {
-				uint8_t c = read8(i, offset);
-				offset += word_size;
-				//	Quantos bytes iguais a este?
-				if (read8(i, offset) == c) {
-					auto j = 2U;
-					for (offset += word_size; offset < size && c == read8(i, offset); offset += word_size, j++)
-						;
-					ostream_printf(file, " %d*%02x", j, static_cast<uint8_t >(c));
-				}
-				ostream_printf(file, " %02x", static_cast<uint8_t >(c));
+		for (auto address = lower_address + byte_order; address < higher_address; ) {
+			uint8_t c = memory.read8(address);
+			address += word_size;
+			//	Quantos bytes iguais a este?
+			if (memory.read8(address) == c) {
+				auto j = 2U;
+				for (address += word_size;
+				     	address < higher_address && c == memory.read8(address);
+					 		address += word_size, j++)
+					;
+				ostream_printf(file, " %d*%02x", j, static_cast<uint8_t >(c));
 			}
+			else
+				ostream_printf(file, " %02x", static_cast<uint8_t >(c));
 		}
 		file.close();
 	} catch (ios_base::failure &e) {
@@ -270,25 +282,15 @@ void Sections::binary_logisim(const char *file_name, unsigned word_size, unsigne
 	}
 }
 
-void Sections::binary_raw(const char *file_name) {
+void Sections::binary_raw(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address) {
 	try {
 		std::ofstream file(file_name);
-		file.fill(0);
-		//	Primeira secção
-		Section *section = table.at(0);
-		file.write((const char *)section->content, section->content_size);
-		size_t current_address = section->base_address + section->content_size;
-		
-		//	Restantes secções
-		for (auto i = 1U; i < table.size(); ++i) {
-			section = table.at(i);
-			if (section->base_address > current_address) {
-				file.width(section->base_address - current_address - 1);
-				file << 0;
-				file.width(0);
-			}
-			file.write((const char *)section->content, section->content_size);
-			current_address = section->base_address + section->content_size;
+		for (auto address = lower_address + byte_order; address < higher_address; ) {
+			uint8_t c = memory.read8(address);
+			file.put(c);
+			address += word_size;
 		}
 		file.close();
 	} catch (ios_base::failure &e) {

@@ -20,6 +20,8 @@ limitations under the License.
 #include <getopt.h>
 #include <regex>
 
+#define DEBUG
+
 #include "p16.h"
 #include "p16.tab.hpp"
 
@@ -45,10 +47,11 @@ void listing_load_inputfile(const char *src_filename);
 		"\t-h, --help\n"
 		"\t-v, --version\n"
 		"\t-i, --input <source filename>\n"
-		"\t-o, --output <filename>\n"
+		"\t-o, --output <base filename>\n"
 		"\t-s, --section <section name>=<address>\n"
 		"\t-f, --format hexintel | binary | logisim\n"
-		"\t-l, --interleave\n",
+		"\t-a, --addresses <from>-<to>\n"
+		"\t-l, --interleave <word_size>\n",
 		prog_name);
 }
  
@@ -63,7 +66,9 @@ int main(int argc, char **argv) {
 	int result = 0;
 	int verbose_flag = 0;
 	const char *output_format = "hexintel";
-	int interleave = 1;
+	auto word_size = 1;
+	uint32_t lower_address, higher_address;
+	bool spec_address = false;
 
 	static struct option long_options[] = {
 		{"verbose", no_argument, &verbose_flag, 1},
@@ -72,13 +77,14 @@ int main(int argc, char **argv) {
 		{"output", required_argument, 0, 'o'},
 		{"section", required_argument, 0, 's'},
 		{"format", required_argument, 0, 'f'},
-		{"interleve", no_argument, 0, 'l'},
+		{"addresses", required_argument, 0, 'a'},
+		{"interleve", required_argument, 0, 'l'},
 		{0, 0, 0, 0}
 	};
 	int option_index, error_in_options = 0;
         
 	int c;
-	while ((c = getopt_long(argc, argv, "hvli:o:s:f:", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "hvl:i:o:s:f:a:", long_options, &option_index)) != -1) {
 		switch (c) {
 		case 0:	//	Opções longas com afetação de flag
 			break; 
@@ -91,9 +97,21 @@ int main(int argc, char **argv) {
 		case 'i':
 			input_filename = optarg;
 			break;
-		case 'l':
-			interleave = 2;
+		case 'l': {
+			regex re("^[1248]$");
+			cmatch cm;
+			if (regex_match(optarg, cm, re)) {
+#ifdef DEBUG
+				cout << "word_size = " << cm[0] << endl;
+#endif
+				word_size = stoul(cm[0], nullptr, 16);
+			}
+			else {
+				printf("Error in option -l argument, use 1, 2, 4 or 8\n");
+				error_in_options = 1;
+			}
 			break;
+		}
 		case 'f':
 			output_format = optarg;
 			break;
@@ -104,20 +122,41 @@ int main(int argc, char **argv) {
 			regex re("^[\\s]*([\\._]?[a-zAZ][a-zA-Z0-9]*)[\\s]*=[\\s]*(0[xX][0-9a-fA-F]+)[\\s]*$");
 			cmatch cm;
 			if (regex_match(optarg, cm, re)) {
-				int address;
-				if (verbose_flag)
-					cout << "{" << cm[1] << "} {" << cm[2] << "}" << endl;
-				sscanf(cm[2].str().c_str(), "%i", &address);
+#ifdef DEBUG
+				cout << "cm[0] = " << cm[0]
+					 << ", cm[1] = " << cm[1]
+					 << ", cm[2] = " << cm[2] << endl;
+#endif
+				auto address = stoul(cm[2], nullptr, 16);
 				section_addresses.set_property(cm[1].str(), address);
 			}
 			else {
-				printf("Error in parameter of option -s\n");
+				printf("Error in option -s argument\n");
+				error_in_options = 1;
+			}
+			break;
+		}
+		case 'a': {
+			regex re("^[\\s]*(0[xX][0-9a-fA-F]+)[\\s]*-[\\s]*(0[xX][0-9a-fA-F]+)[\\s]*$");
+			cmatch cm;
+			if (regex_match(optarg, cm, re)) {
+#ifdef DEBUG
+				cout << "cm[0] = " << cm[0]
+					 << ", cm[1] = " << cm[1]
+					 << ", cm[2] = " << cm[2] << endl;
+#endif
+				lower_address = stoul(cm[1], nullptr, 16);
+				higher_address = stoul(cm[2], nullptr, 16);
+				spec_address = true;
+			}
+			else {
+				printf("Error in option -a argument\n");
 				error_in_options = 1;
 			}
 			break;
 		}
 		case ':':
-			printf("Error in parameter of option -%c\n", optopt);
+			printf("Error in option -%c argument\n", optopt);
 			error_in_options = 1;
 			break;
 		case '?':
@@ -141,12 +180,6 @@ int main(int argc, char **argv) {
 		output_filename = input_filename.substr(0, input_filename.find_last_of('.'));
 
 	string lst_filename = output_filename + ".lst";
-	string bin_filename = output_filename + ".bin";
-	string sim0_filename = output_filename + "_0.sim";
-	string sim1_filename = output_filename + "_1.sim";
-	string hex_filename = output_filename + ".hex";
-	string hex0_filename = output_filename + "_0.hex";
-	string hex1_filename = output_filename + "_1.hex";
 
 	if (verbose_flag) {
 		cout << endl;
@@ -220,6 +253,8 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
+	Sections::fill_memory_space();
+
 	if (verbose_flag) {
 		cout << endl << "Generate listing" << endl;
 		cout << "\t filename: " << lst_filename << endl;
@@ -227,47 +262,62 @@ int main(int argc, char **argv) {
 	remove(lst_filename.c_str());
 	listing(lst_filename.c_str(), ast_root);
 
-	if (strcmp(output_format, "binary") == 0) {
-		if (verbose_flag) {
-			cout << endl << "Generate binary output"<< endl;
-			cout <<	"\tformat: " << output_format << endl;
-			cout << "filename: " << bin_filename << endl;
-		}
-		remove(bin_filename.c_str());
-		Sections::binary_raw(bin_filename.c_str());
+	//	Binário executável
+	if (!spec_address) {
+		Section *first_section = Sections::table[0];
+		Section *last_section = Sections::table[Sections::table.size() - 1];
+		lower_address = first_section->base_address;
+		higher_address = last_section->base_address + last_section->content_size;
+	}
 
+	if (verbose_flag) {
+		cout << endl << "Binary output"<< endl;
+		cout <<	"\tformat: " << output_format << endl;
+		cout << "\tword_size: " << word_size << endl;
+		ostream_printf(cout, "\tlower address: 0x%04x, higher address: 0x%04x\n", lower_address, higher_address);
+		cout << "\tbase file name: " << output_filename << endl;
+	}
+
+	if (strcmp(output_format, "binary") == 0) {
+		if (word_size == 1) {
+			string filename = output_filename + ".bin";
+			remove(filename.c_str());
+			Sections::binary_raw(filename.c_str(), word_size, 0, lower_address, higher_address);
+		}
+		else {
+			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+				string bin_filename = output_filename + string_printf("_%d.bin", byte_order);
+				remove(bin_filename.c_str());
+				Sections::binary_raw(bin_filename.c_str(), word_size, byte_order, lower_address, higher_address);
+			}
+		}
 	}
 	else if (strcmp(output_format, "logisim") == 0) {
-		if (verbose_flag) {
-			cout << endl << "Generate binary output"<< endl;
-			cout <<	"\tformat: " << output_format << endl;
-			cout << "filenames: " << sim0_filename << ", " << sim1_filename << endl;
+		if (word_size == 1) {
+			string filename = output_filename + ".sim";
+			remove(filename.c_str());
+			Sections::binary_logisim(filename.c_str(), word_size, 0, lower_address, higher_address);
 		}
-		remove(sim0_filename.c_str());
-		remove(sim1_filename.c_str());
-		Sections::binary_logisim(sim0_filename.c_str(), 2, 0);
-		Sections::binary_logisim(sim1_filename.c_str(), 2, 1);	
+		else {
+			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+				string filename = output_filename + string_printf("_%d.sim", byte_order);
+				remove(filename.c_str());
+				Sections::binary_logisim(filename.c_str(), word_size, byte_order, lower_address, higher_address);
+			}
+		}
 	}
-	else {
-		if (interleave == 1) {
-			if (verbose_flag) {
-				cout << endl << "Generate binary output"<< endl;
-				cout <<	"\tformat: " << output_format << endl;
-				cout << "\tfilename: " << hex_filename << endl;
-			}
-			remove(hex_filename.c_str());
-			Sections::binary_hex_intel(hex_filename.c_str(), 1, 0);
+	else {	//	Hexadecimal Intel
+		if (word_size == 1) {
+			string filename = output_filename + ".hex";
+			remove(filename.c_str());
+			Sections::binary_hex_intel(filename.c_str(), word_size, 0, lower_address, higher_address);
 		}
-		else {	// interleave == 2
-			if (verbose_flag) {
-				cout << endl << "Generate interleaved binary output"<< endl;
-				cout <<	"\tformat: " << output_format << endl;
-				cout << "\tfilenames: " << hex0_filename << "' " << hex1_filename << endl;
+		else {
+			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+				string filename = output_filename + string_printf("_%d.hex", byte_order);
+				remove(filename.c_str());
+				Sections::binary_hex_intel(filename.c_str(), word_size, byte_order, lower_address, higher_address);
 			}
-			remove(hex0_filename.c_str());
-			remove(hex1_filename.c_str());
-			Sections::binary_hex_intel(hex0_filename.c_str(), 2, 0);
-			Sections::binary_hex_intel(hex1_filename.c_str(), 2, 1);
 		}
 	}
 

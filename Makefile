@@ -49,7 +49,7 @@ clean:
 
 #-------------------------------------------------------------------------------
 
-OBJECTS = pas.o p16.tab.o p16.lex.o instruction.o expression.o sections.o symbols.o \
+OBJECTS = pas.o p16.tab.o p16.lex.o instruction.o expression.o sections.o symbols.o memory_space.o \
 	relocations.o cpp_printf.o listing.o code_generator.o error.o value_type.o directive.o
 
 $(EXECUTABLE): $(addprefix build/, $(OBJECTS))

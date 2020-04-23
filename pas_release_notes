@@ -1,6 +1,7 @@
-V1.3.2 (build: Apr 13 2020)
+V1.3.2 (build: Apr 23 2020)
 
-- Acrescentada opção -l para gerar Hex Intel com apenas o byte de endereço par ou apenas o byte de endereço impar
+- Acrescentada opção -l para gerar ficheiros binários com conteúdos intercalados
+- Acrescentada opção -a para definir a gama de endereços a ser copiada para os ficheiros binários
 
 V1.3.1 (build: Sep 11 2019)
 

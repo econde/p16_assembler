@@ -25,12 +25,12 @@ int main() {
 */
 	.data
 x:
-	.word	30
+	.word	0x0102
 y:
-	.word	4
+	.word	0x0304
 z:
-	.word	0
-	
+	.byte	0x05
+
 	.text
 main:
 	ldr	r0, addressof_x
