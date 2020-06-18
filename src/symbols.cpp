@@ -87,7 +87,7 @@ static bool cmp(Symbol *a, Symbol *b) {
 			table_sort.push_back(pair_symbol.second);
 		sort(table_sort.begin(), table_sort.end(), cmp);
 		for (auto symbol: table_sort) {
-			ostream_printf(lst_file, "%-24s%-10s%04X %-6d%s\n",
+			ostream_printf(lst_file, "%-23s %-10s%04X %-6d%s\n",
 							symbol->name.c_str(), value_type_name[symbol->type],
 							symbol->get_value(), symbol->get_value(),
 							(symbol->type == Value_type::UNDEFINED)

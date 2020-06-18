@@ -22,7 +22,7 @@ using namespace std;
 using namespace ast;
 
 string Directive::listing() {
-	return string_printf("%4d %04X %02X%2c\t", location.line, 
+	return string_printf("%4d %04X %02X%3c\t", location.line, 
 		Sections::get_address(section_index) + section_offset,
 		Sections::read8(section_index, section_offset), ' ');
 }
@@ -349,7 +349,7 @@ string Byte::listing() {
 				Sections::read8(section_index, section_offset),
 				Sections::read8(section_index, section_offset + 1));
 		default:
-			return string_printf("%4d          \t", location.line);
+			return string_printf("%4d           \t", location.line);
 		break;
 
 	}

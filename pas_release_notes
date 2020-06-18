@@ -2,6 +2,7 @@ V1.3.2 (build: Apr 23 2020)
 
 - Acrescentada opção -l para gerar ficheiros binários com conteúdos intercalados
 - Acrescentada opção -a para definir a gama de endereços a ser copiada para os ficheiros binários
+- Correção da listagem de símbolos grandes
 
 V1.3.1 (build: Sep 11 2019)
 
