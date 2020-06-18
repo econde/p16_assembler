@@ -20,7 +20,7 @@ limitations under the License.
 #include <getopt.h>
 #include <regex>
 
-#define DEBUG
+#undef DEBUG
 
 #include "p16.h"
 #include "p16.tab.hpp"
@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	const char *output_format = "hexintel";
 	auto word_size = 1;
 	uint32_t lower_address, higher_address;
-	bool spec_address = false;
+	bool option_address = false;
 
 	static struct option long_options[] = {
 		{"verbose", no_argument, &verbose_flag, 1},
@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 		{"section", required_argument, 0, 's'},
 		{"format", required_argument, 0, 'f'},
 		{"addresses", required_argument, 0, 'a'},
-		{"interleve", required_argument, 0, 'l'},
+		{"interleave", required_argument, 0, 'l'},
 		{0, 0, 0, 0}
 	};
 	int option_index, error_in_options = 0;
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
 #endif
 				lower_address = stoul(cm[1], nullptr, 16);
 				higher_address = stoul(cm[2], nullptr, 16);
-				spec_address = true;
+				option_address = true;
 			}
 			else {
 				printf("Error in option -a argument\n");
@@ -263,11 +263,9 @@ int main(int argc, char **argv) {
 	listing(lst_filename.c_str(), ast_root);
 
 	//	Binário executável
-	if (!spec_address) {
-		Section *first_section = Sections::table[0];
-		Section *last_section = Sections::table[Sections::table.size() - 1];
-		lower_address = first_section->base_address;
-		higher_address = last_section->base_address + last_section->content_size;
+	if (!option_address) {
+		lower_address = Sections::lower_address();
+		higher_address = Sections::higher_address();
 	}
 
 	if (verbose_flag) {

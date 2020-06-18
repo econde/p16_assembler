@@ -16,8 +16,8 @@ pas_setup.exe
 *.d
 *.map
 *.a
-*.sim1
-*.sim0
+*.sim
+*.sim
 *.pdf
 *.lex.cpp
 *.output

@@ -232,21 +232,37 @@ void Sections::binary_hex_intel(const char *file_name,
 								unsigned lower_address, unsigned higher_address) {
 	try {
 		std::ofstream file(file_name);
-		auto size = (higher_address - lower_address) / word_size;
-		auto address = lower_address + byte_order;
-		do {
-			auto rec_len = min(16U, size);
-			auto load_address = address / word_size;
-			uint8_t cheksum = (rec_len + load_address + (load_address >> 8));
-			ostream_printf(file, ":%02X%04X00", rec_len, load_address);
-			for (auto j = 0U; j < rec_len; ++j, address += word_size) {
-				uint8_t b = memory.read8(address);
-				ostream_printf(file, "%02X", b);
-				cheksum += b;
-			}
-			ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
-			size -= rec_len;
-		} while (size > 0);
+		for (size_t i = 0; i < table.size(); ++i) {
+			Section *section = table.at(i);
+
+			if ((section->flags & Section::LOADABLE) == 0)
+				continue;
+
+			if (higher_address < section->base_address)
+				break;
+
+			if (lower_address >= section->base_address + section->content_size)
+				continue;
+
+			auto section_lower_address = max(lower_address, section->base_address);
+			auto section_higher_address = min(higher_address, section->base_address + section->content_size);
+
+			auto address = section_lower_address + byte_order;
+			auto size = (section_higher_address - section_lower_address) / word_size;
+			do {
+				auto rec_len = min(16U, size);
+				auto load_address = address / word_size;
+				uint8_t cheksum = (rec_len + load_address + (load_address >> 8));
+				ostream_printf(file, ":%02X%04X00", rec_len, load_address);
+				for (auto j = 0U; j < rec_len; ++j, address += word_size) {
+					uint8_t b = memory.read8(address);
+					ostream_printf(file, "%02X", b);
+					cheksum += b;
+				}
+				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
+				size -= rec_len;
+			} while (size > 0);
+		}
 		ostream_printf(file, ":00000001FF");
 		file.close();
 	} catch (ios_base::failure &e) {

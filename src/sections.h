@@ -161,6 +161,14 @@ public:
 								unsigned lower_address, unsigned higher_address);
 	
 	static void fill_memory_space();
+
+	static uint32_t lower_address() {
+		return list.empty() ? 0 : list.front()->base_address;
+	}
+	
+	static uint32_t higher_address() {
+		return list.empty() ? 0 : list.back()->base_address + list.back()->content_size;
+	}
 };
 
 }
