@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "code_generator.h"
 #include "relocations.h"
-#include "p16.tab.hpp"
+#include "p16_parser.hpp"
 #include "error.h"
 #include "utils.h"
 

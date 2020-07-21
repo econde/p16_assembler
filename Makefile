@@ -1,56 +1,62 @@
-ifndef WINDOWS
-
-all: pas
-
-GPP = g++
-
-GCC = gcc
-
-EXECUTABLE = pas
-
-CFLAGS	= -c -g -Wa,-a=build/$*.lst -Wall
-
-src/p16.lex.cpp:	src/p16.l src/p16.tab.cpp
-	flex -o src/p16.lex.cpp src/p16.l
-
-src/p16.tab.cpp src/p16.tab.hpp: src/p16.ypp
-	bison --defines=src/p16.tab.hpp --output=src/p16.tab.cpp -v -t src/p16.ypp
-
-#-------------------------------------------------------------------------------
-
-else
-
-all: pas.exe
-
-GPP = /usr/bin/x86_64-w64-mingw32-g++
-
-GCC = /usr/bin/x86_64-w64-mingw32-gcc
+ifdef WINDOWS
 
 EXECUTABLE = pas.exe
 
-CFLAGS	= -c -O3 -Wa,-a=build/$*.lst -Wall
+CXX = /usr/bin/x86_64-w64-mingw32-g++
 
 LDFLAGS = -Wl,-static -static-libgcc -static-libstdc++
 
+else
+
+EXECUTABLE = pas
+
+CXX = g++
+
 endif
-#-------------------------------------------------------------------------------
 
+SOURCES = \
+	build/p16_parser.cpp \
+	build/p16_lexer.cpp  \
+	src/code_generator.cpp \
+ 	src/cpp_printf.cpp \
+	src/directive.cpp \
+	src/error.cpp \
+	src/expression.cpp \
+	src/instruction.cpp \
+	src/listing.cpp \
+	src/pas.cpp \
+	src/relocations.cpp \
+	src/sections.cpp \
+	src/symbols.cpp \
+	src/value_type.cpp
 
-CXXFLAGS = $(CFLAGS) -std=c++11 -U__STRICT_ANSI__
+OBJECTS = $(SOURCES:%.cpp=build/%.o)
 
-build/%.o: src/%.c
-	$(GPP) -o build/$*.o $(CXXFLAGS) $<
+DEPENDENCIES = $(OBJECTS:%.o=%.d)
 
-build/%.o: src/%.cpp
-	$(GPP) -o build/$*.o $(CXXFLAGS) $<
+all: build_dir build/$(EXECUTABLE)
+
+CXXFLAGS = -MMD -c -g -Wall -std=c++11 -U__STRICT_ANSI__ -Ibuild -Isrc
+
+build_dir:
+	mkdir -p build/src build/build
+
+build/p16_lexer.cpp: src/p16.l build/p16_parser.hpp
+	flex -o $@ src/p16.l
+
+build/p16_parser.cpp build/p16_parser.hpp: src/p16.ypp
+	bison --defines=build/p16_parser.hpp --output=build/p16_parser.cpp -v -t src/p16.ypp
+
+-include $(DEPENDENCIES)
+
+build/build/%.o: build/%.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
 	
+build/src/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+build/$(EXECUTABLE): $(OBJECTS)
+	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
+
 clean:
-	rm -rf build/*
-
-#-------------------------------------------------------------------------------
-
-OBJECTS = pas.o p16.tab.o p16.lex.o instruction.o expression.o sections.o symbols.o \
-	relocations.o cpp_printf.o listing.o code_generator.o error.o value_type.o directive.o
-
-$(EXECUTABLE): $(addprefix build/, $(OBJECTS))
-	$(GPP) $(LDFLAGS) -o $@ $(addprefix build/, $(OBJECTS))
+	rm -rf build/src build/build build/*.cpp build/p16_parser.hpp build/p16_parser.output build/$(EXECUTABLE)

@@ -1,9 +1,21 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.13)
 project(pas)
 
 set(CMAKE_CXX_STANDARD 11)
 
+find_package(BISON)
+BISON_TARGET(p16_parser src/p16.ypp ${CMAKE_CURRENT_BINARY_DIR}/p16_parser.cpp)
+
+find_package(FLEX)
+FLEX_TARGET(p16_lexer src/p16.l ${CMAKE_CURRENT_BINARY_DIR}/p16_lexer.cpp)
+
+ADD_FLEX_BISON_DEPENDENCY(p16_lexer p16_parser)
+
+include_directories(src ${CMAKE_CURRENT_BINARY_DIR})
+
 add_executable(pas
+		${BISON_p16_parser_OUTPUTS}
+		${FLEX_p16_lexer_OUTPUTS}
         src/cpp_printf.cpp
         src/cpp_printf.h
         src/pas.cpp
@@ -12,12 +24,7 @@ add_executable(pas
         src/expression_base.h
         src/expression.h
         src/expression.cpp
-        src/p16.h
-        src/p16.l
-        src/p16.ypp
-        src/p16.tab.cpp
-        src/p16.lex.cpp
-        src/instruction.cpp
+		src/instruction.cpp
         src/instruction.h
         src/listing_generator.h
         src/listing.cpp
@@ -38,4 +45,3 @@ add_executable(pas
         src/error.cpp
         src/value_type.h
         src/value_type.cpp)
-

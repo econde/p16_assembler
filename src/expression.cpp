@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #include "p16.h"
-#include "p16.tab.hpp"
+#include "p16_parser.hpp"
 
 namespace ast {
 

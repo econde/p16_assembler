@@ -21,7 +21,7 @@ limitations under the License.
 #include <regex>
 
 #include "p16.h"
-#include "p16.tab.hpp"
+#include "p16_parser.hpp"
 
 #include "code_generator.h"
 #include "relocations.h"

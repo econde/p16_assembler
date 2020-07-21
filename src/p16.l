@@ -20,7 +20,7 @@ limitations under the License.
 %{
 #include <string.h>
 #include "p16.h"
-#include "p16.tab.hpp"
+#include "p16_parser.hpp"
 
 /* handle locations */
 int yycolumn = 0;

@@ -19,7 +19,7 @@ limitations under the License.
 #include <cstdarg>
 #include "error.h"
 #include "p16.h"
-#include "p16.tab.hpp"
+#include "p16_parser.hpp"
 
 extern std::vector<std::string>	srcfile;
 //extern int yylineno;
