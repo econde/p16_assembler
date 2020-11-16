@@ -22,7 +22,7 @@ using namespace std;
 using namespace ast;
 
 string Directive::listing() {
-	return string_printf("%4d %04X %02X%2c\t", location.line, 
+	return string_printf("%4d %04X %02X%3c\t", location.line,
 		Sections::get_address(section_index) + section_offset,
 		Sections::read8(section_index, section_offset), ' ');
 }
@@ -30,7 +30,7 @@ string Directive::listing() {
 string Directive::more_listing() {
 	string tmp = string();
 	for (unsigned i = 1; i < size_in_memory; ++i) {
-		tmp += string_printf("%4d %04X %02X\n", location.line, 
+		tmp += string_printf("%4d %04X %02X\n", location.line,
 		Sections::get_address(section_index) + section_offset + i,
 		Sections::read8(section_index, section_offset + i));
 	}
@@ -130,7 +130,7 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 // 61                0    2    4    6    8    A    C    E  0123456789ABCDEF
 // 61 00A0                                      0001 00D6              ....
 // 61 00B0        0002 00D8 0003 00DA                      ........
-  
+
 	auto address = Sections::get_address(section) + offset;
 	auto remainder_bytes = size;
 
@@ -159,7 +159,7 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 		tmp += ' ';
 	for (auto i = 0U; i < nbytes; i++, n++) {
 		auto c = Sections::read8(section, offset + i);
-		if (isprint(c) && 
+		if (isprint(c) &&
 			c != '\t' && c != '\n' && c != '\r' && c != '\v' &&
 			c != '\b' && c != '\f' && c != '\a')
 			tmp += string_printf("%c", c);
@@ -189,7 +189,7 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 		//	ascii
 		for (auto i = 0U; i < 16U; i++) {
 			auto c = Sections::read8(section, offset + i);
-			if (isprint(c) && 
+			if (isprint(c) &&
 				c != '\t' && c != '\n' && c != '\r' && c != '\v' &&
 				c != '\b' && c != '\f' && c != '\a')
 				tmp += string_printf("%c", c);
@@ -224,7 +224,7 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 		n = 0;
 		for (auto i = 0U; i < remainder_bytes; i++, n++) {
 			auto c = Sections::read8(section, offset + i);
-			if (isprint(c) && 
+			if (isprint(c) &&
 				c != '\t' && c != '\n' && c != '\r' && c != '\v' &&
 				c != '\b' && c != '\f' && c != '\a')
 				tmp += string_printf("%c", c);
@@ -241,11 +241,11 @@ static string hex_dump(int line, unsigned section, unsigned offset, unsigned siz
 string Ascii::listing() {
 	switch (size_in_memory) {
 		case 1:
-			return string_printf("%4d %04X %02X\t", location.line, 
+			return string_printf("%4d %04X %02X\t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset));
 		case 2:
-			return string_printf("%4d %04X %02X %02X\t", location.line, 
+			return string_printf("%4d %04X %02X %02X\t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset),
 				Sections::read8(section_index, section_offset + 1));
@@ -265,12 +265,12 @@ string Ascii::more_listing() {
 #if 0
 string Byte::listing() {
 	if (grain_size == 2)
-		return string_printf("%4d %04X %02X%02X\t", location.line, 
+		return string_printf("%4d %04X %02X%02X\t", location.line,
 			Sections::get_address(section_index) + section_offset,
 			Sections::read8(section_index, section_offset + 1),
 			Sections::read8(section_index, section_offset));
 	else
-		return string_printf("%4d %04X %02X  \t", location.line, 
+		return string_printf("%4d %04X %02X  \t", location.line,
 			Sections::get_address(section_index) + section_offset,
 			Sections::read8(section_index, section_offset));
 }
@@ -279,13 +279,13 @@ string Byte::more_listing() {
 	string tmp = string();
 	if (grain_size == 2)
 		for (unsigned i = 2; i < size_in_memory; i += 2)
-			tmp += string_printf("%4d %04X %02X%02X\n", location.line, 
+			tmp += string_printf("%4d %04X %02X%02X\n", location.line,
 			Sections::get_address(section_index) + section_offset + i,
 			Sections::read8(section_index, section_offset + i + 1),
 			Sections::read8(section_index, section_offset + i));
 	else
 		for (unsigned i = 1; i < size_in_memory; ++i) {
-			tmp += string_printf("%4d %04X %02X\n", location.line, 
+			tmp += string_printf("%4d %04X %02X\n", location.line,
 			Sections::get_address(section_index) + section_offset + i,
 			Sections::read8(section_index, section_offset + i));
 		}
@@ -298,7 +298,7 @@ string Byte::more_listing() {
 string Byte::listing() {
 	if (grain_size == 2)
 		if (size_in_memory < 8)
-			return string_printf("%4d %04X %02X%02X\t", location.line, 
+			return string_printf("%4d %04X %02X%02X\t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset + 1),
 				Sections::read8(section_index, section_offset));
@@ -306,7 +306,7 @@ string Byte::listing() {
 			return string_printf("%4d          \t", location.line);
 	else	//	grain_size == 1
 		if (size_in_memory < 4)
-			return string_printf("%4d %04X %02X  \t", location.line, 
+			return string_printf("%4d %04X %02X  \t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset));
 		else
@@ -318,7 +318,7 @@ string Byte::more_listing() {
 	if (grain_size == 2)
 		if (size_in_memory < 8)
 			for (unsigned i = 2; i < size_in_memory; i += 2)
-				tmp += string_printf("%4d %04X %02X%02X\n", location.line, 
+				tmp += string_printf("%4d %04X %02X%02X\n", location.line,
 				Sections::get_address(section_index) + section_offset + i,
 				Sections::read8(section_index, section_offset + i + 1),
 				Sections::read8(section_index, section_offset + i));
@@ -327,7 +327,7 @@ string Byte::more_listing() {
 	else 	//	grain_size == 1
 		if (size_in_memory < 4)
 			for (unsigned i = 1; i < size_in_memory; ++i) {
-				tmp += string_printf("%4d %04X %02X\n", location.line, 
+				tmp += string_printf("%4d %04X %02X\n", location.line,
 				Sections::get_address(section_index) + section_offset + i,
 				Sections::read8(section_index, section_offset + i));
 			}
@@ -340,11 +340,11 @@ string Byte::more_listing() {
 string Byte::listing() {
 	switch (size_in_memory) {
 		case 1:
-			return string_printf("%4d %04X %02X\t", location.line, 
+			return string_printf("%4d %04X %02X\t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset));
 		case 2:
-			return string_printf("%4d %04X %02X %02X\t", location.line, 
+			return string_printf("%4d %04X %02X %02X\t", location.line,
 				Sections::get_address(section_index) + section_offset,
 				Sections::read8(section_index, section_offset),
 				Sections::read8(section_index, section_offset + 1));
@@ -365,13 +365,13 @@ string Space::more_listing() {
 	string tmp = string();
 	if (size_in_memory <= 3)
 		for (unsigned i = 1; i < size_in_memory; ++i) {
-			tmp += string_printf("%4d %04X %02X\n", location.line, 
+			tmp += string_printf("%4d %04X %02X\n", location.line,
 				Sections::get_address(section_index) + section_offset + i,
 				Sections::read8(section_index, section_offset + i));
 		}
 	else {
-		tmp += string_printf("%4d .... ..\n", location.line); 
-		tmp += string_printf("%4d %04X %02X\n", location.line, 
+		tmp += string_printf("%4d .... ..\n", location.line);
+		tmp += string_printf("%4d %04X %02X\n", location.line,
 			Sections::get_address(section_index) + section_offset + size_in_memory - 1,
 			Sections::read8(section_index, section_offset + size_in_memory - 1));
 	}
@@ -382,7 +382,7 @@ string Align::listing() {
 	if (size_in_memory == 0)
 		return string_printf("%4d%10c\t", location.line, ' ');
 	else
-		return string_printf("%4d %04X %02X%2c\t", location.line, 
+		return string_printf("%4d %04X %02X%2c\t", location.line,
 			Sections::get_address(section_index) + section_offset,
 			Sections::read8(section_index, section_offset), ' ');
 }

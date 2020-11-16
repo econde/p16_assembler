@@ -26,6 +26,7 @@ SOURCES = \
 	src/listing.cpp \
 	src/pas.cpp \
 	src/relocations.cpp \
+	src/memory_space.cpp \
 	src/sections.cpp \
 	src/symbols.cpp \
 	src/value_type.cpp
@@ -51,7 +52,7 @@ build/p16_parser.cpp build/p16_parser.hpp: src/p16.ypp
 
 build/build/%.o: build/%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
-	
+
 build/src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 

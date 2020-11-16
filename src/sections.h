@@ -40,7 +40,7 @@ struct Section {
 	void enlarge(unsigned new_capacity);
 
 	Section(std::string name, unsigned number, unsigned flags)
-			: name {name}, number{number}, base_address {0}, flags {flags}, 
+			: name {name}, number{number}, base_address {0}, flags {flags},
 			  content_capacity {0}, content_size {0}, content(nullptr) { }
 
 	void write8(unsigned offset, uint8_t value);
@@ -149,11 +149,28 @@ public:
 	static void locate(Properties<std::string, unsigned> *section_addresses);
 
 	//	Produz um ficheiro em formato Hex Intel com o conteúdo das secções.
-	static void binary_hex_intel(const char *file_name);
+	static void binary_hex_intel(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address);
 
 	//	Produz um ficheiro no formato usado no Logisim com o conteúdo das secções.
-	static void binary_logisim(const char *file_name, unsigned word_size, unsigned byte_order);
-	static void binary_raw(const char *file_name);
+	static void binary_logisim(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address);
+	static void binary_raw(const char *file_name,
+								unsigned word_size, unsigned byte_order,
+								unsigned lower_address, unsigned higher_address);
+
+	static void fill_memory_space();
+
+	static uint32_t lower_address() {
+		return list.empty() ? 0 : list.front()->base_address;
+	}
+
+	static uint32_t higher_address() {
+		return list.empty() ? 0 : list.back()->base_address + list.back()->content_size;
+	}
+
 };
 
 }

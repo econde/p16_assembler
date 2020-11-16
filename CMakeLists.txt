@@ -31,6 +31,8 @@ add_executable(pas
         src/code_generator.h
         src/code_generator.cpp
         src/location.h
+        src/memory_space.h
+        src/memory_space.cpp
         src/sections.h
         src/sections.cpp
         src/statement.h

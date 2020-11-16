@@ -51,12 +51,12 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root) {
 		Sections::listing(lst);
 		Symbols::listing(lst);
 
-	lst << "Code listing" << endl;
+		lst << "Code listing" << endl;
 		for (auto s: *ast_root) {
 			Statement *statement = s;
 			std::string line;
 			for (; current_line < statement->location.line; ++current_line) {
-			//	linhas em branco e comentários 
+			//	linhas em branco e comentários
 				line = srcfile[current_line - 1];
 				ostream_printf(lst, "%4d%11c\t", current_line, ' ') << line << endl;
 			}
