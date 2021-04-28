@@ -1,3 +1,7 @@
+V1.3.3 (build: Apr 28 2021)
+
+- Correção de erro na verificação do alcance das instruções branch
+
 V1.3.2 (build: Apr 23 2020)
 
 - Acrescentada opção -l para gerar ficheiros binários com conteúdos intercalados

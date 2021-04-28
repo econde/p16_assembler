@@ -240,12 +240,12 @@ void Code_generator::visit(Branch *s) {
 			offset = s->expression->get_value() - s->section_offset - 2;    //  O PC está dois endereços à frente
 			if ((offset & 1) != 0)
 				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), offset));
-			offset >>= 1;
 			if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
 				error_report(&s->expression->location,
                              string_printf( "Interval between PC and target address - %+d (0x%x) words - "
                                             "isn't codable in %d bit two's complement",
-                                            offset, offset, BRANCH_OFFSET_SIZE));
+                                            offset >> 1, offset >> 1, BRANCH_OFFSET_SIZE));
+			offset >>= 1;
 		} else {    // A Label pertence a outra secção será resolvida na fase de relocalização
 			auto addend = s->expression->get_value() - 2;
 			if ((addend & 1) != 0)
