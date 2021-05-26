@@ -244,8 +244,6 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-	Sections::fill_memory_space();
-
 	if (verbose_flag) {
 		cout << endl << "Relocate symbols" << endl;
 		Relocations::print(cout);
@@ -256,6 +254,8 @@ int main(int argc, char **argv) {
 		result = -2;
 		goto exit_error;
 	}
+
+	Sections::fill_memory_space();
 
 	if (verbose_flag) {
 		cout << endl << "Generate listing" << endl;
