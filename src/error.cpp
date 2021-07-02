@@ -39,7 +39,7 @@ static void fputnc(char c, int n, FILE *fd) {
 	while (n--)
 		fputc(c, stderr);
 }
-	
+
 static void underline(int offset, int left, int right, const char *text) {
 	auto column = offset;
 	while (--offset > 0)
@@ -104,4 +104,5 @@ void yyerror(const char *s, ...) {
 	fprintf(stderr, "\n");
 
 	error_count++;
+	exit(-1);
 }
