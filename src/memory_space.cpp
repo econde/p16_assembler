@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-/*	
+/*
 	Simulação de sistema de memória paginado de um nível.
 
 	Dimensão da página e dimensão total do espaço de endereçamento parametrizáveis.
@@ -66,31 +66,35 @@ Memory_space::~Memory_space() {
 	free(page_table);
 }
 
-void Memory_space::read(uint32_t address, uint8_t *buffer, size_t buffer_size) {
+void Memory_space::read(uint32_t address, uint8_t *buffer, size_t size) {
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
-	size_t size = buffer_size;
-	while ( size > 0 ) {
-		size_t nbytes = min(size, (size_t)(page_size - byte_offset));
-		memcpy(buffer, page_table[page_index].data + byte_offset, nbytes);
-		size -= nbytes;
+	size_t buffer_size = size;
+	uint8_t *buffer_ptr = buffer;
+	while ( buffer_size > 0 ) {
+		size_t nbytes = min(buffer_size, (size_t)(page_size - byte_offset));
+		memcpy(buffer_ptr, page_table[page_index].data + byte_offset, nbytes);
+		buffer_size -= nbytes;
+		buffer_ptr += nbytes;
 		page_index = (page_index + 1) & page_table_mask;
 		byte_offset = 0;
 	}
 }
 
-void Memory_space::write(uint32_t address, uint8_t *data, size_t data_size) {
+void Memory_space::write(uint32_t address, uint8_t *data, size_t size) {
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
-	size_t size = data_size;
-	while ( size > 0 ) {
-		size_t nbytes = min(size, (size_t)(page_size - byte_offset));
+	size_t data_size = size;
+	uint8_t *data_ptr = data;
+	while ( data_size > 0 ) {
+		size_t nbytes = min(data_size, (size_t)(page_size - byte_offset));
 		if ( ! page_table[page_index].present) {
 			page_table[page_index].data = (uint8_t*)calloc(page_size, 1);
 			page_table[page_index].present = 1;
 		}
-		memcpy(page_table[page_index].data + byte_offset, data, nbytes);
-		size -= nbytes;
+		memcpy(page_table[page_index].data + byte_offset, data_ptr, nbytes);
+		data_size -= nbytes;
+		data_ptr += nbytes;
 		page_index = (page_index + 1) & page_table_mask;
 		byte_offset = 0;
 	}
