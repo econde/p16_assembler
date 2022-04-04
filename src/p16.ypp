@@ -88,13 +88,13 @@ typedef struct YYLTYPE {
 	PARENTHESE_LEFT PARENTHESE_RIGHT BRACKET_LEFT BRACKET_RIGHT BRACE_LEFT BRACE_RIGHT
 	EOL
 
-%token ALIGN SECTION EQU TEXT DATA SPACE ASCII ASCIZ
+%token ALIGN SECTION EQU TEXT DATA BSS STACK SPACE ASCII ASCIZ
 %type <integer> ASCII
 
 %token CPSR SPSR
 
-%token LDR_STR LDR LDRB STR STRB STACK POP PUSH
-%type <integer> LDR_STR STACK
+%token LDR_STR LDR LDRB STR STRB PUSH_POP POP PUSH
+%type <integer> LDR_STR PUSH_POP
 
 %token ARITH ADD ADC SUB SBC
 %type <integer> ARITH
@@ -178,9 +178,9 @@ instruction
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA register BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
 
-	|	STACK BRACE_LEFT register BRACE_RIGHT
+	|	PUSH_POP BRACE_LEFT register BRACE_RIGHT
 			{ $$ = new ast::Push_pop($1, $3, LOCATION(@1)); }
-	|	STACK register
+	|	PUSH_POP register
 			{ $$ = new ast::Push_pop($1, $2, LOCATION(@1)); }
 
 	|	ARITH register COMMA register COMMA register
@@ -247,13 +247,24 @@ directive
 			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
 	|	SECTION DATA
 			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+	|	SECTION BSS
+			{ $$ = new ast::DSection(std::string(".bss"), LOCATION(@1)); }
+	|	SECTION STACK
+			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
 	|	TEXT
 			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
 	|	DATA
 			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+	|	BSS
+			{ $$ = new ast::DSection(std::string(".bss"), LOCATION(@1)); }
+	|	STACK
+			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
 
 	|	EQU IDENTIFIER COMMA expression
 			{ $$ = new ast::Equ(*$2, $4, LOCATION(@1)); delete($2); }
+
+	|	BYTE
+			{ $$ = new ast::Byte($1, new std::list<ast::Expression*>{new ast::Value(0, LOCATION(@1))}, LOCATION(@1)); }
 
 	|	BYTE value_list
 			{ $$ = new ast::Byte($1, $2, LOCATION(@1)); }

@@ -60,18 +60,21 @@ BinDigit			[01]
 
 /* -----------------------------------------------------------------------------
 	zona de regras
+"."+(?i:stack)		{ return STACK; }
 */
 %%
-".section"			{ return SECTION; }
-".text"				{ return TEXT; }
-".data"				{ return DATA; }
-".equ"				{ return EQU; }
-".align"			{ return ALIGN; }
-".byte"				{ yylval.integer = 1; return BYTE; }
-".word"				{ yylval.integer = 2; return BYTE; }
-".space"			{ return SPACE; }
-".ascii"			{ yylval.integer = 0; return ASCII; }
-".asciz"			{ yylval.integer = 1; return ASCII; }
+"."+(?i:section)	{ return SECTION; }
+"."+(?i:text)		{ return TEXT; }
+"."+(?i:data)		{ return DATA; }
+"."+(?i:bss)		{ return BSS; }
+"."+(?i:stack)		{ return STACK; }
+"."+(?i:equ)		{ return EQU; }
+"."+(?i:align)		{ return ALIGN; }
+"."+(?i:byte)		{ yylval.integer = 1; return BYTE; }
+"."+(?i:word)		{ yylval.integer = 2; return BYTE; }
+"."+(?i:space)		{ return SPACE; }
+"."+(?i:ascii)		{ yylval.integer = 0; return ASCII; }
+"."+(?i:asciz)		{ yylval.integer = 1; return ASCII; }
 	/* operators */
 "="					{ return EQUAL; }
 "=="				{ return EQUAL_EQUAL; }
@@ -122,57 +125,57 @@ BinDigit			[01]
 "r10"|"R10"				{ yylval.integer = 10; return REGISTER; }
 "r11"|"R11"				{ yylval.integer = 11; return REGISTER; }
 "r12"|"R12"				{ yylval.integer = 12; return REGISTER; }
-"r13"|"R13"|"sp"|"SP"	{ yylval.integer = 13; return REGISTER; }
-"r14"|"R14"|"lr"|"LR"	{ yylval.integer = 14; return REGISTER; }
-"r15"|"R15"|"pc"|"PC"	{ yylval.integer = 15; return REGISTER; }
-"cpsr"|"CPSR"			{ yylval.integer = CPSR; return SPECIAL; }
-"spsr"|"SPSR"			{ yylval.integer = SPSR; return SPECIAL; }
+"r13"|"R13"|(?i:sp)		{ yylval.integer = 13; return REGISTER; }
+"r14"|"R14"|(?i:lr)		{ yylval.integer = 14; return REGISTER; }
+"r15"|"R15"|(?i:pc)		{ yylval.integer = 15; return REGISTER; }
+(?i:cpsr)				{ yylval.integer = CPSR; return SPECIAL; }
+(?i:spsr)				{ yylval.integer = SPSR; return SPECIAL; }
 
 
 	/* instructions */
 
-"ldr"				{ yylval.integer = 0; return LDR_STR; }
-"ldrb"				{ yylval.integer = 1; return LDR_STR; }
-"str"				{ yylval.integer = 2; return LDR_STR; }
-"strb"				{ yylval.integer = 3; return LDR_STR; }
+(?i:ldr)				{ yylval.integer = 0; return LDR_STR; }
+(?i:ldrb)				{ yylval.integer = 1; return LDR_STR; }
+(?i:str)				{ yylval.integer = 2; return LDR_STR; }
+(?i:strb)				{ yylval.integer = 3; return LDR_STR; }
 
-"push"				{ yylval.integer = PUSH; return STACK; }
-"pop"				{ yylval.integer = POP;  return STACK; }
+(?i:push)				{ yylval.integer = PUSH; return PUSH_POP; }
+(?i:pop)				{ yylval.integer = POP;  return PUSH_POP; }
 
-"add"|"adds"		{ yylval.integer = ADD; return ARITH; }
-"adc"|"adcs"		{ yylval.integer = ADC; return ARITH; }
-"sub"|"subs"		{ yylval.integer = SUB; return ARITH; }
-"sbc"|"sbcs"		{ yylval.integer = SBC; return ARITH; }
+(?i:add)|(?i:adds)		{ yylval.integer = ADD; return ARITH; }
+(?i:adc)|(?i:adcs)		{ yylval.integer = ADC; return ARITH; }
+(?i:sub)|(?i:subs)		{ yylval.integer = SUB; return ARITH; }
+(?i:sbc)|(?i:sbcs)		{ yylval.integer = SBC; return ARITH; }
 
-"cmp"				{ yylval.integer = CMP; return CMP; }
+(?i:cmp)				{ yylval.integer = CMP; return CMP; }
 
-"and"|"ands"		{ yylval.integer = AND; return LOGIC; }
-"orr"|"orrs"		{ yylval.integer = OR; return LOGIC; }
-"eor"|"eors"		{ yylval.integer = EOR; return LOGIC; }
-"mvn"|"mvns"		{                       return NOT; }
+(?i:and)|(?i:ands)		{ yylval.integer = AND; return LOGIC; }
+(?i:orr)|(?i:orrs)		{ yylval.integer = OR; return LOGIC; }
+(?i:eor)|(?i:eors)		{ yylval.integer = EOR; return LOGIC; }
+(?i:mvn)|(?i:mvns)		{                       return NOT; }
 
-"lsl"|"lsls"		{ yylval.integer = LSL; return SHIFT; }
-"lsr"|"lsrs"		{ yylval.integer = LSR; return SHIFT; }
-"asr"|"asrs"		{ yylval.integer = ASR; return SHIFT; }
-"ror"|"rors"		{ yylval.integer = ROR; return SHIFT; }
-"rrx"|"rrxs"		{                       return RRX; }
+(?i:lsl)|(?i:lsls)		{ yylval.integer = LSL; return SHIFT; }
+(?i:lsr)|(?i:lsrs)		{ yylval.integer = LSR; return SHIFT; }
+(?i:asr)|(?i:asrs)		{ yylval.integer = ASR; return SHIFT; }
+(?i:ror)|(?i:rors)		{ yylval.integer = ROR; return SHIFT; }
+(?i:rrx)|(?i:rrxs)		{                       return RRX; }
 
-"movs"				{ return MOVS; }
-"mov"				{ yylval.integer = MOV_LOW; return MOV; }
-"movt"				{ yylval.integer = MOV_HIGH; return MOV; }
-"msr"				{ return MSR; }
-"mrs"				{ return MRS; }
+(?i:movs)				{ return MOVS; }
+(?i:mov)				{ yylval.integer = MOV_LOW; return MOV; }
+(?i:movt)				{ yylval.integer = MOV_HIGH; return MOV; }
+(?i:msr)				{ return MSR; }
+(?i:mrs)				{ return MRS; }
 
-"beq"|"bzs"			{ yylval.integer = EQ; return BRANCH; }
-"bne"|"bzc"			{ yylval.integer = NE; return BRANCH; }
-"bcs"				{ yylval.integer = CS; return BRANCH; }
-"blo"				{ yylval.integer = LO; return BRANCH; }
-"bcc"				{ yylval.integer = CC; return BRANCH; }
-"bhs"				{ yylval.integer = HS; return BRANCH; }
-"blt"				{ yylval.integer = LT; return BRANCH; }
-"bge"				{ yylval.integer = GE; return BRANCH; }
-"b"					{ yylval.integer = B;  return BRANCH; }
-"bl"				{ yylval.integer = BL; return BRANCH; }
+(?i:beq)|(?i:bzs)		{ yylval.integer = EQ; return BRANCH; }
+(?i:bne)|(?i:bzc)		{ yylval.integer = NE; return BRANCH; }
+(?i:bcs)				{ yylval.integer = CS; return BRANCH; }
+(?i:blo)				{ yylval.integer = LO; return BRANCH; }
+(?i:bcc)				{ yylval.integer = CC; return BRANCH; }
+(?i:bhs)				{ yylval.integer = HS; return BRANCH; }
+(?i:blt)				{ yylval.integer = LT; return BRANCH; }
+(?i:bge)				{ yylval.integer = GE; return BRANCH; }
+(?i:b)					{ yylval.integer = B;  return BRANCH; }
+(?i:bl)					{ yylval.integer = BL; return BRANCH; }
 
 	/* numeric literals */
 
