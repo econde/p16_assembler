@@ -30,7 +30,7 @@ enum {
     RS_POSITION = 7,
     LDR_RELATIVE_OPCODE = 0x0c00,
     LDR_RELATIVE_CONSTANT_SIZE = 6,
-    LDR_REALTIVE_CONSTANT_POSITION = 4,
+    LDR_RELATIVE_CONSTANT_POSITION = 4,
 
     POP_OPCODE = 0x0400,
     PUSH_OPCODE = 0x2400,
@@ -112,24 +112,24 @@ void Code_generator::visit(Load_relative *s) {
 			string symbol = s->constant->get_symbol();
 			auto addend = s->constant->get_value() - 2;
 			auto *reloc = new Relocation{&s->location, &s->constant->location, s->section_index, s->section_offset,
-										LDR_REALTIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
+										LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
 										Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
 			Relocations::add(reloc);
 		}
 		if (constant < 0)
 			error_report(&s->constant->location,
 						"Address defined by \"" + s->constant->to_string()
-						 + "must be higher than current location");
+						 + " must be higher than current location");
 		if ((constant & ~MAKE_MASK(LDR_RELATIVE_CONSTANT_SIZE, 0)) != 0) {
 			error_report(&s->constant->location,
-						"Address defined by \"" + s->constant->to_string()
+						"Absolute address defined by \"" + s->constant->to_string()
 						+ string_printf("\" PC + %d (0x%x) is out of range for PC-relative addressing",
 										constant, constant));
 		}
 		if ((constant & 1) != 0)
 			warning_report(&s->constant->location,
 						   string_printf("Word access in odd address: PC + %d (0x%x)", constant, constant));
-		code |= constant << LDR_REALTIVE_CONSTANT_POSITION;
+		code |= constant << LDR_RELATIVE_CONSTANT_POSITION;
 	}
 	else
 		error_report(&s->constant->location, "Invalid expression");
@@ -242,9 +242,9 @@ void Code_generator::visit(Branch *s) {
 				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), offset));
 			if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
 				error_report(&s->expression->location,
-                             string_printf( "Interval between PC and target address - %+d (0x%x) words - "
+                             string_printf( "Interval between PC and target address: %+d (0x%x) - "
                                             "isn't codable in %d bit two's complement",
-                                            offset >> 1, offset >> 1, BRANCH_OFFSET_SIZE));
+                                            offset, offset, BRANCH_OFFSET_SIZE + 1));
 			offset >>= 1;
 		} else {    // A Label pertence a outra secção será resolvida na fase de relocalização
 			auto addend = s->expression->get_value() - 2;

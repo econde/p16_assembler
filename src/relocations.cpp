@@ -65,9 +65,9 @@ void Relocations::relocate() {
 			value >>= 1;
 			if (ABSOLUTE(value) > (mask >> 1))		//	signed
 					error_report(reloc->exp_location,
-								 string_printf("Interval in words, between PC and target address: %+d (0x%x), "
+								 string_printf("Interval between PC and target address: %+d (0x%x), "
 												"isn't codable in %d bit two's complement",
-												value, value, reloc->width));
+												value * 2, value * 2, reloc->width + 1));
 		}
 		else if (reloc->type == Relocation::Type::RELATIVE_UNSIGNED) {	//	usado no ldr rd, label
 			if (value & 1)
@@ -80,13 +80,13 @@ void Relocations::relocate() {
 			value >>= 1;
 			if (ABSOLUTE(value) > mask)
 				error_report(reloc->exp_location,
-							 string_printf("Interval in words, between PC and target address: %+d (0x%x), "
+							 string_printf("Interval between PC and target address: %+d (0x%x), "
 										   "isn't codable with %d bit",
-										   value, value, reloc->width));
+										   value * 2, value * 2, reloc->width + 1));
 		}
 		else if (ABSOLUTE(value) > mask) { //  Relocation::Type::ABSOLUTE
 			error_report(reloc->exp_location,
-				string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+				string_printf("Expression's value: %d (0x%x) isn't codable in %d bit, truncate to %d (0x%x)",
 					value, value, reloc->width, value & mask, value & mask));
 		}
 		content += (value & mask) << reloc->position;
