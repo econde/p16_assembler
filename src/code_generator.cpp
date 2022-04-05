@@ -98,6 +98,7 @@ enum {
 //	Instruction
 
 void Code_generator::visit(Load_relative *s) {
+	s->check_alignment();
 	if ((s->ldst & 2) != 0) // is a STR
 		error_report(&s->location, "str instructions with PC relative address doesn't exist, only ldr exists");
 	if (s->ldst == 1)       // is a LDRB
@@ -118,6 +119,7 @@ void Code_generator::visit(Load_relative *s) {
 }
 
 void Code_generator::visit(Load_store_indirect *s) {
+	s->check_alignment();
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 	auto byte = s->ldst & 1;
@@ -167,6 +169,7 @@ void Code_generator::visit(Load_store_indirect *s) {
 }
 
 void Code_generator::visit(Branch *s) {
+	s->check_alignment();
 	auto code = 0U;
 	switch (s->condition) {
 		case EQ:
@@ -242,6 +245,7 @@ void Code_generator::visit(Branch *s) {
 }
 
 void Code_generator::visit(Shift *s) {
+	s->check_alignment();
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 
@@ -271,6 +275,7 @@ void Code_generator::visit(Shift *s) {
 }
 
 void Code_generator::visit(Rrx *s) {
+	s->check_alignment();
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 	Sections::write16(s->section_index, s->section_offset,
@@ -278,6 +283,7 @@ void Code_generator::visit(Rrx *s) {
 }
 
 void Code_generator::visit(Arith *s) {
+	s->check_alignment();
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 
@@ -333,6 +339,7 @@ void Code_generator::visit(Arith *s) {
 }
 
 void Code_generator::visit(Logic *s) {
+	s->check_alignment();
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 
@@ -346,12 +353,14 @@ void Code_generator::visit(Logic *s) {
 }
 
 void Code_generator::visit(Not *s) {
+	s->check_alignment();
 	Sections::write16(s->section_index, s->section_offset,
 					  static_cast<uint16_t>(NOT_OPCODE + (s->rn->n << RS_POSITION) + (s->rd->n << RD_POSITION)));
 }
 
 void Code_generator::visit(Move *s) {
-    auto code = s->rd->n << RD_POSITION;
+	s->check_alignment();
+	auto code = s->rd->n << RD_POSITION;
 	if (s->constant == nullptr) {	//	mov	rd, rs
 		code |= MOV_REG_OPCODE | (s->rs->n << MOV_RS_POSITION);
 	} else {                        //      mov | movt      rd, constant
@@ -386,10 +395,13 @@ void Code_generator::visit(Move *s) {
 }
 
 void Code_generator::visit(Moves *s) {
+	s->check_alignment();
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(MOVS_OPCODE));
 }
 
 void Code_generator::visit(Compare *s) {
+	s->check_alignment();
+
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 	auto code = s->rn->n << RN_POSITION;
@@ -402,6 +414,8 @@ void Code_generator::visit(Compare *s) {
 }
 
 void Code_generator::visit(Msr *s) {
+	s->check_alignment();
+
 	if (s->rd->n != CPSR && s->rd->n != SPSR)
 		error_report(&s->rd->location, "Invalid register");
 
@@ -411,6 +425,7 @@ void Code_generator::visit(Msr *s) {
 }
 
 void Code_generator::visit(Mrs *s) {
+	s->check_alignment();
 	if (s->rs->n != CPSR && s->rs->n != SPSR)
 		error_report(&s->rs->location, "Invalid register");
 
@@ -420,6 +435,7 @@ void Code_generator::visit(Mrs *s) {
 }
 
 void Code_generator::visit(Push_pop *s) {
+	s->check_alignment();
 	Sections::write16(s->section_index, s->section_offset,
 					  static_cast<uint16_t>((s->push == PUSH ? PUSH_OPCODE : POP_OPCODE)
 											| (s->r->n << RD_POSITION)));
@@ -469,8 +485,8 @@ void Code_generator::visit(Align *s) {
 void Code_generator::visit(Byte *s) {
 	if ((s->section_offset & (s->grain_size - 1)) != 0)
 		warning_report(&s->location,
-			string_printf("Misaligned address (0x%x)- multibyte value (%d bytes) not in an address multiple of %d",
-					s->section_offset, s->grain_size, s->grain_size));
+			string_printf("Misaligned address - multibyte value (%d bytes) not in an address multiple of %d",
+					s->grain_size, s->grain_size));
 	auto i = 0U;
 	auto mask = MAKE_MASK(s->grain_size * 8, 0);
 	for (auto e: *s->value_list) {

@@ -54,6 +54,12 @@ struct Instruction: public Statement {
 							 Sections::read8(section_index, section_offset + 1)
 		);
 	}
+	void check_alignment() {
+		if ((section_offset & 1) != 0)
+			warning_report(&location,
+				string_printf("Misaligned address - "
+					"instruction binary code must be located in an even address"));
+	}
 };
 
 struct Load_relative: public Instruction {
