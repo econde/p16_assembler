@@ -88,7 +88,7 @@ typedef struct YYLTYPE {
 	PARENTHESE_LEFT PARENTHESE_RIGHT BRACKET_LEFT BRACKET_RIGHT BRACE_LEFT BRACE_RIGHT
 	EOL
 
-%token ALIGN SECTION EQU TEXT DATA BSS STACK SPACE ASCII ASCIZ
+%token ALIGN SECTION EQU TEXT RODATA DATA BSS STACK SPACE ASCII ASCIZ
 %type <integer> ASCII
 
 %token CPSR SPSR
@@ -245,6 +245,8 @@ directive
 			{ $$ = new ast::DSection(*$2, LOCATION(@1)); delete($2); delete($4); }
 	|	SECTION TEXT
 			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+	|	SECTION RODATA
+			{ $$ = new ast::DSection(std::string(".rodata"), LOCATION(@1)); }
 	|	SECTION DATA
 			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
 	|	SECTION BSS
@@ -253,6 +255,8 @@ directive
 			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
 	|	TEXT
 			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+	|	RODATA
+			{ $$ = new ast::DSection(std::string(".rodata"), LOCATION(@1)); }
 	|	DATA
 			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
 	|	BSS

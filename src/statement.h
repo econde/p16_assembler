@@ -37,9 +37,9 @@ struct Statement {
 		size_in_memory {0} { }
 
 	virtual ~Statement( ) { }
-	
+
 	string label;
-	
+
 	//	Localização no ficheiro fonte
 	Location location;
 
@@ -73,12 +73,11 @@ public:
 		Statement {left} {
 		section_index = Sections::current_section->number;
 		section_offset = Sections::current_section->content_size;
-		size_in_memory = 0;
 		add_label(l);
 	 }
 	 Statement_empty(Location left):
 		Statement {left} { }
-		
+
 	 string to_string() {
 		 return label.empty() ? label : (label + ':');
 	 }

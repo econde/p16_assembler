@@ -65,6 +65,7 @@ BinDigit			[01]
 %%
 "."+(?i:section)	{ return SECTION; }
 "."+(?i:text)		{ return TEXT; }
+"."+(?i:rodata)		{ return RODATA; }
 "."+(?i:data)		{ return DATA; }
 "."+(?i:bss)		{ return BSS; }
 "."+(?i:stack)		{ return STACK; }
