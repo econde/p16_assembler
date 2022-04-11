@@ -33,7 +33,7 @@ class Listing_generator: public Visitor {
 	//	Instruction
 
 	void visit(Load_relative *s) {
-		cout << s->location.line << '\t' << s->Statement::to_string() << 
+		cout << s->location.line << '\t' << s->Statement::to_string() <<
 			std::string((s->ldst & 2) ? "str" : "ldr") << ((s->ldst & 1) ? 'b' : ' ') <<
 				"\t" << register_name(s->rd->n) << ", ";
 		s->constant->accept(this);
@@ -41,7 +41,7 @@ class Listing_generator: public Visitor {
 	}
 
 	void visit(Load_store_indirect *s) {
-	cout << s->location.line << '\t' << s->Statement::to_string()
+		cout << s->location.line << '\t' << s->Statement::to_string()
 			 << std::string((s->ldst & 2) ? "str" : "ldr") << ((s->ldst & 1) ? 'b' : ' ')
 			 <<	"\t" << register_name(s->rd->n) << ", [" << register_name(s->rn->n) << ", ";
 		if (s->constant == nullptr)
@@ -49,7 +49,7 @@ class Listing_generator: public Visitor {
 		else
 			s->constant->accept(this);
 		cout << "]" << endl;
-	} 
+	}
 
 	void visit(Branch *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
@@ -97,7 +97,7 @@ class Listing_generator: public Visitor {
 		s->constant->accept(this);
 		cout << endl;
 	}
-   
+
 	void visit(Rrx *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << "rrx\t" << register_name(s->rd->n) << ", " << register_name(s->rn->n) << endl;
@@ -117,7 +117,7 @@ class Listing_generator: public Visitor {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << "movs\t" << register_name(s->rd->n) << ", " << register_name(s->rn->n) << endl;
 	}
-	
+
 	void visit(Msr *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << "msr\t" << register_special_name(s->rs->n) << ", " << register_name(s->rd->n) << endl;
@@ -132,15 +132,15 @@ class Listing_generator: public Visitor {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << (s->push ? "push\t" : "pop\t") << register_name(s->r->n) << endl;
 	}
-	
+
 	//------------------------------------------------------------------------------------------
 	//	Directive
-   
+
 	void visit(DSection *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << ".section " << s->name << endl;
 	}
-	
+
 	void visit(Byte *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << ((s->grain_size == 1) ? ".byte" : ".word") << '\t' << endl;
@@ -152,7 +152,7 @@ class Listing_generator: public Visitor {
 		for (auto p: *s->string_list)
 			cout << p << endl;
 	}
-	
+
 	void visit(Space *s) {
 		cout << s->location.line << "\t" << s->Statement::to_string()
 			 << ".space\t";
@@ -178,7 +178,7 @@ class Listing_generator: public Visitor {
 
 	//------------------------------------------------------------------------------------------
 	//	Expression
-	
+
 	void visit(Value *s) { cout << s->to_string(); }
 
 	void visit(Identifier *s) { cout << s->to_string(); }

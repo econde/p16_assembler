@@ -118,7 +118,7 @@ struct Space: public Directive {
 		section_index = Sections::current_section->number;
 		section_offset = Sections::current_section->content_size;
 		size_in_memory = size->get_value();
-		Sections::increase(section_index, size_in_memory);
+		Sections::increase(section_index, size_in_memory & 0xffff);
 	}
 	~Space() { delete size; delete initial; }
 

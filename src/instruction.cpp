@@ -36,7 +36,7 @@ std::string register_name(int r) {
 	return std::string("???");
 }
 
- std::string register_special_name(int r) {
+std::string register_special_name(int r) {
 	switch (r) {
 		case 14:
 			return std::string("lr");
