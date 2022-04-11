@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <climits>
+
 #include "code_generator.h"
 #include "relocations.h"
 #include "p16_parser.hpp"
@@ -446,11 +448,24 @@ void Code_generator::visit(Push_pop *s) {
 
 void Code_generator::visit(Space *s) {
 	auto size_type = s->size->get_type();
-	auto initial_type = s->initial->get_type();
 	if (size_type == ABSOLUTE) {
+		auto size_value = s->size->get_value();
+		if (size_value > 0xFFFF) {
+			warning_report(&s->initial->location,
+				string_printf("Size of space directive %d (%x) exceds memory size, truncat to %d (%x)\n",
+							size_value, size_value, size_value & 0xffff, size_value & 0xffff));
+			size_value &= 0xffff;
+		}
+		auto initial_type = s->initial->get_type();
 		if (initial_type == ABSOLUTE) {
-			Sections::fill(s->section_index, s->section_offset,
-				   static_cast<uint8_t>(s->initial->get_value()), s->size->get_value());
+			auto initial_value = s->initial->get_value();
+			if (initial_value > UINT8_MAX) {
+				warning_report(&s->initial->location,
+					string_printf("Initial value %d (%x) exceds %d, truncate to %d (%x)\n",
+								initial_value, initial_value, UINT8_MAX, initial_value & 0xff, initial_value & 0xff));
+				initial_value &= 0xff;
+			}
+			Sections::fill(s->section_index, s->section_offset, initial_value, size_value);
 		}
 		else if (initial_type == UNDEFINED) {
 			error_report(&s->initial->location, "Undefined expression");
