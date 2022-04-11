@@ -30,3 +30,4 @@ bugs/
 .vscode/
 *.cson
 *.code-workspace
+*.iss

@@ -1,3 +1,25 @@
+
+
+V1.3.3 (build: Apr 11 2022)
+- Gerar ficheiro em formato Logisim com palavra a 16 bits
+- Verificação de erros na diretiva space
+- Verificação do alinhamento de endereço do código binário das instruções
+- Print da tabela de símbolos - garantir separação entre valores grandes e secção
+- Aceitar diretivas .byte e .word sem parâmetro
+- Case insensitive nas mnemónicas
+- Introdução das secções .bss .stack .rodata
+- Dimensões de memória em mensagens de erro apresentadas em bytes
+- Correção de erro na verificação do alcance das instruções branch
+- Assinalar erro no caso de comentário não fechado
+- Correção de erro na simulação do espaço de memória.
+
+V1.3.2 (build: Apr 23 2020)
+
+- Acrescentada opção -l para gerar ficheiros binários com conteúdos intercalados
+- Acrescentada opção -a para definir a gama de endereços a ser copiada para os ficheiros binários
+- Correção da listagem de símbolos grandes
+
+V1.3.1 (build: Sep 11 2019)
 - Não aceitar mnemónicas alternativas not, or, asciiz
 - Assinalar erro em constantes não definidas nas diretivas .space e .align
 - Na instrução ldr rd, [pc, <imm6>] :

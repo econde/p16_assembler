@@ -1,5 +1,3 @@
-Gerar ficheiro sim a 16 bits.
 Permitir sintaxe ldr rd, [pc, imm6]
 Avisar ou aceitar a falta do enter na última linha do programa.
-Assinalar erro se não fechar comentário multilinha.
 
