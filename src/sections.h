@@ -157,6 +157,12 @@ public:
 	static void binary_logisim(const char *file_name,
 								unsigned word_size, unsigned byte_order,
 								unsigned lower_address, unsigned higher_address);
+
+	//	Produz um ficheiro no formato usado no Logisim com o conteúdo das secções,
+	//	em palavras de 16 bits
+	static void binary_logisim16(const char *file_name,
+								unsigned lower_address, unsigned higher_address);
+
 	static void binary_raw(const char *file_name,
 								unsigned word_size, unsigned byte_order,
 								unsigned lower_address, unsigned higher_address);

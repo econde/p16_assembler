@@ -49,15 +49,21 @@ void listing_load_inputfile(const char *src_filename);
 		"\t-i, --input <source filename>\n"
 		"\t-o, --output <base filename>\n"
 		"\t-s, --section <section name>=<address>\n"
-		"\t-f, --format hexintel | binary | logisim\n"
+		"\t-f, --format hexintel | binary | logisim8 | logisim16\n"
 		"\t-a, --addresses <from>-<to>\n"
-		"\t-l, --interleave <word_size>\n",
+		"\t-l, --interleave\n",
 		prog_name);
 }
 
 static void version() {
 	cout << "P16 assembler v" VERSION " (" __DATE__ ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
+}
+static bool validate_output_format(const char *format) {
+	return strcmp(format, "hexintel") == 0
+		|| strcmp(format, "binary") == 0
+		|| strcmp(format, "logisim8") == 0
+		|| strcmp(format, "logisim16") == 0;
 }
 
 int main(int argc, char **argv) {
@@ -81,11 +87,12 @@ int main(int argc, char **argv) {
 		{"interleave", required_argument, 0, 'l'},
 		{0, 0, 0, 0}
 	};
-	int option_index, error_in_options = 0;
 
-	int c;
-	while ((c = getopt_long(argc, argv, "hvl:i:o:s:f:a:", long_options, &option_index)) != -1) {
-		switch (c) {
+	auto error_in_options = false;
+
+	int option_index, option_char;
+	while ((option_char = getopt_long(argc, argv, "hvli:o:s:f:a:", long_options, &option_index)) != -1) {
+		switch (option_char) {
 		case 0:	//	Opções longas com afetação de flag
 			break;
 		case 'h':
@@ -97,23 +104,16 @@ int main(int argc, char **argv) {
 		case 'i':
 			input_filename = optarg;
 			break;
-		case 'l': {
-			regex re("^[1248]$");
-			cmatch cm;
-			if (regex_match(optarg, cm, re)) {
-#ifdef DEBUG
-				cout << "word_size = " << cm[0] << endl;
-#endif
-				word_size = stoul(cm[0], nullptr, 16);
-			}
-			else {
-				printf("Error in option -l argument, use 1, 2, 4 or 8\n");
-				error_in_options = 1;
-			}
+		case 'l':
+			word_size = 2;
 			break;
-		}
 		case 'f':
 			output_format = optarg;
+			if (!validate_output_format(output_format)) {
+				fprintf(stderr, "Format %s not permitted in -%c option\n",
+						output_format, option_char);
+				error_in_options = true;
+			}
 			break;
 		case 'o':
 			output_filename = optarg;
@@ -131,8 +131,8 @@ int main(int argc, char **argv) {
 				section_addresses.set_property(cm[1].str(), address);
 			}
 			else {
-				printf("Error in option -s argument\n");
-				error_in_options = 1;
+				fprintf(stderr, "Error in option -s argument\n");
+				error_in_options = true;
 			}
 			break;
 		}
@@ -150,17 +150,17 @@ int main(int argc, char **argv) {
 				option_address = true;
 			}
 			else {
-				printf("Error in option -a argument\n");
-				error_in_options = 1;
+				fprintf(stderr, "Error in option -a argument\n");
+				error_in_options = true;
 			}
 			break;
 		}
 		case ':':
-			printf("Error in option -%c argument\n", optopt);
-			error_in_options = 1;
+			fprintf(stderr, "Error in option -%c argument\n", optopt);
+			error_in_options = true;
 			break;
 		case '?':
-			error_in_options = 1;
+			error_in_options = true;
 			break;
 		}
 	}
@@ -235,6 +235,9 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
+
+	if (verbose_flag)
+		cout << endl << "Locate Sections" << endl;
 	Sections::locate(&section_addresses);
 	if (verbose_flag)
 		Sections::listing(cout);
@@ -274,7 +277,8 @@ int main(int argc, char **argv) {
 		cout << endl << "Binary output"<< endl;
 		cout <<	"\tformat: " << output_format << endl;
 		cout << "\tword_size: " << word_size << endl;
-		ostream_printf(cout, "\tlower address: 0x%04x, higher address: 0x%04x\n", lower_address, higher_address);
+		ostream_printf(cout, "\tlower address: 0x%04x, higher address: 0x%04x\n",
+						lower_address, higher_address);
 		cout << "\tbase file name: " << output_filename << endl;
 	}
 
@@ -292,7 +296,7 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-	else if (strcmp(output_format, "logisim") == 0) {
+	else if (strcmp(output_format, "logisim8") == 0) {
 		if (word_size == 1) {
 			string filename = output_filename + ".sim";
 			remove(filename.c_str());
@@ -305,6 +309,11 @@ int main(int argc, char **argv) {
 				Sections::binary_logisim(filename.c_str(), word_size, byte_order, lower_address, higher_address);
 			}
 		}
+	}
+	else if (strcmp(output_format, "logisim16") == 0) {
+		string filename = output_filename + ".sim";
+		remove(filename.c_str());
+		Sections::binary_logisim16(filename.c_str(), lower_address, higher_address);
 	}
 	else {	//	Hexadecimal Intel
 		if (word_size == 1) {

@@ -296,6 +296,31 @@ void Sections::binary_logisim(const char *file_name,
 	}
 }
 
+void Sections::binary_logisim16(const char *file_name, unsigned lower_address, unsigned higher_address) {
+	try {
+		std::ofstream file(file_name);
+		file << "v2.0 raw" << endl;
+		for (auto address = lower_address; address < higher_address; ) {
+			auto c = memory.read16(address);
+			address += 2;
+			//	Quantas palavras iguais a esta?
+			if (memory.read16(address) == c) {
+				auto j = 2U;
+				for (address += 2;
+				     	address < higher_address && c == memory.read16(address);
+					 		address += 2, j++)
+					;
+				ostream_printf(file, " %d*%04x", j, static_cast<uint16_t >(c));
+			}
+			else
+				ostream_printf(file, " %04x", static_cast<uint16_t >(c));
+		}
+		file.close();
+	} catch (ios_base::failure &e) {
+		cerr << e.what();
+	}
+}
+
 void Sections::binary_raw(const char *file_name,
 								unsigned word_size, unsigned byte_order,
 								unsigned lower_address, unsigned higher_address) {
