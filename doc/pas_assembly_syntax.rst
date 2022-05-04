@@ -1,0 +1,154 @@
+Linguagem *assembly* - sintaxe
+============================
+
+A linguagem *assembly* do P16 é semelhante à usada pelo assembler AS da GNU
+quando usado no desenvolvimento de programas para a arquitectura ARM.
+O objectivo é facilitar ao estudante a transição para essa arquitectura.
+A sintaxe das instruções, apesar de definida no âmbito da arquitectura P16,
+é semelhante à sintaxe unificada da arquitectura ARM.
+Em seguida descrevem-se, na notação *Wirth Syntax Notation* (WSN),
+as regras sintácticas a aplicar na escrita de programas em linguagem *assembly* do P16.
+
+.. table:: Directivas para definição de secções
+   :name: diretiva_seccoes
+
+   +-----------+-------------------------------------------------------------------+
+   | ``[a]``   | O elemento ``a`` é opcional.                                      |
+   +-----------+-------------------------------------------------------------------+
+   | ``a | b`` | ``a`` ou ``b`` são elementos alternativos                         |
+   +-----------+-------------------------------------------------------------------+
+   | ``{a}``   | O elemento ``a`` pode não existir ou repetir-se indefinidamente   |
+   +-----------+-------------------------------------------------------------------+
+   | ``"a"``   | Elemento terminal                                                 |
+   +-----------+-------------------------------------------------------------------+
+
+.. code-block::
+
+   program = statement { statement }.
+
+   statement =
+     [label] [instruction | direcive] “EOL” .
+
+   directive =
+     ( “.section” symbol )
+     | “.text”
+     | ".rodata"
+     | “.data”
+     | ".bss"
+     | “.align” [ expression ]
+     | “.equ” symbol “,” expression )
+     | ( “.byte” | “.word” ) expression { “,” expression }
+     | “.space” expression [ “,” expression ] )
+     | ( “.ascii” | “.asciz” ) string { “,” string } .
+
+   instruction =
+     “ldr” reg0-15 “,” ( “[” (“pc” | “r15”) “,” expression “]” ) | identifier
+
+     | ( ( “ldr” | “str” ) [“b”] reg0-15 “,”
+        ( “[“ reg0-7 [“,” (reg0-15 | expression)] “]” )
+     | ( "mov" | “movt” ) reg0-15, (reg0-15 | expression)
+     | ( “push” | “pop” ) [“{“] reg0-15
+     | ( “add” | “sub” ) reg0-15, reg0-7, (reg0-15 | expression)
+     | ( “adc” | “sbc” ) reg0-15, reg0-7,  reg0-15
+     | “cmp” reg0-7, reg0-15
+     | ( “and” | “orr” | “eor” ) reg0-15, reg0-7, reg0-15
+     | ( “mvn” | “not”) reg0-15, reg0-15
+     | ( “lsl” | “lsr” | “asr” | “ror” )	reg0-15, reg0-7, expression
+     | “rrx” reg0-15, reg0-7
+     | “msr” psw “," reg0-15
+     | “mrs” reg0-15 “,” psw
+     | ( “bzs” | “beq” | “bzc” | “bne” | “bcs” | “blo” | “bcc” | “bhs”
+     | “blt” | “bge” | “bl” | “b” ) symbol
+     | “movs pc, lr” .
+
+   reg0-7 = “r0” | “r1” | “r2” | “r3” | “r4” | “r5” | “r6” | “r7” .
+      | “R0” | “R1” | “R2” | “R3” | “R4” | “R5” | “R6” | “R7” .
+
+   reg0-15 = reg0-7
+     | “r8” | “r9” | “r10” | “r11” | “r12” | “r13” | “r14” | “r15”
+     | “R8” | “R9” | “R10” | “R11” | “R12” | “R13” | “R14” | “R15”
+     | “sp” | “lr” | “pc” | “SP” | “LR” | “PC” .
+
+   psw = “cpsw” | “spsw” | “CPSW” | “SPSW”.
+
+   expression = logical_or_expression
+     | logical_or_expression “?” expression “:” expression .
+
+   logical_or_expression = logical_and_expression
+     | logical_or_expression “||” logical_and_expression .
+
+   logical_and_expression = inclusive_or_expression
+     | logical_and_expression “&&” inclusive_or_expression .
+
+   inclusive_or_expression = exclusive_or_expression
+     | inclusive_or_expression “|” exclusive_or_expression .
+
+   exclusive_or_expression = and_expression
+     | exclusive_or_expression “^” and_expression .
+
+   and_expression = equality_expression
+     | and_expression “&” equality_expression .
+
+   equality_expression = relational_expression
+     | equality_expression “==” relational_expression
+     | equality_expression “!=” relational_expression .
+
+   relational_expression = shift_expression
+     | relational_expression “<” shift_expression
+     | relational_expression “>” shift_expression
+     | relational_expression “<=” shift_expression
+     | relational_expression “>=” shift_expression .
+
+   shift_expression = additive_expression
+     | shift_expression “<<” additive_expression
+     | shift_expression “>>” additive_expression .
+
+   additive_expression = multiplicative_expression
+     | additive_expression “+” multiplicative_expression
+     | additive_expression “-” multiplicative_expression .
+
+   multiplicative_expression = unary_expression
+     | multiplicative_expression “*” unary_expression
+     | multiplicative_expression “/” unary_expression
+     | multiplicative_expression “%” unary_expression .
+
+   unary_expression = primary_expression
+     | “+” primary_expression
+     | “-” primary_expression
+     | “!” primary_expression
+     | “~” primary_expression .
+
+   primary_expression = literal | identifier | “(” expression “)” .
+
+   identifier = (alphabet | “_”) { alphabet | number | “_” }.
+
+   label =  identifier “:” .
+
+   literal = decimal | hexadecimal | octal | binary | “’” character “’” .
+
+   decimal = “0” | ((“1” | ... | “9”) { decimal_digit } ) .
+
+   hexadecimal = “0” (“x” | “X”) hexadecimal_digit { hexadecimal_digit } .
+
+   octal = “0” (“1” | ... | “7”) { octal_digit } .
+
+   binary = “0” (“b” | “B”) (“0” | “1”) { “0” | “1” } .
+
+   octal_digit = “0” | “1” | ... | “6” | “7” .
+
+   decimal_digit = “0” | “1” | ... | “8” | “9” .
+
+   hexadecimal_digit = decimal_digit | “a” | ... | “f” | “A” | ... | “F” .
+
+   alphabet = “a” | ... | “z” | “A” | ... | “Z” .
+
+   symbol = “[” | “]” | “{” | “}” | “(” | “)” | “<” | “>”
+     | “=” | “|” | “&” | “%” | “$” | “#” | “/” | “?” | “!” | “_” | “*”
+     | “\b” | “\t” | “\n” | “\f” | “\r” | “\\” | “\"” | “\'”
+     | ( “\” ( decimal | hexadecimal | octal | binary ) ) .
+
+   character = alphabet | decimal_digit | symbol .
+
+   string = “\”” character { character } “\”” .
+
+   “EOL” = control character for end of line

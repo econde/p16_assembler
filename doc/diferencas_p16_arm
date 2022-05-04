@@ -1,0 +1,9 @@
++-------------------------------------+----------------------------------------+
+| P16                                 | ARM                                    |
++-------------------------------------+----------------------------------------+
+| Todas as isntruções aritmética      | Só as instruções com sufixo 's'        |
+| e lógicas afetam as flags           | afetam as flags                        |
++-------------------------------------+----------------------------------------+
+| A flags C significa borrow após     | A flag C significa o inverso de borrow |
+| uma subtração                       | após uma subtração.                    |
++-------------------------------------+----------------------------------------+

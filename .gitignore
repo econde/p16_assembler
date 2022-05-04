@@ -1,4 +1,6 @@
-.idea/
+doc/_build
+doc/_static
+doc/_templates
 build/
 cmake-build-*/
 pas
@@ -24,7 +26,6 @@ pas_setup.exe
 *.tab.hpp
 *.zip
 a.out
-doc/
 test/
 bugs/
 .vscode/
