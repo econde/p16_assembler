@@ -172,6 +172,8 @@ void Sections::listing(std::ostream& lst_file) {
 	lst_file << "Sections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
+		if (table[i]->content_size == 0)
+			continue;
 		ostream_printf(lst_file, "%-8d%-16s%04X - %04X     %04X %d\n", i,
 						table[i]->name.c_str(), table[i]->base_address,
 						table[i]->base_address + table[i]->content_size - 1,
