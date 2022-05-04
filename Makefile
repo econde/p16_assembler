@@ -37,7 +37,7 @@ DEPENDENCIES = $(OBJECTS:%.o=%.d)
 
 all: build_dir build/$(EXECUTABLE)
 
-CXXFLAGS = -MMD -c -g -Wall -std=c++11 -U__STRICT_ANSI__ -Ibuild -Isrc
+CXXFLAGS = -MMD -c -g -Wall -std=c++11 -Ibuild -Isrc
 
 build_dir:
 	mkdir -p build/src build/build
@@ -51,7 +51,7 @@ build/p16_parser.cpp build/p16_parser.hpp: src/p16.ypp
 -include $(DEPENDENCIES)
 
 build/build/%.o: build/%.cpp
-	$(CXX) $(CXXFLAGS) $< -o $@
+	$(CXX) $(CXXFLAGS) -Wno-free-nonheap-object $< -o $@
 
 build/src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
