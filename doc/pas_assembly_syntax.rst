@@ -4,13 +4,10 @@ Linguagem *assembly* - sintaxe
 A linguagem *assembly* do P16 é semelhante à usada pelo assembler AS da GNU
 quando usado no desenvolvimento de programas para a arquitectura ARM.
 O objectivo é facilitar ao estudante a transição para essa arquitectura.
-A sintaxe das instruções, apesar de definida no âmbito da arquitectura P16,
-é semelhante à sintaxe unificada da arquitectura ARM.
-Em seguida descrevem-se, na notação *Wirth Syntax Notation* (WSN),
-as regras sintácticas a aplicar na escrita de programas em linguagem *assembly* do P16.
+A sintaxe das instruções do P16 é semelhante à sintaxe unificada da arquitectura ARM.
 
-.. table:: Directivas para definição de secções
-   :name: diretiva_seccoes
+.. table:: Elementos da notação *Wirth Syntax Notation* (WSN)
+   :name: notacao WSN
 
    +-----------+-------------------------------------------------------------------+
    | ``[a]``   | O elemento ``a`` é opcional.                                      |
@@ -22,8 +19,13 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
    | ``"a"``   | Elemento terminal                                                 |
    +-----------+-------------------------------------------------------------------+
 
-.. code-block::
+Descrevem-se na :numref:`sintaxe`, em notação *Wirth Syntax Notation* (WSN) [#f1]_,
+as regras sintácticas a aplicar na escrita de programas em linguagem *assembly* do P16.
 
+.. code-block:: console
+   :caption: Regras sintáticas da linguagem *assembly*
+   :name: sintaxe
+   
    program = statement { statement }.
 
    statement =
@@ -152,3 +154,7 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
    string = “\”” character { character } “\”” .
 
    “EOL” = control character for end of line
+
+.. rubric:: Footnotes
+
+.. [#f1] https://en.wikipedia.org/wiki/Wirth_syntax_notation

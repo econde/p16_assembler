@@ -4,7 +4,7 @@ Utilização
 A partir de um ficheiro de texto em linguagem *assembly*, produzido num editor de programas,
 o PAS gera ficheiros com o código máquina específico do P16.
 
-O PAS é um *assembler* de uma única passagem, que por razões didácticas, processa apenas um ficheiro
+O PAS é um *assembler* de uma única passagem, que por razões didácticas, processa um único ficheiro
 fonte e localiza o código gerado. A localização consiste em atribuir endereço absoluto ao programa,
 tarefa que não é normalmente realizada pelo *assembler*.
 
@@ -15,7 +15,7 @@ O PAS é invocado na janela de comando segundo a seguinte sintaxe:
 
    .. code-block:: console
 
-      pas [options] <program filename>
+      pas [options] <source filename>
 
       options:
          --verbose
@@ -31,10 +31,12 @@ O PAS é invocado na janela de comando segundo a seguinte sintaxe:
 Os erros e avisos são assinalados na janela de comando utilizada na invocação.
 
 O ficheiro com o texto do programa em linguagem *assembly* -- ficheiro fonte --
-assinalado como **<source filename>**, tem normalmente a extensão **'s'**.
+assinalado como `<source filename>`, tem normalmente a extensão **'s'**.
 
-No caso de não serem detetados erros, são gerados ficheiros com o nome de base (**<base filename>**) definido na
-opção ``--output`` e com as extensões **lst** e outras dependendo do formato do ficheiro com o código binário.
+.. No caso de não serem detetados erros, é gerado um ficheiro com extensão **'lst'**,
+   com informação legível, e um ficheiro com o código binário. 
+
+A opção ``--output`` permite definir o nome base [#f2]_ dos ficheiros de saída.
 Se esta opção for omitida, os ficheiros produzidos terão o mesmo nome base que o ficheiro fonte.
 
 A opção ``--section`` permite definir o endereço de localização das secções.
@@ -44,7 +46,7 @@ pela ordem com que estão escritas no ficheiro fonte.
 A opção ``--format`` permite definir o formato do ficheiro de saída com o código binário do programa.
 A omissão desta opção é equivalente a ``--format hexintel``.
 
-Os formatos possíveis são:
+Formatos possíveis para o ficheiro com o código binário:
 
 * ``--format hexintel``: ficheiro binário em formato Intel HEX;
 * ``--format binary``: o conteúdo do ficheiro binário é uma imagem exata da memória;
@@ -52,12 +54,12 @@ Os formatos possíveis são:
 * ``--format logisim16``: ficheiro binário em formato Logisim, organizado em palavras de 16 *bits*.
 
 A opção ``--addresses`` permite definir a gama de endereços cujo conteúdo é transcrito para o ficheiro binário de saída.
-O conteúdo respeitante a endereços fora do intervalo especificado é omitido do ficheiro binário de saída.
+O conteúdo respeitante a endereços fora do intervalo especificado é excluido do ficheiro binário de saída.
 
 A opção ``--interleave`` faz com que o código binário do programa seja repartido por dois ficheiros
- -- um com os *bytes* respeitantes aos endereços pares
- e outro com os *bytes* respeitantes aos endereços ímpares.
- Esta opção é ignorada se também for mencionada a opção ``--format logisim16``.
+-- um com os *bytes* respeitantes aos endereços pares
+e outro com os *bytes* respeitantes aos endereços ímpares.
+Esta opção é ignorada se também for mencionada a opção ``--format logisim16``.
 
 Localização das secções
 -----------------------
@@ -75,7 +77,7 @@ esta é localizada no endereço 0x0000.
 No caso da secção estar fragmentada, e aplicando-se a localização implícita,
 a sua localização é definida pela posição do primeiro fragmento.
 
-O endereço inicial de uma secção é localizado automaticamente num endereço par.
+O início de uma secção é localizado automaticamente num endereço par.
 
 Formatos de saída
 -----------------
@@ -87,11 +89,11 @@ Formato binário
 ^^^^^^^^^^^^^^^
 
 No formato binário o conteúdo do ficheiro produzido é a imagem exata do conteúdo
-da memória do sistema ao executar o programa.
-O primeiro byte do ficheiro corresponde ao endereço da primeira secção.
+da memória do sistema.
+O primeiro *byte* do ficheiro corresponde ao endereço da primeira secção.
 Ao que se segue o restante conteúdo da primeira secção e das secções seguintes.
 Se existirem intervalos de espaço de endereçamento entre secções,
-a esse espaço será preenchido com o valor zero.
+serão preenchidos com o valor zero.
 
 Formato Logisim
 ^^^^^^^^^^^^^^^
@@ -99,7 +101,7 @@ Formato Logisim
 O simulador Logisim simula dispositivos de memória RAM ou ROM cujo conteúdo pode
 ser carregado a partir de ficheiro.
 Na utilização do Logisim na simulação de sistemas baseados no P16
-é necessário carregar neste dispositivos
+é necessário carregar nesses dispositivos
 o código binário dos programas, produzido pelo PAS.
 
 O código binário é guardado em formato de texto como uma sequência
@@ -110,7 +112,7 @@ Sendo N o número de vezes que o valor ocorre e X o valor em si.
 Exemplo de utilização
 ---------------------
 
-Considere-se o seguinte programa como conteúdo do ficheiro ``multiply.s``.
+Considere-se o programa da :numref:`ficheiro_multiply_s` como conteúdo do ficheiro ``multiply.s``.
 
 **Código fonte:** :download:`multiply.s<code/multiply.s>`
 
@@ -120,22 +122,23 @@ Considere-se o seguinte programa como conteúdo do ficheiro ``multiply.s``.
    :caption: Ficheiro ``multiply.s``
    :name: ficheiro_multiply_s
 
-O comando
+No comando
 
    .. code-block:: console
 
       pas multiply.s -s .data=0x4000 -s .text=0x1000
 
-traduz e localiza o programa.
-As opções ``-s`` definem-se os endereços da secção ``.data`` em ``0x4000``
-e da secção ``.text`` em ``0x1000``.
-Por localização implicita, a secção ``.startup`` é localizada no endereço ``0x0000``
-por ser a primeira que aparece no ficheiro,
-a secção ``.bss`` é localizada no endereço ``0x4002`` porque vem a seguir a ``.data`` que tem uma dimensão 2
-e a secção .stack é localizada no endereço ``0x4006`` por vir depois da ``.bss`` que tem dimensão 4.
+a primeira ocorrência da opção ``-s`` define o endereços da secção ``.data`` em ``0x4000``
+e a segunda ocorrência define o endereço da secção ``.text`` em ``0x1000``.
+A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
+porque está definida em primeiro lugar no ficheiro fonte.
+A secção ``.bss`` é localizada no endereço ``0x4002``, também por localização implícita, 
+porque está definida a seguir a ``.data`` que tem uma dimensão 2.
+Por fim, a secção .stack é localizada no endereço ``0x4006``, também por localização implícita,
+porque está definida a seguir a ``.bss`` que tem dimensão 4.
 
-Os erros são assinalados na própria janela de comandos. Foi introduzido um
-erros de sintaxe apenas para exemplificar.
+Os erros e avisos são assinalados na própria janela de comandos. Foi introduzido um
+erro de sintaxe apenas para exemplificar.
 
    .. code-block:: console
 
@@ -161,7 +164,7 @@ Por uma questão de organização, é conveniente criar especificamente uma dire
 ficheiros relacionados com um dado programa. No exemplo seguinte a directoria ``multiply`` aloja
 todos os ficheiros relacionados com este programa: ``multiply.s``, ``multiply.lst`` e ``multiply.hex``.
 
-   .. code-block::
+   .. code-block:: console
 
       disciplinas
          |-- pe
@@ -232,3 +235,5 @@ Serve para terminar o ficheiro.
 .. rubric:: Footnotes
 
 .. [#f1] https://en.wikipedia.org/wiki/Intel_HEX
+
+.. [#f2] Nome do ficheiro excluindo a extensão.

@@ -3,22 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PAS - P16 Assembler's documentation!
-===============================================
+Manual de utilização do PAS
+===========================
 
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: Conteúdo:
 
-   pas_utilizacao.rst
    pas_assembly_language.rst
+   pas_utilizacao.rst
    pas_assembly_syntax.rst
    pas_instalacao.rst
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

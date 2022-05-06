@@ -4,20 +4,19 @@ Linguagem *assembly*
 Um programa em linguagem *assembly* é formado por uma sequência de linhas de texto.
 Cada linha contém uma instrução, diretiva ou *label*.
 
-
-   ``sub	r0, r0, 1``
-
 Uma instrução é formada por uma mnemónica, que identifica a instrução,
 seguida dos parâmetros.
 No exemplo, ``sub`` é a mnemónica da instrução e ``r0, r0, 1``
 são os parâmetros.
 
+   ``sub	r0, r0, 1``
+
 O P16 dispõe das instruções listadas na tabela (:numref:`instrucoes_p16`).
 A quantidade e o tipo dos parâmetros dependem da instrução em causa
 e podem ser registos do processador, constantes numéricas ou símbolos.
 
-As mnemónicas das isntruções e o nome dos registos
-podem ser escritos em letras maiúsculas ou minúsculas (*case insensitive*).
+As mnemónicas das instruções e o nome dos registos
+podem ser escritos em letras maiúsculas ou minúsculas (*case insensitive* [#f1]_).
 
    .. table:: Instruções do P16
       :widths: auto
@@ -59,21 +58,16 @@ Se for necessário referenciar a instrução,
 por exemplo para saltar para ela desde outro ponto do programa,
 precede-se a instrução de uma *label*.
 
-   .. code-block:: console
+.. code-block:: console
 
-      cycle:
-              sub	r0, r0, 1
-              . . .
-              b 	cycle
+   cycle:
+           sub	r0, r0, 1
+           . . .
+           b 	cycle
 
 A *label* define um símbolo. No exemplo acima é definido o símbolo ``cycle``,
 cujo valor é o endereço de memória onde está alojado o código máquina da instrução ``sub r0, r0, 1``.
 
-Sintacticamente, é formada por uma palavra iniciada por uma letra
-seguida de mais letras ou dígitos e terminada pelo carácter ``‘:’``.
-Pode conter o carácter ``‘_’``, tanto no início da palavra, como entre caracteres.
-O compilador distingue letras maiúsculas de minúsculas
-na definição de símbolo do tipo *label* (*case sensitive*).
 Para melhor evidência, a *label* costuma colocar-se
 na linha anterior à da instrução a que se refere.
 
@@ -81,15 +75,15 @@ Os comentários podem ser inseridos em qualquer lugar
 quando delimitados pelas marcas ``‘/*’`` e ``‘*/’`` como em linguagem C,
 ou depois do carácter ``‘;’`` até ao fim da linha.
 
-  .. code-block:: console
+.. code-block:: console
 
-      /* Main cycle.
-	 Iterates until counter reach zero.
-      */
-      cycle:
-              sub	r0, r0, 1	; decrement counter
-              . . .
-              b 	cycle
+   /* Main cycle.
+   Iterates until counter reach zero.
+   */
+   cycle:
+           sub	r0, r0, 1	; decrement counter
+           . . .
+           b 	cycle
 
 Diretivas
 ---------
@@ -101,7 +95,7 @@ Sintacticamente uma directiva é identificada por uma palavra chave iniciada pel
 No texto do programa, uma directiva e os seus parâmetros ocupam
 a mesma posição da mnemónica da instrução e dos respectivos parâmetros.
 
-Na linguagem *assembly* do P16 existem directivas para definir os dados do programa,
+Na linguagem *assembly* do P16 existem directivas para definir dados do programa,
 para controlar a localização dos dados e do código máquina em memória e para definir símbolos.
 
 .. table:: Directivas para definição de dados do programa
@@ -133,28 +127,29 @@ para controlar a localização dos dados e do código máquina em memória e par
   |                                             | de *strings* indicada. As *strings* produzidas são compostas |
   |                                             | pelos caracteres indicados e terminadas com o valor zero.    |
   +---------------------------------------------+--------------------------------------------------------------+
-  | ``.align`` [n]                              | Avança o contador de localização até um valor múltiplo de    |
-  |                                             | 2^n. O novo valor do contador terá zero nos 'n' *bits*       |
+  | ``.align`` [*n*]                            | Avança o contador de localização até um valor múltiplo de    |
+  |                                             | 2^*n*. O novo valor do contador terá zero nos *n* *bits*     |
   |                                             | de menor peso. A omissão de argumento é equivalente a        |
   |                                             | ``.align 1``.                                                |
   +---------------------------------------------+--------------------------------------------------------------+
 
 Exemplo de utilização da directiva ``.word`` na definição de uma variável de 16 *bits*
-identificada pelo símbolo ``counter`` iniciada com o valor zero.
+identificada pelo símbolo ``counter`` iniciada com o valor zero. Esta variável ocupa
+duas posições de memória.
 
-   .. code-block::
+.. code-block::
 
-      counter:
-      	.word	0
+   counter:
+   	.word	0
 
-Exemplo de utilização da directiva ``.byte na definição de um *array*
-de valores representados a 8 *bits*, com três posições,
-iniciadas com os valores 3, 4 e 5, sucessivamente.
+Exemplo de utilização da directiva ``.byte`` na definição de um *array*
+de três posições iniciadas com 3, 4 e 5, sucessivamente. Os valores são
+representados a 8 *bits*, ocupando apenas uma posição de memória.
 
-   .. code-block::
+.. code-block::
 
-      array:
-      	.byte	3, 4, 5
+   array:
+   	.byte	3, 4, 5
 
 Exemplo de utilização da directiva ``.asciz`` para definição de um *array*
 de caracteres iniciado com a *string* “Portugal”, no formato da linguagem C.
@@ -186,6 +181,10 @@ oito para os códigos dos caracteres e uma para o terminador.
    | ``.bss``                   | Define uma secção com o nome '.bss'.          |
    +----------------------------+-----------------------------------------------+
 
+A inserção de uma diretiva de definição de secção no texto do programa
+significa que todos os elementos de programa, instruções ou variáveis,
+definidos à frente são alojados nessa secção.
+
 .. table:: Directiva para definição de símbolos
    :widths: 6 14
    :name: diretiva_simbolos
@@ -195,21 +194,38 @@ oito para os códigos dos caracteres e uma para o terminador.
    |                            | equivalente a *value*.                        |
    +----------------------------+-----------------------------------------------+
 
+A diretiva ``.equ`` permite definir um símbolo e associar-lhe um valor numérico.
+Esta diretiva pode ser posicionada em qualquer lugar do texto do programa,
+tanto antes como depois da sua invocação.
+
 Símbolos
 --------
 
+Um símbolo é uma palavra iniciada por uma letra seguida de mais letras ou dígitos.
+Pode conter o carácter ``‘_’``, tanto no início da palavra, como entre caracteres.
+A formação de símbolos é *case sensitive* [#f1]_.
+
 Existem duas formas de definir símbolos: através de *labels*
 ou através da directiva ``.equ``.
-No caso das *labels* o símbolo é equivalente ao endereço da instrução
-ou da variável seguinte.
-No caso da directiva ``.equ`` o símbolo é equivalente ao valor da constante
-ou expressão associada.
+
+A definição de *label* é formada pelo símbolo terminado com o carácter ``‘:’``.
+Na invocação utiliza-se apenas o símbolo sem o carácter ``‘:’``.
+Uma *label* é equivalente ao endereço da instrução ou da variável seguinte.
+Em geral, na definição de *labels* usam-se letras minúsculas
+e o carácter ``‘_’`` na separação de palavras em símbolos compostos.
+
+No caso da diretiva ``.equ``, o símbolo é equivalente ao valor numérico
+da expressão associada, que na forma mais simples pode ser um literal.
+A expressão pode conter outros símbolos definidos com ``.equ`` ou *labels*
+e deve ser calculável pelo *assembler*.
+Em geral. na definição de símbolos com ``.equ`` usam-se letras maiúsculas
+e o carácter ``‘_’`` na separação de palavras em símbolos compostos.
 
 .. code-block::
 
-   	.equ	MASK, 0b00001110
+   	.equ	MODE_MASK, 0b00001110
 
-Neste exemplo, a directiva ``.equ`` é usada para definir o símbolo ``MASK``
+Neste exemplo, a directiva ``.equ`` define o símbolo ``MODE_MASK``
 como equivalente ao valor binário ``1110``.
 
 Contador de localização
@@ -307,3 +323,7 @@ Limitações sintáticas
 
 * A última linha do programa também deve ser terminada com "mudança de linha".
   Se o ficheiro do programa terminar numa linha incompleta é assinalado erro de sintaxe.
+
+.. rubric:: Footnotes
+
+.. [#f1] https://pt.wikipedia.org/wiki/Case-sensitive
