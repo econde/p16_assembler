@@ -6,6 +6,10 @@
 Manual de utilização do PAS
 ===========================
 
+.. sidebar:: *Feedback*
+
+   Alertas para erros, comentários e sugestões devem ser enviados para `ezequiel.conde[at]isel.pt`.
+
 .. toctree::
    :maxdepth: 2
    :numbered:
@@ -14,5 +18,4 @@ Manual de utilização do PAS
    pas_utilizacao.rst
    pas_assembly_syntax.rst
    pas_instalacao.rst
-
 

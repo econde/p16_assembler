@@ -34,7 +34,7 @@ O ficheiro com o texto do programa em linguagem *assembly* -- ficheiro fonte --
 assinalado como `<source filename>`, tem normalmente a extensão **'s'**.
 
 .. No caso de não serem detetados erros, é gerado um ficheiro com extensão **'lst'**,
-   com informação legível, e um ficheiro com o código binário. 
+   com informação legível, e um ficheiro com o código binário.
 
 A opção ``--output`` permite definir o nome base [#f2]_ dos ficheiros de saída.
 Se esta opção for omitida, os ficheiros produzidos terão o mesmo nome base que o ficheiro fonte.
@@ -124,15 +124,13 @@ Considere-se o programa da :numref:`ficheiro_multiply_s` como conteúdo do fiche
 
 No comando
 
-   .. code-block:: console
-
-      pas multiply.s -s .data=0x4000 -s .text=0x1000
+   ``pas multiply.s -s .data=0x4000 -s .text=0x1000``
 
 a primeira ocorrência da opção ``-s`` define o endereços da secção ``.data`` em ``0x4000``
 e a segunda ocorrência define o endereço da secção ``.text`` em ``0x1000``.
 A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
 porque está definida em primeiro lugar no ficheiro fonte.
-A secção ``.bss`` é localizada no endereço ``0x4002``, também por localização implícita, 
+A secção ``.bss`` é localizada no endereço ``0x4002``, também por localização implícita,
 porque está definida a seguir a ``.data`` que tem uma dimensão 2.
 Por fim, a secção .stack é localizada no endereço ``0x4006``, também por localização implícita,
 porque está definida a seguir a ``.bss`` que tem dimensão 4.
@@ -140,22 +138,22 @@ porque está definida a seguir a ``.bss`` que tem dimensão 4.
 Os erros e avisos são assinalados na própria janela de comandos. Foi introduzido um
 erro de sintaxe apenas para exemplificar.
 
-   .. code-block:: console
+.. code-block:: console
 
-      multiply.s (51): 	ld	r0, addressof_m
-      ----------------        ^^
-      ERROR!	syntax error
+   multiply.s (51): 	ld	r0, addressof_m
+   ----------------        ^^
+   ERROR!	syntax error
 
 Se o programa fonte não tiver erros, são produzidos dois ficheiros adicionais ``multiply.lst`` com
 informação legível e ``multiply.hex`` com o código máquina.
 
 A emissão de avisos não impede a geração do código binário como no seguinte caso:
 
-   .. code-block:: console
+.. code-block:: console
 
-      multiply.s (90): 	sub	r1, r1, 17
-      ----------------                        ^^
-      WARNING!	Expression's value = 17 (0x11) not encodable in 4 bit, truncate to 1 (0x1)
+   multiply.s (90): 	sub	r1, r1, 17
+   ----------------                        ^^
+   WARNING!	Expression's value = 17 (0x11) not encodable in 4 bit, truncate to 1 (0x1)
 
 Faz parte de uma boa prática de programação corrigir o programa até suprimir a emissão de
 mensagens de aviso.
@@ -164,19 +162,19 @@ Por uma questão de organização, é conveniente criar especificamente uma dire
 ficheiros relacionados com um dado programa. No exemplo seguinte a directoria ``multiply`` aloja
 todos os ficheiros relacionados com este programa: ``multiply.s``, ``multiply.lst`` e ``multiply.hex``.
 
-   .. code-block:: console
+.. code-block:: console
 
-      disciplinas
-         |-- pe
-         |-- ss
-         |-- ac
-            |-- documents
-            |-- p16_code
-               |-- divide
-               |-- multiply
-                  |-- multiply.s
-                  |-- multiply.lst
-                  |-- multiply.hex
+   disciplinas
+      |-- pe
+      |-- ss
+      |-- ac
+         |-- documents
+         |-- p16_code
+            |-- divide
+            |-- multiply
+               |-- multiply.s
+               |-- multiply.lst
+               |-- multiply.hex
 
 Em seguida apresenta-se o conteúdo do ficheiro ``lst``. Este contém a tabela de secções,
 a tabela de símbolos e a listagem das instruções.

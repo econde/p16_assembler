@@ -15,6 +15,7 @@ Linux
    Descarregar `daqui <https://www.dropbox.com/s/dtw6l7li4cug9cc/pas?dl=0>`_.
 
    É necessário redefinir o atributo de executável:
+
    ``$ chmod 755 pas``
 
    Copiar para a diretoria de instalação. Por exemplo:
