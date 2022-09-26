@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 	int result = 0;
 	int verbose_flag = 0;
 	const char *output_format = "hexintel";
-	auto word_size = 1;
+	auto word_size = 1U;
 	uint32_t lower_address, higher_address;
 	bool option_address = false;
 
@@ -183,10 +183,8 @@ int main(int argc, char **argv) {
 
 	if (verbose_flag) {
 		cout << endl;
-		cout << "Source file:    " << input_filename << endl;
+		cout << "Source file: " << input_filename << endl;
 	}
-
-
 
 	yyin = stdin;
 	if ( ! input_filename.empty()) {
@@ -205,7 +203,7 @@ int main(int argc, char **argv) {
 
 	// yydebug = 1;
 	if (verbose_flag)
-		cout << endl << "Análise sintática e geração da AST" << endl;
+		cout << endl << "Syntatic analisis and AST generation" << endl << endl;
 
 	if (yyparse())
 		return -1;
@@ -218,11 +216,22 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-	if (verbose_flag)
+#if 0
+	if (verbose_flag) {
 		Symbols::print(cout);
+		cout << endl << "Evaluate symbols" << endl << endl;
+	}
+
+	Symbols::evaluate();
+#endif
+
+	if (verbose_flag) {
+		cout << endl << "Print symbols" << endl << endl;
+		Symbols::print(cout);
+	}
 
 	if (verbose_flag)
-		cout << endl << "Code gneration" << endl;
+		cout << endl << "Code generation" << endl << endl;
 	{
 		Code_generator code_gen;
 		for (auto s: *ast_root) {
@@ -235,9 +244,8 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-
 	if (verbose_flag)
-		cout << endl << "Locate Sections" << endl;
+		cout << endl << "Locate Sections" << endl << endl;
 	Sections::locate(&section_addresses);
 	if (verbose_flag)
 		Sections::listing(cout);
@@ -248,7 +256,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (verbose_flag) {
-		cout << endl << "Relocate symbols" << endl;
+		cout << endl << "Relocate symbols" << endl << endl;
 		Relocations::print(cout);
 	}
 	Relocations::relocate();
@@ -279,7 +287,6 @@ int main(int argc, char **argv) {
 		cout << "\tword_size: " << word_size << endl;
 		ostream_printf(cout, "\tlower address: 0x%04x, higher address: 0x%04x\n",
 						lower_address, higher_address);
-		cout << "\tbase file name: " << output_filename << endl;
 	}
 
 	if (strcmp(output_format, "binary") == 0) {
@@ -289,7 +296,7 @@ int main(int argc, char **argv) {
 			Sections::binary_raw(filename.c_str(), word_size, 0, lower_address, higher_address);
 		}
 		else {
-			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+			for (auto byte_order = 0U; byte_order < word_size; ++byte_order) {
 				string bin_filename = output_filename + string_printf("_%d.bin", byte_order);
 				remove(bin_filename.c_str());
 				Sections::binary_raw(bin_filename.c_str(), word_size, byte_order, lower_address, higher_address);
@@ -303,7 +310,7 @@ int main(int argc, char **argv) {
 			Sections::binary_logisim(filename.c_str(), word_size, 0, lower_address, higher_address);
 		}
 		else {
-			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+			for (auto byte_order = 0U; byte_order < word_size; ++byte_order) {
 				string filename = output_filename + string_printf("_%d.sim", byte_order);
 				remove(filename.c_str());
 				Sections::binary_logisim(filename.c_str(), word_size, byte_order, lower_address, higher_address);
@@ -322,7 +329,7 @@ int main(int argc, char **argv) {
 			Sections::binary_hex_intel(filename.c_str(), word_size, 0, lower_address, higher_address);
 		}
 		else {
-			for (auto byte_order = 0; byte_order < word_size; ++byte_order) {
+			for (auto byte_order = 0U; byte_order < word_size; ++byte_order) {
 				string filename = output_filename + string_printf("_%d.hex", byte_order);
 				remove(filename.c_str());
 				Sections::binary_hex_intel(filename.c_str(), word_size, byte_order, lower_address, higher_address);
