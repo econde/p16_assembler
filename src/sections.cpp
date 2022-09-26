@@ -264,7 +264,7 @@ void Sections::binary_hex_intel(const char *file_name,
 				size -= rec_len;
 			} while (size > 0);
 		}
-		ostream_printf(file, ":00000001FF");
+		ostream_printf(file, ":00000001FF\n");
 		file.close();
 	} catch (ios_base::failure &e) {
 		cerr << e.what();

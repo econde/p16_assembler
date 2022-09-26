@@ -46,7 +46,7 @@ struct Instruction: public Statement {
 		size_in_memory = 2;
 		Sections::increase(section_index, size_in_memory);
 	}
-	
+
 	string listing() {
 		return string_printf("%4d %04X %02X %02X\t", location.line,
 							 Sections::get_address(section_index) + section_offset,
@@ -65,10 +65,10 @@ struct Instruction: public Statement {
 struct Load_relative: public Instruction {
 	unsigned ldst;
 	Register *rd;
-	Expression *constant;
+	Expression *target;
 	Load_relative(unsigned ldst, Register *rd, Expression *d, Location left) :
-		Instruction {left}, ldst {ldst}, rd {rd}, constant {d} { }
-	~Load_relative() { delete constant; }
+		Instruction {left}, ldst {ldst}, rd {rd}, target {d} { }
+	~Load_relative() { delete target; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -95,35 +95,35 @@ struct Branch: public Instruction {
 	~Branch() { delete expression; }
 	void accept(Visitor *v) { v->visit(this); }
 };
- 
+
 struct Arith: public Instruction {
 	Register *rd, *rn, *rm;
 	Expression *expression;
 	unsigned operation;
-	
+
 	Arith(unsigned o, Register *rd, Register *rn, Register *rm, Location left) :
 		Instruction {left}, rd {rd}, rn {rn}, rm {rm}, expression {nullptr}, operation {o} { }
 
 	Arith(unsigned o, Register *rd, Register *rn, Expression *e, Location left) :
 		Instruction {left}, rd {rd}, rn {rn}, expression {e}, operation {o} { }
-	
+
 	~Arith() { delete expression; }
-	
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
 struct Compare: public Instruction {
 	Register *rn, *rm;
-	Expression *constant;
-	 
+//	Expression *constant;
+
 	Compare(Register *rn, Register *rm, Location left) :
-		Instruction {left}, rn {rn}, rm {rm}, constant {nullptr} { }
+		Instruction {left}, rn {rn}, rm {rm} { }
 
-	Compare(Register *rn, Expression *c, Location left) :
-		Instruction {left}, rn {rn}, constant {c} { }
+//	Compare(Register *rn, Expression *c, Location left) :
+//		Instruction {left}, rn {rn}, constant {c} { }
 
-	~Compare() { delete constant; }
-			
+//	~Compare() { delete constant; }
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -139,10 +139,10 @@ struct Logic: public Instruction {
 
 struct Not: public Instruction {
 	Register *rd, *rn;
-	 
+
 	Not(Register *rd, Register *rn, Location left) :
 		Instruction {left}, rd {rd}, rn {rn} { }
-	
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -151,7 +151,7 @@ struct Shift: public Instruction {
 	Register *rd, *rn;
 	unsigned operation;
 	Expression *constant;
-	
+
 	Shift(unsigned op, Register *rd, Register *rn, Expression *p, Location left) :
 		Instruction {left}, rd {rd}, rn {rn}, operation {op}, constant {p} { }
 
@@ -163,7 +163,7 @@ struct Shift: public Instruction {
 
 struct Rrx: public Instruction {
 	Register *rd, *rn;
-	
+
 	Rrx(Register *rd, Register *rn, Location left) :
 		Instruction {left}, rd {rd}, rn {rn} {	}
 
@@ -177,7 +177,7 @@ struct Move: public Instruction {
 
 	Move(Register *rd, Register *rs, Location left) :
 		Instruction {left}, rd {rd}, rs {rs}, constant {nullptr} { }
- 
+
  	Move(unsigned high, Register *rd, Expression *c, Location left) :
 		Instruction {left}, rd {rd}, constant {c}, high(high) { }
 
@@ -191,7 +191,7 @@ struct Moves: public Instruction {
 
 	Moves(Register *rd, Register *rn, Location left) :
 		Instruction {left}, rd {rd}, rn {rn} { }
- 
+
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -216,7 +216,7 @@ struct Mrs: public Instruction {
 struct Push_pop: public Instruction {
 	unsigned push;
 	Register *r;
-	
+
 	Push_pop(unsigned push, Register *r, Location left) :
 		Instruction {left}, push {push}, r {r} { }
 

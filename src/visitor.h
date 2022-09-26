@@ -85,7 +85,6 @@ public:
 	virtual void visit(ast::Unary_expression *) = 0;
 	virtual void visit(ast::Binary_expression *) = 0;
 	virtual void visit(ast::Conditional_expression *) = 0;
-
 };
 
 #endif
