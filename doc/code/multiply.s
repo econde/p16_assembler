@@ -3,10 +3,9 @@
 	b	.
 _start:
 	ldr	sp, addressof_stack_top
-	ldr	r0, addressof_main
-	mov	r1, pc
-	add	lr, r1, 4
-	mov	pc, r0
+	mov	r0, pc
+	add	lr, r0, 4
+	ldr	pc, addressof_main
 	b	.
 
 addressof_stack_top:
@@ -32,7 +31,6 @@ n:
 /*---------------------------------------------------
 uint16_t p, q;
 */
-
 	.bss
 p:
 	.word

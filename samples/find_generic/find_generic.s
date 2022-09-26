@@ -3,17 +3,17 @@
 	b	_start
 
 _start:
-	ldr	sp, addr_stack_top
-	ldr	r0, addr_main
-	mov	r1, pc
-	add	lr, r1, 4
-	mov	pc, r0
+	ldr	sp, addressof_stack_top
+	mov	r0, pc
+	add	lr, r0, 4
+	ldr	pc, addressof_main
+
 	b	.
 
-addr_stack_top:
+addressof_stack_top:
 	.word	stack_top
-	
-addr_main:
+
+addressof_main:
 	.word	main
 
 	.section .stack
@@ -65,8 +65,6 @@ luis:
 	.asciz	"luis"
 luis_silva:
 	.asciz	"luis silva"
-xx:
-	.ascii	"ab"
 
 	.data
 people:
@@ -81,7 +79,7 @@ people_0:
 	.byte	164
 	.byte	65, 0, 0
 	.word	50700
-	
+
 	.word	luis
 	.word	silva
 	.byte	177
@@ -105,14 +103,14 @@ main:
 	ldr	r0, addr_result
 	push	r0
 	ldr	r0, addr_luis_silva
-	push	r0	
+	push	r0
 	ldr	r0, addr_people
 	mov	r1, PEOPLE_SIZE
 	mov	r2, PERSON_SIZE
 	ldr	r3, addr_cmp_name
 	bl	find
-	mov	r1, 3 *2
-	add	sp, r1, sp 
+	mov	r1, 3 * 2
+	add	sp, r1, sp
 	pop	pc
 
 addr_result:
@@ -123,12 +121,12 @@ addr_cmp_name:
 	.word	cmp_name
 addr_luis_silva:
 	.word	luis_silva
-	
+
 /*------------------------------------------------------------------------------
-(r0) size_t find (void *array (r0), size_t array_size (r1), size_t elem_size (r2) (r8),
-		int (*cmp (r3)(r10))(const void *, const void *), const void *context (r7[2]),
-		void *result[] (r7[4]), size_t result_size (r7[6]) (r5)) {
-	void **result_iter (r6) = result;
+(r0) size_t find (void *array <r0>, size_t array_size <r1>, size_t elem_size <r2> <r8>,
+		int (*cmp <r3><r10>)(const void *, const void *), const void *context <r7[2]>),
+		void *result[] <r7[4]>, size_t result_size <r7[6]> <r5>) {
+	void **result_iter <r6> = result;
 	void *last (r9) = array + array_size * elem_size;
 	for (void *iter (r4) = array; iter < last ; iter += elem_size) {
 		if (cmp(iter, context) == 0) {
@@ -139,6 +137,12 @@ addr_luis_silva:
 	}
 	return result_iter - result;
 }
+
+Representação do stack após a instrução push r10
+O registo r7 é utilizado como base para aceder aos argumentos em stack
+sp* - posição do registo sp à entrada da função, antes de executada qualquer instrução
+r7* - posição do registo r7; vai manter-se nesta posição durante toda a função
+
 	---------
 	|	|
 	---------
@@ -146,9 +150,9 @@ addr_luis_silva:
 	---------
 	|result	|		r7[4]
 	---------
-	|context|	sp	r7[2]
+	|context|	sp*	r7[2]
 	---------
-	|r7	|	r7
+	|r7	|	r7*
 	---------
 	|lr	|
 	---------
@@ -198,7 +202,7 @@ for:
 	ldr	r1, [r7, 2]
 	mov	r2, pc
 	add	lr, r2, 4
-	mov	pc, r10		
+	mov	pc, r10
 	sub	r0, r0, 0		/* if (cmp(iter, context) == 0) { */
 	bne	if_end
 	str	r4, [r6]	/* *result_iter++ = iter; */
@@ -212,7 +216,7 @@ for_end:
 	ldr	r0, [r7, 4]	/* return result_iter - result; */
 	sub	r0, r6, r0
 	lsr	r0, r0, 1
-	
+
 	pop	r10
 	pop	r9
 	pop	r8
@@ -259,7 +263,7 @@ cmp_name:
 	mov	r0, sp
 	ldr	r1, [r4, 2]
 	bl	strcat		/* strcat (full_name, ((Person*)a)->surname); */
-	
+
 	mov	r0, sp
 	mov	r1, r5
 	bl	strcmp
@@ -301,7 +305,7 @@ strcmp_for_cond:
 strcmp_for_end:
 	sub	r0, r2, r3
 	mov	pc, lr
-	
+
 /*------------------------------------------------------------------------------
 char *strcat(char *dst, const char *src) {
 	char *aux = dst;
@@ -338,7 +342,7 @@ strcat_while2_cond:
 char *strcpy(char *dst, const char *src) {
     char *aux = dst;
     while (*src)
-        *dst++ = *src++;        
+        *dst++ = *src++;
     *dst = *src;
     return aux;
 }
@@ -377,7 +381,7 @@ strlen_cond:
 	bne	strlen_for
 	mov	r0, r1		/* return i */
 	mov	pc, lr
-	
+
 /*------------------------------------------------------------------------------
 uint32_t multiply(uint16_t multiplicand, uint16_t multiplier) {
 	uint16_t result = 0;
