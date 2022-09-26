@@ -203,8 +203,8 @@ instruction
 
 	|	CMP register COMMA register
 			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
-	|	CMP register COMMA expression
-			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
+//	|	CMP register COMMA expression
+//			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
 
 	|	MOV register COMMA register
 			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
@@ -265,7 +265,7 @@ directive
 			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
 
 	|	EQU IDENTIFIER COMMA expression
-			{ $$ = new ast::Equ(*$2, $4, LOCATION(@1)); delete($2); }
+			{ $$ = new ast::Equ(new ast::Symbol(LOCATION(@2), *$2), $4, LOCATION(@1)); delete($2); }
 
 	|	BYTE
 			{ $$ = new ast::Byte($1, new std::list<ast::Expression*>{new ast::Value(0, LOCATION(@1))}, LOCATION(@1)); }
