@@ -27,18 +27,24 @@ namespace ast {
 
 		Location location;
 
-		Expression(Location location) : location{location} {}
+		unsigned value;		//	Valor associado à expressão
+		Value_type type;	//	Tipo associado à expressão
+		//	Estes campos apenas são atualizados no método evaluate
 
-		Expression(Expression *e, Location location) : location{location} {}
+		Expression(Location location, unsigned value, Value_type type)
+			: location{location} , value{value}, type{type} {}
+
+		Expression(Location location) : location{location} {}
 
 		virtual ~Expression() {};
 
 		virtual std::string to_string() = 0;
 
-		virtual unsigned get_value() = 0;
-		virtual Value_type get_type() = 0;
-		virtual std::string get_symbol() = 0;
+		unsigned get_value() { return value; }
+		Value_type get_type() { return type; }
 
+		virtual bool evaluate() = 0;
+		virtual std::string get_symbol() = 0;
 		virtual void accept(Visitor *v) = 0;
 	};
 }

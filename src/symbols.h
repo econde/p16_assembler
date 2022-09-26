@@ -25,23 +25,21 @@ limitations under the License.
 namespace ast {
 
 	struct Symbol {
-		//  Tipo do valor associado ao simbolo:
-		//      - ABSOLUTE - valores absolutos calculáveis imediatamente
-		//      - LABEL - label cujo valor é relativo à secção a que pertence
-		//      - UNDEFINED - simbolo apenas referido;
-		//          pode ser uma expressão da forma (label + ADDEND) em que ADDEND é uma constante
-		//      - INVALID - expressão que envolve operações invalidas sobre labels;
-		//          (label * CONST) (label + label) ...
+		Location location;
+		std::string name;	//	Nome do símbolo
+		Value_type type;	//
+		unsigned section;	//	Secção a que pertence
+		Expression *value_expression;	//	Expressão do valor associado ao símbolo
 
-		std::string name;
-		Value_type type;
-		unsigned section;
-		Expression *value_expression;
-		unsigned value;
+		Symbol(Location location, std::string name) : location{location}, name{name} { }
+		Symbol(Location location, std::string name, Value_type type, unsigned section, Expression *value) :
+				location{location}, name{name}, type{type}, section{section}, value_expression{value} { }
 
-		Symbol(std::string name) : name{name} { }
-		Symbol(std::string name, Value_type type, unsigned section, Expression *value) :
-				name{name}, type{type}, section{section}, value_expression{value} { }
+		void set_properties(Value_type type, unsigned section, Expression *value) {
+			this->section = section;
+			this->type = type;
+			this->value_expression = value;
+		}
 
 		unsigned get_value();
 
@@ -53,15 +51,7 @@ namespace ast {
 	public:
 		static void deallocate();
 
-		static bool do_exist(std::string name) {
-			return table.find(name) != table.end();
-		}
-
-		static void add(std::string name, Value_type type, unsigned section, Expression *value);
-
-		static int add(std::string name, unsigned section, Expression *value);
-
-		static void set_properties(std::string name, Value_type type, unsigned section, Expression *value);
+		static void add(Symbol *symbol)  { table[symbol->name] = symbol; }
 
 		static unsigned get_section(std::string name) {
 			auto pair_symbol = table.find(name);
@@ -79,14 +69,25 @@ namespace ast {
 
 		static Value_type get_type(std::string name) {
 			auto pair_symbol = table.find(name);
-			if (pair_symbol != table.end())
-				return pair_symbol->second->get_type();
+			if (pair_symbol != table.end()) {
+				auto symbol = pair_symbol->second;
+				return symbol->get_type();
+			}
 			return Value_type::UNDEFINED;
+		}
+
+		static Symbol *search(std::string name) {
+			auto pair_symbol = table.find(name);
+			if (pair_symbol != table.end())
+				return pair_symbol->second;
+			return nullptr;
 		}
 
 		static void print(std::ostream &os);
 
 		static void listing(std::ostream &lst_file);
+
+		static void evaluate();
 	};
 }
 

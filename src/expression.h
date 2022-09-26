@@ -30,16 +30,16 @@ namespace ast {
 using namespace std;
 
 class Value: public Expression {
-protected:
-	int value;
+
 public:
-	Value(Location location): Expression {location}, value {0} { }
-	Value(int v, Location location) : Expression {location}, value {v} { }
+
+	Value(unsigned value, Location location)
+		: Expression {location, value, Value_type::ABSOLUTE} { }
 	~Value() { }
 
-	unsigned get_value() { return value; }
-	string get_symbol() { return string(); }
-	Value_type get_type() { return Value_type::ABSOLUTE; }
+	bool evaluate() { return true; }
+
+	string get_symbol() { return string(); }	//	string vazia
 
 	string to_string() { return string_printf("%d", value); }
 	void accept(Visitor *v) { v->visit(this); }
@@ -47,25 +47,32 @@ public:
 
 	//-----------------------------------------------------------------------------------------------------
 
-class Identifier: public Value {
-	string name;
+class Identifier: public Expression {
+	Symbol *symbol;
 public:
 	Identifier(string name, Location location) :
-		Value {location}, name {name} {
-		if (name.compare(0, 5, "line#") == 0)	//	Simbolo .	 (ponto)
-			Symbols::add(name, Value_type::LABEL, Sections::current_section->number,
+		Expression {location} {
+		if (name.compare(0, 5, "line#") == 0)	{ //	Simbolo .	 (ponto)
+			symbol = new Symbol(location, name, Value_type::LABEL, Sections::current_section->number,
 						 new Value(Sections::current_section->content_size, location));
-		else if (!Symbols::do_exist(name))
-			Symbols::add(name, Value_type::UNDEFINED, 0, 0);
+			Symbols::add(symbol);
+		}
+		else {
+			symbol = Symbols::search(name);
+			if (symbol == nullptr)
+			symbol = new Symbol(location, name, Value_type::UNDEFINED, 0, nullptr);
+			Symbols::add(symbol);
+		}
 	}
 
-	unsigned get_value() { return Symbols::get_value(name); }
-	Value_type get_type() { return Symbols::get_type(name); }
-	string get_symbol() { return name; }
+	unsigned get_value();
+	bool evaluate();
+	Value_type get_type() { return symbol->get_type(); }
+	string get_symbol() { return symbol->name; }
 
-	void set_value(int v) { value = v; }
+//	void set_value(int v) { value = v; }
 
-	string to_string() { return name; }
+	string to_string() { return symbol->name; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
@@ -78,9 +85,18 @@ public:
 
 	virtual ~Priority() { delete expression; }
 
-	unsigned get_value() { return expression->get_value(); }
+	bool evaluate() {
+		if (expression->evaluate()) {
+			type = expression->get_type();
+			value = expression->get_value();
+			return true;
+		}
+		else {
+			type = expression->get_type();
+			return false;
+		}
+	}
 	string get_symbol() { return expression->get_symbol(); }
-	Value_type get_type() { return expression->get_type(); }
 
 	string to_string() { return "(" + expression->to_string() + ")"; }
 	void accept(Visitor *v) { v->visit(this); }
@@ -98,6 +114,7 @@ public:
 	~Unary_expression() { delete expression; }
 
 	string get_symbol() { return expression->get_symbol(); }
+	bool evaluate();
 	unsigned get_value();
 	Value_type get_type();
 
@@ -121,6 +138,7 @@ public:
 
 	string get_symbol();
 	unsigned get_value();
+	bool evaluate();
 	Value_type get_type();
 
 	string to_string();
@@ -128,32 +146,28 @@ public:
 };
 
 class Conditional_expression: public Expression {
-	Expression *logical_expression, *expression, *conditional_expression;
+	Expression *logical_expression, *true_expression, *false_expression;
 public:
 	Conditional_expression(Expression *le, Expression *e, Expression *ce, Location location) :
-			Expression {location}, logical_expression {le}, expression{e}, conditional_expression{ce} { }
+			Expression {location}, logical_expression {le}, true_expression{e}, false_expression{ce} { }
 
 	virtual ~Conditional_expression() {
 		 delete logical_expression;
-		 delete expression;
-		 delete conditional_expression;
+		 delete true_expression;
+		 delete false_expression;
 	}
 
-	unsigned get_value() {
-		return logical_expression->get_value() != 0
-			   ? expression->get_value() : conditional_expression->get_value();
+	string get_symbol() {	//	get_type() só pode ser invocado depois de evaluate().
+		return get_type() == LABEL && logical_expression->get_value()
+					? true_expression->get_symbol()
+					: false_expression->get_symbol();
 	}
-
-	string get_symbol() {	//	É preciso avaliar se se pode faze get_value antes da localização.
-		return logical_expression->get_value() != 0
-			   ? expression->get_symbol() : conditional_expression->get_symbol();
-	}
-
- 	Value_type get_type();
+	bool evaluate();
 
 	string to_string() {
-		return logical_expression->to_string() + " ? " +
-				expression->to_string() + " : " + conditional_expression->to_string();
+		return logical_expression->to_string()
+			+ " ? " + true_expression->to_string()
+			+ " : " + false_expression->to_string();
 	}
 
 	void accept(Visitor *v) { v->visit(this); }
