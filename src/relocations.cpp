@@ -35,9 +35,9 @@ void Relocations::print(ostream & os) {
 					reloc->location->unit, reloc->location->line,
 					reloc->section_index, reloc->section_offset,
 					reloc->position, MAKE_MASK(reloc->width, 0),
-					reloc->type == Relocation::Type::ABSOLUTE ? "ABSOLUTE" : "RELATIVE",
+					reloc->type == Relocation::Relocation_type::ABSOLUTE ? "ABSOLUTE" : "RELATIVE",
 					reloc->addend, reloc->symbol.c_str());
-	}		
+	}
 }
 
 void Relocations::relocate() {
@@ -56,20 +56,20 @@ void Relocations::relocate() {
 		auto value = 0;	//	Valor com sinal
 		value = (reloc->symbol.empty() ? 0 : Sections::get_address(Symbols::get_section(reloc->symbol)))
 				+ reloc->addend;
-		if (reloc->type == Relocation::Type::RELATIVE) {
+		if (reloc->type == Relocation::Relocation_type::RELATIVE) {
 			//	Nas instruções branch os offsets são codificados em número de instruções (value / 2)
 			if (value & 1)
 				warning_report(reloc->exp_location,
 					string_printf("Target address is odd: %+d (0x%x)", value, value));
 			value -= Sections::get_address(section) + offset;
-			value >>= 1;
-			if (ABSOLUTE(value) > (mask >> 1))		//	signed
+			if (value >= (1 << reloc->width) || value < (~0 << reloc->width))	//	signed
 					error_report(reloc->exp_location,
 								 string_printf("Interval between PC and target address: %+d (0x%x), "
-												"isn't codable in %d bit two's complement",
-												value * 2, value * 2, reloc->width + 1));
+												"isn't codable in %d bit two's complementxx",
+												value, value, reloc->width + 1));
+			value >>= 1;
 		}
-		else if (reloc->type == Relocation::Type::RELATIVE_UNSIGNED) {	//	usado no ldr rd, label
+		else if (reloc->type == Relocation::Relocation_type::RELATIVE_UNSIGNED) {	//	usado no ldr rd, label
 			if (value & 1)
 				warning_report(reloc->exp_location,
 					string_printf("Target address is odd: %+d (0x%x)", value, value));
@@ -77,19 +77,20 @@ void Relocations::relocate() {
 			if (value < 0)
 				error_report(reloc->exp_location,
 							"Indicated address must be higher than current location");
-			value >>= 1;
-			if (ABSOLUTE(value) > mask)
+			if (value >= (1 << (reloc->width + 1)))
 				error_report(reloc->exp_location,
 							 string_printf("Interval between PC and target address: %+d (0x%x), "
 										   "isn't codable with %d bit",
-										   value * 2, value * 2, reloc->width + 1));
+										   value, value, reloc->width + 1));
+			value >>= 1;
 		}
-		else if (ABSOLUTE(value) > mask) { //  Relocation::Type::ABSOLUTE
+		else if (value > (1 << reloc->width)) { //  Relocation::Type::ABSOLUTE
 			error_report(reloc->exp_location,
-				string_printf("Expression's value: %d (0x%x) isn't codable in %d bit, truncate to %d (0x%x)",
-					value, value, reloc->width, value & mask, value & mask));
+				string_printf("Expression's value: %d (0x%x) isn't codable in %d bit",
+					value, value, reloc->width));
 		}
-		content += (value & mask) << reloc->position;
+		content &= ~(mask << reloc->position);
+		content |= (value & mask) << reloc->position;
 		Sections::write16(section, offset, content);
 	}
 }

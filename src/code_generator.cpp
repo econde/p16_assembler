@@ -94,7 +94,10 @@ enum {
     MRS_OPCODE = 0xb060,
     SPSR_INDICATION_POSITION = 4,
 
-    CMP_OPCODE = 0xb800
+    CMP_OPCODE = 0xb800,
+
+    SPACE_SIZE = 16,
+    SPACE_INITIAL_VALUE_SIZE = 8
 };
 
 //	Instruction
@@ -106,17 +109,19 @@ void Code_generator::visit(Load_relative *s) {
 	if (s->ldst == 1)       // is a LDRB
 		error_report(&s->location, "ldrb instruction with PC relative address doesn't exist, only ldr exists");
 	unsigned code = LDR_RELATIVE_OPCODE + (s->rd->n << RD_POSITION);
-	Value_type direct_type = s->constant->get_type();
-	if (direct_type == Value_type::LABEL) {
-		string symbol = s->constant->get_symbol();
-		auto addend = s->constant->get_value() - 2;
-		auto *reloc = new Relocation{&s->location, &s->constant->location, s->section_index, s->section_offset,
-									LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
-									Relocation::Type::RELATIVE_UNSIGNED, symbol, addend};
-		Relocations::add(reloc);
+	if (s->target->evaluate()) {
+		auto target_type = s->target->get_type();
+		if (target_type == Value_type::LABEL) {
+			string symbol = s->target->get_symbol();
+			auto addend = s->target->get_value() - 2;
+			auto *reloc = new Relocation{&s->location, &s->target->location, s->section_index, s->section_offset,
+										LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
+										Relocation::Relocation_type::RELATIVE_UNSIGNED, symbol, addend};
+			Relocations::add(reloc);
+		}
+		else
+			error_report(&s->target->location, "Invalid expression, must be a label");
 	}
-	else
-		error_report(&s->constant->location, "Invalid expression");
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
 }
 
@@ -129,43 +134,39 @@ void Code_generator::visit(Load_store_indirect *s) {
 			| (byte << LDR_STR_INDIRECT_BYTE_INDICATION_POSITION) | (s->rd->n << RD_POSITION) | (s->rn->n << RN_POSITION);
 	if (s->constant == nullptr) {
 		code |= (1 << LDR_STR_INDIRECT_REG_INDICATION_POSITION) + (s->rm->n << RM_POSITION);
-	} else {
+	} else if (s->constant->evaluate()) {
 		auto constant_type = s->constant->get_type();
 		if (constant_type == ABSOLUTE) {
-			auto constant = s->constant->get_value();
+			auto constant_value = s->constant->get_value();
 			if (byte) {
-                if ((constant & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-                    warning_report(&s->constant->location,
-                                   string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
-                                                 " truncate to %d (0x%x)",
-                                                 constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-                                                 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-                                                 constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
-                }
-                code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
-            }
-            else {
-				if ((constant & 1) != 0)
+				if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+					warning_report(&s->constant->location,
+							   string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
+											 " truncate to %d (0x%x)",
+											 constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+											 constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+											 constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+				}
+				code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+			}
+			else {
+				if ((constant_value & 1) != 0)
 					warning_report(&s->constant->location, string_printf(
-							"Expression's value = %d (0x%x) must be an even value", constant, constant));
-                constant /= 2;
-				if ((constant & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-                    warning_report(&s->constant->location,
-                                   string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
-                                                  "truncate to %d (0x%x)",
-                                                  constant, constant, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-                                                  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-                                                  constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
-                }
-                code |= ((constant & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+						"Expression's value = %d (0x%x) must be an even value", constant_value, constant_value));
+				constant_value /= 2;
+				if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+					warning_report(&s->constant->location,
+							   string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
+											  "truncate to %d (0x%x)",
+											  constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+											  constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+											  constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+				}
+				code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
 			}
 		}
-		else if (constant_type == UNDEFINED) {
-			error_report(&s->constant->location, string_printf("Undefined expression"));
-		}
-		else {
-			error_report(&s->constant->location, string_printf("Invalid expression"));
-		}
+		else if (constant_type == Value_type::LABEL)
+			error_report(&s->constant->location,"Can't be a label, must be a constant");
 	}
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
 }
@@ -201,45 +202,37 @@ void Code_generator::visit(Branch *s) {
 			code = BL_OPCODE;
 			break;
 	}
-	auto exp_type = s->expression->get_type();
 	auto offset = 0;    //  valor com sinal
-	if (exp_type == ABSOLUTE || exp_type == UNDEFINED) {
-		string symbol;
-		auto addend = s->expression->get_value() - 2;
-		if (exp_type == ABSOLUTE) {     // salto para endereço absoluto?
-			;
+	if (s->expression->evaluate()) {
+		auto exp_type = s->expression->get_type();
+		auto expression_value = s->expression->get_type();
+		if (exp_type == ABSOLUTE) {
+			if ((expression_value & 1) != 0)
+				warning_report(&s->expression->location, "Must be an even value!");
+			offset = expression_value >> 1;
 		}
-		else { // exp_type == UNDEFINED
-			symbol = s->expression->get_symbol();
-		}
-		if ((addend & 1) != 0)
-			warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-		auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
-									BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-									Relocation::Type::RELATIVE, symbol, addend};
-		Relocations::add(reloc);
-	}
-	else if (exp_type == Value_type::LABEL) {   //  Label resolvida, distância definida se pertencer à mesma secção
-		string symbol = s->expression->get_symbol();
+		else if (exp_type == Value_type::LABEL) {
+			string symbol = s->expression->get_symbol();
 
-		if (s->section_index == Symbols::get_section(symbol)) {
-			offset = s->expression->get_value() - s->section_offset - 2;    //  O PC está dois endereços à frente
-			if ((offset & 1) != 0)
-				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), offset));
-			if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
-				error_report(&s->expression->location,
-                             string_printf( "Interval between PC and target address: %+d (0x%x) - "
-                                            "isn't codable in %d bit two's complement",
-                                            offset, offset, BRANCH_OFFSET_SIZE + 1));
-			offset >>= 1;
-		} else {    // A Label pertence a outra secção será resolvida na fase de relocalização
-			auto addend = s->expression->get_value() - 2;
-			if ((addend & 1) != 0)
-				warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
-			auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
-										BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
-										Relocation::Type::RELATIVE, symbol, addend};
-			Relocations::add(reloc);
+			if (s->section_index == Symbols::get_section(symbol)) { //  Label resolvida se pertencer à mesma secção
+				offset = s->expression->get_value() - s->section_offset - 2;    //  O PC está dois endereços à frente
+				if ((offset & 1) != 0)
+					warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), offset));
+				if (offset >= (1 << BRANCH_OFFSET_SIZE) || offset < (~0 << BRANCH_OFFSET_SIZE))
+					error_report(&s->expression->location,
+								 string_printf( "Interval between PC and target address: %+d (0x%x) - "
+												"isn't codable in %d bit two's complement",
+												offset, offset, BRANCH_OFFSET_SIZE + 1));
+				offset >>= 1;
+			} else {    // A Label pertence a outra secção. Será resolvida na fase de relocalização
+				auto addend = s->expression->get_value() - 2;
+				if ((addend & 1) != 0)
+					warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
+				auto *reloc = new Relocation{&s->location, &s->expression->location, s->section_index, s->section_offset,
+											BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
+											Relocation::Relocation_type::RELATIVE, symbol, addend};
+				Relocations::add(reloc);
+			}
 		}
 	}
 	Sections::write16(s->section_index, s->section_offset,
@@ -251,29 +244,29 @@ void Code_generator::visit(Shift *s) {
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 
-	auto position_type = s->constant->get_type();
-	if (position_type == ABSOLUTE) {
-		auto constant = s->constant->get_value();
-		if ((constant & ~MAKE_MASK(SHIFT_CONST_SIZE, 0)) != 0) {
-			warning_report(&s->constant->location,
-                           string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-                                         constant, constant, SHIFT_CONST_SIZE,
-                                         constant & MAKE_MASK(SHIFT_CONST_SIZE, 0),
-                                         constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)));
+	if (s->constant->evaluate()) {
+		auto position_type = s->constant->get_type();
+		if (position_type == ABSOLUTE) {
+			auto constant = s->constant->get_value();
+			if ((constant & ~MAKE_MASK(SHIFT_CONST_SIZE, 0)) != 0) {
+				warning_report(&s->constant->location,
+							   string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+											 constant, constant, SHIFT_CONST_SIZE,
+											 constant & MAKE_MASK(SHIFT_CONST_SIZE, 0),
+											 constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)));
+			}
+			Sections::write16(s->section_index, s->section_offset,
+							  static_cast<uint16_t>(((s->operation == LSL
+													  ? LSL_OPCODE : s->operation == LSR
+																	 ? LSR_OPCODE : s->operation == ASR
+																					? ASR_OPCODE : s->operation == ROR
+																								   ? ROR_OPCODE : 0))
+													+ ((constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)) << SHIFT_CONST_POSITION)
+													+ (s->rn->n << RN_POSITION) + (s->rd->n << RD_POSITION)));
 		}
-		Sections::write16(s->section_index, s->section_offset,
-                          static_cast<uint16_t>(((s->operation == LSL
-                                                  ? LSL_OPCODE : s->operation == LSR
-                                                                 ? LSR_OPCODE : s->operation == ASR
-                                                                                ? ASR_OPCODE : s->operation == ROR
-                                                                                               ? ROR_OPCODE : 0))
-                                                + ((constant & MAKE_MASK(SHIFT_CONST_SIZE, 0)) << SHIFT_CONST_POSITION)
-                                                + (s->rn->n << RN_POSITION) + (s->rd->n << RD_POSITION)));
+		else if (position_type == Value_type::LABEL)
+			error_report(&s->constant->location,"Can't be a label, must be a constant");
 	}
-	else if (position_type == UNDEFINED)
-		error_report(&s->constant->location, string_printf("Undefined expression"));
-	else if (position_type == Value_type::LABEL || position_type == INVALID)
-		error_report(&s->constant->location, string_printf("Invalid expression"));
 }
 
 void Code_generator::visit(Rrx *s) {
@@ -318,23 +311,22 @@ void Code_generator::visit(Arith *s) {
             case SBC:
                 error_report(&s->expression->location, "Invalid operand");
 	    }
-		auto expression_type = s->expression->get_type();
-		if (expression_type == ABSOLUTE || expression_type == Value_type::LABEL) {
-			auto constant = s->expression->get_value();
-			if ((constant & ~MAKE_MASK(ARITH_CONST_SIZE, 0)) != 0) {
-				warning_report(&s->expression->location,
-                               string_printf( "Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-                                              constant, constant, ARITH_CONST_SIZE,
-                                              constant & MAKE_MASK(ARITH_CONST_SIZE, 0),
-                                              constant & MAKE_MASK(ARITH_CONST_SIZE, 0)));
+		if (s->expression->evaluate()) {
+			auto expression_type = s->expression->get_type();
+			if (expression_type == ABSOLUTE) {
+				auto constant = s->expression->get_value();
+				if ((constant & ~MAKE_MASK(ARITH_CONST_SIZE, 0)) != 0) {
+					warning_report(&s->expression->location,
+								   string_printf( "Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+												  constant, constant, ARITH_CONST_SIZE,
+												  constant & MAKE_MASK(ARITH_CONST_SIZE, 0),
+												  constant & MAKE_MASK(ARITH_CONST_SIZE, 0)));
+				}
+				code |= (constant & MAKE_MASK(ARITH_CONST_SIZE, 0)) << ARITH_CONST_POSITION;
 			}
-			code |= (constant & MAKE_MASK(ARITH_CONST_SIZE, 0)) << ARITH_CONST_POSITION;
-		}
-		else if (expression_type == UNDEFINED) {
-			error_report(&s->expression->location, "Undefined expression");
-		}
-		else {
-			error_report(&s->expression->location, "Invalid expression");
+			else {
+				error_report(&s->expression->location,"Can't be a label, must be a constant");
+			}
 		}
 	}
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
@@ -366,31 +358,27 @@ void Code_generator::visit(Move *s) {
 	if (s->constant == nullptr) {	//	mov	rd, rs
 		code |= MOV_REG_OPCODE | (s->rs->n << MOV_RS_POSITION);
 	} else {                        //      mov | movt      rd, constant
-        code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
-		auto const_type= s->constant->get_type();
-		if (const_type == ABSOLUTE ) {
+		code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
+		if (s->constant->evaluate()) {
 			auto constant = s->constant->get_value();
-			if ((abs(static_cast<int>(constant)) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
-				warning_report(&s->constant->location,
-					string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-							constant, constant, MOV_CONST_SIZE,
-							constant & MAKE_MASK(MOV_CONST_SIZE, 0), constant & MAKE_MASK(MOV_CONST_SIZE, 0)));
+			auto const_type= s->constant->get_type();
+			if (const_type == ABSOLUTE ) {
+				if ((abs(static_cast<int>(constant)) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
+					warning_report(&s->constant->location,
+						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+								constant, constant, MOV_CONST_SIZE,
+								constant & MAKE_MASK(MOV_CONST_SIZE, 0), constant & MAKE_MASK(MOV_CONST_SIZE, 0)));
+				}
+				code |= (constant & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
 			}
-			code |= (constant & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
-		}
-		else if (const_type == Value_type::LABEL) {
-			auto symbol = s->constant->get_symbol();
-			auto value = s->constant->get_value();
-			auto *reloc = new Relocation {&s->location, &s->constant->location, s->section_index, s->section_offset,
-											MOV_CONST_POSITION, MOV_CONST_SIZE,
-											Relocation::Type::ABSOLUTE, symbol, value};
-			Relocations::add(reloc);
-		}
-		else if (const_type == UNDEFINED) {
-			error_report(&s->constant->location, "Undefined expression");
-		}
-		else {
-			error_report(&s->constant->location, "Invalid expression");
+			else if (const_type == Value_type::LABEL) {
+				auto symbol = s->constant->get_symbol();
+				auto value = s->constant->get_value();
+				auto *reloc = new Relocation {&s->location, &s->constant->location, s->section_index, s->section_offset,
+												MOV_CONST_POSITION, MOV_CONST_SIZE,
+												Relocation::Relocation_type::ABSOLUTE, symbol, value};
+				Relocations::add(reloc);
+			}
 		}
 	}
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
@@ -407,11 +395,11 @@ void Code_generator::visit(Compare *s) {
 	if (s->rn->n > 7)
 		error_report(&s->rn->location, "Invalid register");
 	auto code = s->rn->n << RN_POSITION;
-	if (s->constant == nullptr) {
+//	if (s->constant == nullptr) {
 		code |= CMP_OPCODE | (s->rm->n << RM_POSITION);
-	} else {
-		error_report(&s->constant->location, "Invalid operand");
-	}
+//	} else {
+//		error_report(&s->constant->location, "Invalid operand");
+//	}
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
 }
 
@@ -446,54 +434,64 @@ void Code_generator::visit(Push_pop *s) {
 //------------------------------------------------------------------------------------------
 //	Directive
 
+void Code_generator::visit(Equ *e) {
+	if (e->symbol->type == UNDEFINED && e->symbol->value_expression != nullptr) {
+		e->symbol->value_expression->evaluate(); 	//	Valor ainda não avaliado
+		e->symbol->type = e->symbol->value_expression->get_type();
+	}
+}
+
 void Code_generator::visit(Space *s) {
-	auto size_type = s->size->get_type();
-	if (size_type == ABSOLUTE) {
+	if (s->size->evaluate()) {
 		auto size_value = s->size->get_value();
-		if (size_value > 0xFFFF) {
-			warning_report(&s->initial->location,
-				string_printf("Size of space directive %d (%x) exceds memory size, truncat to %d (%x)\n",
-							size_value, size_value, size_value & 0xffff, size_value & 0xffff));
-			size_value &= 0xffff;
-		}
-		auto initial_type = s->initial->get_type();
-		if (initial_type == ABSOLUTE) {
-			auto initial_value = s->initial->get_value();
-			if (initial_value > UINT8_MAX) {
-				warning_report(&s->initial->location,
-					string_printf("Initial value %d (%x) exceds %d, truncate to %d (%x)\n",
-								initial_value, initial_value, UINT8_MAX, initial_value & 0xff, initial_value & 0xff));
-				initial_value &= 0xff;
+		auto size_type = s->size->get_type();
+		if (size_type == ABSOLUTE) {
+			if (static_cast<int>(size_value) < 0) {
+				error_report(&s->size->location,
+					string_printf("Invalid: %d (%x), size must be a positive value.\n",
+								size_value, size_value));
+					size_value = 0;
 			}
-			Sections::fill(s->section_index, s->section_offset, initial_value, size_value);
+			else if ((size_value & ~MAKE_MASK(16, 0)) != 0) {
+				warning_report(&s->size->location,
+					string_printf("Size for space directive %d (0x%x) exceds memory size, truncate to %d (0x%x)",
+								size_value, size_value, size_value & MAKE_MASK(SPACE_SIZE, 0), size_value & MAKE_MASK(SPACE_SIZE, 0)));
+				size_value &= MAKE_MASK(SPACE_SIZE, 0);
+			}
+			if (s->initial->evaluate()) {
+				auto initial_value = s->initial->get_value();
+				auto initial_type = s->initial->get_type();
+				if (initial_type == ABSOLUTE) {
+					if ((abs(static_cast<int>(initial_value)) & ~MAKE_MASK(8, 0)) != 0) {
+						warning_report(&s->initial->location,
+							string_printf("Initial value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+								initial_value, initial_value, SPACE_INITIAL_VALUE_SIZE,
+								initial_value & MAKE_MASK(SPACE_INITIAL_VALUE_SIZE, 0), initial_value & MAKE_MASK(SPACE_INITIAL_VALUE_SIZE, 0)));
+
+						initial_value &= MAKE_MASK(SPACE_INITIAL_VALUE_SIZE, 0);
+					}
+					Sections::fill(s->section_index, s->section_offset, initial_value, size_value);
+				}
+				else if (initial_type == Value_type::LABEL)
+					error_report(&s->initial->location,"Can't be a label, must be a constant");
+			}
 		}
-		else if (initial_type == UNDEFINED) {
-			error_report(&s->initial->location, "Undefined expression");
-		}
-		else {
-			error_report(&s->initial->location, "Invalid expression");
-		}
-	}
-	else if (size_type == UNDEFINED) {
-		error_report(&s->size->location, "Undefined expression");
-	}
-	else {
-		error_report(&s->size->location, "Invalid expression");
+		else if (size_type == Value_type::LABEL)
+			error_report(&s->initial->location,"Can't be a label, must be a constant");
 	}
 }
 
 void Code_generator::visit(Align *s) {
-	auto exp_type = s->size->get_type();
-	if (exp_type == ABSOLUTE) {
-		if (s->size->get_value() > 1)
-			warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
-		Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
-	}
-	else if (exp_type == UNDEFINED) {
-		error_report(&s->size->location, "Undefined expression");
-	}
-	else {
-		error_report(&s->size->location, "Invalid expression");
+	if (s->size->evaluate()) {
+		auto size_value = s->size->get_value();
+		auto size_type = s->size->get_type();
+		if (size_type == ABSOLUTE) {
+			if (size_value > 1)
+				warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
+			Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
+		}
+		else if (size_type == Value_type::LABEL)
+			error_report(&s->size->location,"Can't be a label, must be a constant");
 	}
 }
 
@@ -506,41 +504,49 @@ void Code_generator::visit(Byte *s) {
 	auto mask = MAKE_MASK(s->grain_size * 8, 0);
 	for (auto e: *s->value_list) {
 		auto value = 0U;
-		auto exp_type = e->get_type();
-		if (exp_type == ABSOLUTE || exp_type == Value_type::LABEL) {
+		if (e->evaluate()) {
+			value = e->get_value();
+			auto exp_type = e->get_type();
 			if (exp_type == ABSOLUTE) {
-				value = e->get_value();
-			} else {
+				if ((abs(static_cast<int>(value)) & ~mask) != 0)
+					warning_report(&e->location,
+						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+						value, value, s->grain_size * 8, value & mask, value & mask));
+			}
+			else if (exp_type == Value_type::LABEL) {
 				auto symbol = e->get_symbol();
-				auto addend = e->get_value();
 				auto *reloc = new Relocation{&s->location, &e->location, s->section_index, s->section_offset + i,
 											0, s->grain_size * 8,
-											Relocation::Type::ABSOLUTE, symbol, addend};
+											Relocation::Relocation_type::ABSOLUTE, symbol, value};
 				Relocations::add(reloc);
 			}
-
-			if ((abs(static_cast<int>(value)) & ~mask) != 0)
-				warning_report(&e->location,
-					string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-					value, value, s->grain_size * 8, value & mask, value & mask));
-			switch (s->grain_size) {
-				case 1:
-					Sections::write8(s->section_index, s->section_offset + i, static_cast<uint8_t>(value));
-					break;
-				case 2:
-					Sections::write16(s->section_index, s->section_offset + i, static_cast<uint16_t>(value));
-					break;
-				case 4:
-					Sections::write32(s->section_index, s->section_offset + i, static_cast<uint32_t>(value));
-			}
 		}
-		else if (exp_type == UNDEFINED) {
-			error_report(&e->location, "Undefined expression");
-		}
-		else {
-			error_report(&e->location, "Invalid expression");
+		switch (s->grain_size) {
+			case 1:
+				Sections::write8(s->section_index, s->section_offset + i, static_cast<uint8_t>(value));
+				break;
+			case 2:
+				Sections::write16(s->section_index, s->section_offset + i, static_cast<uint16_t>(value));
+				break;
+			case 4:
+				Sections::write32(s->section_index, s->section_offset + i, static_cast<uint32_t>(value));
 		}
 		i += s->grain_size;
 	}
 }
 
+#if 0
+			if (exp_type == ABSOLUTE || exp_type == Value_type::LABEL) {
+				if (exp_type == Value_type::LABEL) {
+					auto symbol = e->get_symbol();
+					auto addend = e->get_value();
+					auto *reloc = new Relocation{&s->location, &e->location, s->section_index, s->section_offset + i,
+												0, s->grain_size * 8,
+												Relocation::Relocation_type::ABSOLUTE, symbol, addend};
+					Relocations::add(reloc);
+				}
+				if ((abs(static_cast<int>(value)) & ~mask) != 0)
+					warning_report(&e->location,
+						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
+						value, value, s->grain_size * 8, value & mask, value & mask));
+#endif

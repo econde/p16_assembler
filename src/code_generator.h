@@ -50,10 +50,10 @@ public:
 
 	void visit(DSection *) {}
 	void visit(Ascii *) {}
-	void visit(Equ *) {}
-	void visit(Space *s);
-	void visit(Align *s);
-	void visit(Byte *s);
+	void visit(Equ *);
+	void visit(Space *);
+	void visit(Align *);
+	void visit(Byte *);
 
 	//------------------------------------------------------------------------------------------
 	//	Expression

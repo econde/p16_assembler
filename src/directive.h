@@ -56,7 +56,7 @@ struct DSection: public Directive {
 };
 
 //------------------------------------------------------------------------------
-//	.byte .hword .word
+//	.byte .word
 
 struct Byte: public Directive {
 	list<Expression*> *value_list;
@@ -117,7 +117,11 @@ struct Space: public Directive {
 		Directive {left}, size {s}, initial {i} {
 		section_index = Sections::current_section->number;
 		section_offset = Sections::current_section->content_size;
-		size_in_memory = size->get_value();
+		if (size->evaluate())
+			size_in_memory = size->get_value();
+		else
+			error_report(&size->location, "Size parameter for .space directive must be defined before");
+
 		Sections::increase(section_index, size_in_memory & 0xffff);
 	}
 	~Space() { delete size; delete initial; }
@@ -131,19 +135,25 @@ struct Space: public Directive {
 //	.equ
 
 struct Equ: public Directive {
-	string name;
-	Expression *value;
+	Symbol *symbol;
 
-	Equ(string name, Expression *value, Location left) :
-		Directive {left}, name {name}, value {value} {
+	Equ(Symbol *symbol, Expression *value, Location left) :
+		Directive {left}, symbol {symbol} {
 		section_index = Sections::current_section->number;		/* Um simbolo equ não pertence a uma secção ... */
 		section_offset = Sections::current_section->content_size;
 		size_in_memory = 0;
-		if (Symbols::add(name, Sections::current_section->number, value) == 0) {
-			error_report(&location, "Symbol \"" + name + "\" is already defined");
+		symbol->set_properties(UNDEFINED, Sections::current_section->number, value);
+		Symbol *s = Symbols::search(symbol->name);
+		if (s == nullptr) {
+			Symbols::add(symbol);
 		}
+		else if (s->value_expression == nullptr) {
+			s->set_properties(UNDEFINED, Sections::current_section->number, value);
+			delete symbol;
+		}
+		else
+			error_report(&symbol->location, "Symbol \"" + symbol->name + "\" is already defined");
 	}
-	~Equ() { delete value; }
 
 	string listing() {
 		return string_printf("%4d%10c\t", location.line, ' ');

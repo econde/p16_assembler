@@ -28,8 +28,8 @@ struct Relocation {
 	unsigned section_offset;	// offset na secção
 	unsigned position;		// offset em bits na palavra
 	unsigned width;			// dimensão em bit
-	enum Type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };
-	Type type;
+	enum Relocation_type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };
+	Relocation_type type;
 	string symbol;			// simbolo que vai fornecer o valor
 	unsigned addend;		// valor a adicionar
 };

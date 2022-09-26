@@ -50,10 +50,13 @@ struct Statement {
 
 	void add_label(string *l) {
 		label = l->substr(0, l->find(':'));
-		if ( ! Symbols::do_exist(label))
-			Symbols::add(label, Value_type::LABEL, section_index, new Value(section_offset, location));
-		else if (Symbols::get_type(label) == Value_type::UNDEFINED)
-			Symbols::set_properties(label, Value_type::LABEL, section_index, new Value(section_offset, location));
+		Symbol *symbol = Symbols::search(label);
+		if (symbol == nullptr) {
+			symbol = new Symbol(location, label, Value_type::LABEL, section_index, new Value(section_offset, location));
+			Symbols::add(symbol);
+		}
+		else if (symbol->get_type() == Value_type::UNDEFINED)
+			symbol->set_properties(Value_type::LABEL, section_index, new Value(section_offset, location));
 		else
 			error_report(&location, "Symbol \'" + label + "\' is already defined");
 	}
