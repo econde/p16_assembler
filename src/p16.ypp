@@ -268,7 +268,7 @@ directive
 			{ $$ = new ast::Equ(new ast::Symbol(LOCATION(@2), *$2), $4, LOCATION(@1)); delete($2); }
 
 	|	BYTE
-			{ $$ = new ast::Byte($1, new std::list<ast::Expression*>{new ast::Value(0, LOCATION(@1))}, LOCATION(@1)); }
+			{ $$ = new ast::Byte($1, new std::list<ast::Expression*>, LOCATION(@1)); }
 
 	|	BYTE value_list
 			{ $$ = new ast::Byte($1, $2, LOCATION(@1)); }
