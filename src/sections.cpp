@@ -143,7 +143,11 @@ void Sections::deallocate() {
 
 void Sections::set_section(std::string section_name) {
 	unsigned section_flags = 0;
-	if (section_name != ".bss" && section_name != ".stack")
+	if (section_name == ".bss")
+		section_flags = Section::BSS;
+	else if (section_name == ".stack")
+		;
+	else
 		section_flags = Section::LOADABLE;
 
 	/* A secção .text é sempre criada inicialmente.
@@ -172,8 +176,6 @@ void Sections::listing(std::ostream& lst_file) {
 	lst_file << "Sections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
-		if (table[i]->content_size == 0)
-			continue;
 		ostream_printf(lst_file, "%-8d%-16s%04X - %04X     %04X %d\n", i,
 						table[i]->name.c_str(), table[i]->base_address,
 						table[i]->base_address + table[i]->content_size - 1,
@@ -226,7 +228,6 @@ void Sections::fill_memory_space() {
 			continue;
 		memory.write(section->base_address, section->content, section->content_size);
 	}
-
 }
 
 void Sections::binary_hex_intel(const char *file_name,

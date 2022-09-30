@@ -506,6 +506,8 @@ void Code_generator::visit(Byte *s) {
 		auto value = 0U;
 		if (e->evaluate()) {
 			value = e->get_value();
+			if (value != 0 && (Sections::get_section(s->section_index)->flags & Section::BSS) != 0)
+				error_report(&e->location, "Attempt to store non-zero value in section \'.bss\'");
 			auto exp_type = e->get_type();
 			if (exp_type == ABSOLUTE) {
 				if ((abs(static_cast<int>(value)) & ~mask) != 0)

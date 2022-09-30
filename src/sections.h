@@ -33,7 +33,7 @@ struct Section {
 	unsigned number;
 	unsigned base_address;
 	unsigned flags;
-	enum {LOADABLE = 1};
+	enum {LOADABLE = 1, BSS = 2};
 	unsigned content_capacity, content_size;
 	uint8_t *content;
 
@@ -83,6 +83,7 @@ public:
 	static Section *current_section;
 
 	static void set_section(std::string name);
+	static Section *get_section(unsigned section) { return table.at(section); }
 
 	static void set_address(unsigned section, unsigned base_address) {
 		table.at(section)->base_address = base_address;

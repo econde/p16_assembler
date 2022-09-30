@@ -91,6 +91,9 @@ string Ascii::more_listing() {
 	return string();
 }
 
+//---------------------------------------------------------------------------------------------
+//	.byte .word
+
 string Byte::listing() {
 	switch (size_in_memory) {
 		case 1:

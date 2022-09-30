@@ -14,10 +14,12 @@ addressof_main:
 	.word	main
 
 	.text
-	.rodata
 	.data
-	.bss
+
 	.stack
+stack:
+	.space	1024
+stack_top:
 
 /*---------------------------------------------------
 uint8_t m = 20, n = 3;
@@ -31,11 +33,11 @@ n:
 /*---------------------------------------------------
 uint16_t p, q;
 */
-	.bss
+
 p:
-	.word
+	.word	0
 q:
-	.word
+	.word	0
 
 /*---------------------------------------------------
 int main() {
@@ -91,7 +93,3 @@ while_end:
 	mov	r0, r2
 	mov	pc, lr
 
-	.section .stack
-stack:
-	.space	1024
-stack_top:
