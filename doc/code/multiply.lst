@@ -1,4 +1,4 @@
-P16 assembler v1.3.3 (Sep 30 2022)	doc/code/multiply.lst	Fri Sep 30 16:21:06 2022
+P16 assembler v1.3.99 (Oct  3 2022)	multiply.lst	Mon Oct  3 13:28:16 2022
 
 Sections
 Index   Name            Addresses       Size
@@ -126,4 +126,3 @@ Code listing
   92           	while_end:
   93 0042 00 B1		mov	r0, r2
   94 0044 0F B7		mov	pc, lr
-  95           	
