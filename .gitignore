@@ -32,3 +32,5 @@ bugs/
 *.cson
 *.code-workspace
 *.iss
+!doc/code/multiply.hex
+!doc/code/multiply.lst
