@@ -1,5 +1,5 @@
 Linguagem *assembly*
-==================
+====================
 
 Um programa em linguagem *assembly* é formado por uma sequência de linhas de texto.
 Cada linha contém uma instrução, diretiva ou *label*.
@@ -11,7 +11,8 @@ são os parâmetros.
 
    ``sub	r0, r0, 1``
 
-O P16 dispõe das instruções listadas na tabela (:numref:`instrucoes_p16`).
+O P16 dispõe das instruções listadas na tabela (:numref:`instrucoes_p16`)
+:ref:`[2]<ref2>`.
 A quantidade e o tipo dos parâmetros dependem da instrução em causa
 e podem ser registos do processador, constantes numéricas ou símbolos.
 
@@ -54,9 +55,10 @@ podem ser escritos em letras maiúsculas ou minúsculas (*case insensitive* [#f1
       | ``mrs   rd, spsr``           | ``bl      label``              |                           |
       +------------------------------+--------------------------------+---------------------------+
 
-Se for necessário referenciar a instrução,
-por exemplo para saltar para ela desde outro ponto do programa,
-precede-se a instrução de uma *label*.
+.. rubric:: *Label*
+
+Se for necessário referenciar uma instrução ou variável,
+precede-se essa instrução ou variável de uma *label*.
 
 .. code-block:: console
 
@@ -65,15 +67,15 @@ precede-se a instrução de uma *label*.
            . . .
            b 	cycle
 
-A *label* define um símbolo. No exemplo acima é definido o símbolo ``cycle``,
-cujo valor é o endereço de memória onde está alojado o código máquina da instrução ``sub r0, r0, 1``.
+No exemplo acima, precede-se a instrução ``sub  r0, r0, 1`` da label ``cycle:``
+para indicar o local para onde a instrução ``b  cycle`` deve "saltar"
+para iniciar novo ciclo.
 
-Para melhor evidência, a *label* costuma colocar-se
-na linha anterior à da instrução a que se refere.
+.. rubric:: Comentários
 
 Os comentários podem ser inseridos em qualquer lugar
-quando delimitados pelas marcas ``‘/*’`` e ``‘*/’`` como em linguagem C,
-ou depois do carácter ``‘;’`` até ao fim da linha.
+quando delimitados pelas marcas ``'/*'`` e ``'*/'`` como em linguagem C,
+ou depois do carácter ``';'`` até ao fim da linha.
 
 .. code-block:: console
 
@@ -88,71 +90,77 @@ ou depois do carácter ``‘;’`` até ao fim da linha.
 Diretivas
 ---------
 
-Directivas de compilação são comandos que permitem ao programador controlar
+Directivas de compilação são comandos que permitem controlar
 a operação do *assembler*.
 
-Sintacticamente uma directiva é identificada por uma palavra chave iniciada pelo carácter '.'.
+Sintacticamente uma directiva é identificada por uma palavra chave iniciada pelo carácter \'.\'.
 No texto do programa, uma directiva e os seus parâmetros ocupam
 a mesma posição da mnemónica da instrução e dos respectivos parâmetros.
 
 Na linguagem *assembly* do P16 existem directivas para definir dados do programa,
 para controlar a localização dos dados e do código máquina em memória e para definir símbolos.
 
+.. rubric::  Directivas para definição de dados do programa
+
 .. table:: Directivas para definição de dados do programa
-  :widths: 8 12
+  :widths: 7 12
   :name: diretiva_dados
 
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.byte`` [*expr1* [, *expr2*, ...]]        | Reserva uma sequência de *bytes*, cada um inicializado       |
-  |                                             | com o valor da respetiva expressão.                          |
-  |                                             | Se não forem indicados parâmetros, reserva um *byte*         |
-  |                                             | inicializado com zero.                                       |
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.word`` [*expr1* [, *expr2*, ...]]        | Reserva uma sequência de *words*, cada uma inicializada      |
-  |                                             | com o valor da respetiva expressão.                          |
-  |                                             | Se não forem indicados parâmetros, reserva uma *word*        |
-  |                                             | inicializada com zero.                                       |
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.space``  *size* [, *fill* ]              | Reserva um bloco de memória com a dimensão em *bytes*        |
-  |                                             | indicada pelo parâmetro *size*,                              |
-  |                                             | sendo cada *byte* inicializado com o valor da expressão      |
-  |                                             | *fill*. Se o parâmetro *fill* for omitido                    |
-  |                                             | o bloco será preenchido com zeros.                           |
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.ascii`` *“string1”* [, *“string2”*, ...] | Reserva uma porção de memória para alojar a sequência        |
-  |                                             | de *strings* indicada. As *strings* produzidas são compostas |
-  |                                             | apenas pelos caracteres indicados, não contêm terminador.    |
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.asciz`` *“string1”* [, *“string2”*, ...] | Reserva uma porção de memória para alojar a sequência        |
-  |                                             | de *strings* indicada. As *strings* produzidas são compostas |
-  |                                             | pelos caracteres indicados e terminadas com o valor zero.    |
-  +---------------------------------------------+--------------------------------------------------------------+
-  | ``.align`` [*n*]                            | Avança o contador de localização até um valor múltiplo de    |
-  |                                             | 2^*n*. O novo valor do contador terá zero nos *n* *bits*     |
-  |                                             | de menor peso. A omissão de argumento é equivalente a        |
-  |                                             | ``.align 1``.                                                |
-  +---------------------------------------------+--------------------------------------------------------------+
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.byte`` [*expr1* [, *expr2*, ...]]            | Reserva uma sequência de *bytes*, cada um inicializado            |
+  |                                                 | com o valor da respetiva expressão. Sem argumento não             |
+  |                                                 | produz efeito.                                                    |
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.word`` [*expr1* [, *expr2*, ...]]            | Reserva uma sequência de *words*, cada uma inicializada           |
+  |                                                 | com o valor da respetiva expressão.  Sem argumento não            |
+  |                                                 | produz efeito.                                                    |
+  |                                                 | Uma *word* é composta por dois *bytes*, sendo o de menor peso     |
+  |                                                 | colocado na posição de menor endereço                             |
+  |                                                 | que deve ser um endereço par.                                     |
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.space``  *size* [, *fill* ]                  | Reserva um bloco de memória com a dimensão em *bytes*             |
+  |                                                 | indicada pelo parâmetro *size*,                                   |
+  |                                                 | sendo cada *byte* inicializado com o valor da expressão           |
+  |                                                 | *fill*. Se o argumento *fill* for omitido                         |
+  |                                                 | o bloco será preenchido com      zeros.                           |
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.ascii`` *\"string1\"* [, *\"string2\"*, ...] | Reserva uma porção de memória para alojar a sequência             |
+  |                                                 | de *strings* definida. As *strings* produzidas são compostas      |
+  |                                                 | apenas pelos caracteres indicados, não contêm terminador.         |
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.asciz`` *\"string1\"* [, *\"string2\"*, ...] | Reserva uma porção de memória para alojar a sequência             |
+  |                                                 | de *strings* definida. As *strings* produzidas são compostas      |
+  |                                                 | pelos caracteres indicados e terminadas com o valor zero          |
+  |                                                 | (como na linguagem C).                                            |
+  +-------------------------------------------------+-------------------------------------------------------------------+
+  | ``.align`` [*n*]                                | Avança o contador de localização até um valor múltiplo de         |
+  |                                                 | 2^n. O novo valor do contador terá zero nos *n* *bits*            |
+  |                                                 | de menor peso. A omissão de argumento é equivalente a             |
+  |                                                 | ``.align 1``.                                                     |
+  +-------------------------------------------------+-------------------------------------------------------------------+
 
 Exemplo de utilização da directiva ``.word`` na definição de uma variável de 16 *bits*
-identificada pelo símbolo ``counter`` iniciada com o valor zero. Esta variável ocupa
-duas posições de memória.
+inicializada com o valor mil. Este valor é representado a 16 *bits* (0000 0011 1110 1000),
+sendo o *byte* de menor peso guardado na posição de memória de endereço menor
+e o *byte* de maior peso guardado na posição de endereço maior.
 
-.. code-block::
+.. code-block:: console
 
    counter:
-   	.word	0
+   	.word	1000
 
 Exemplo de utilização da directiva ``.byte`` na definição de um *array*
-de três posições iniciadas com 3, 4 e 5, sucessivamente. Os valores são
-representados a 8 *bits*, ocupando apenas uma posição de memória.
+de três posições iniciadas com 3, 4 e 5, sucessivamente. São ocupadas três
+posições de memória. A posição de endereço mais baixo recebe o valor 3,
+a seguinte o valor 4 e a última o valor 5.
 
-.. code-block::
+.. code-block:: console
 
    array:
    	.byte	3, 4, 5
 
 Exemplo de utilização da directiva ``.asciz`` para definição de um *array*
-de caracteres iniciado com a *string* “Portugal”, no formato da linguagem C.
+de caracteres iniciado com a *string* \"Portugal\", no formato da linguagem C.
 Neste formato cada posição do *array* guarda o código de um carácter,
 começando no endereço mais baixo e pela ordem de escrita.
 A terminação da *string* é assinalada com o valor zero
@@ -160,10 +168,12 @@ na posição a seguir à do último carácter.
 Neste exemplo são ocupadas nove posições de memória,
 oito para os códigos dos caracteres e uma para o terminador.
 
-.. code-block::
+.. code-block:: console
 
    message:
-   	.asciz	“Portugal”
+   	.asciz	"Portugal"
+
+.. rubric::  Directivas para definição de secções
 
 .. table:: Directivas para definição de secções
    :widths: 8 12
@@ -174,16 +184,20 @@ oito para os códigos dos caracteres e uma para o terminador.
    +----------------------------+-----------------------------------------------+
    | ``.text``                  | Define uma secção com o nome ``.text``.       |
    +----------------------------+-----------------------------------------------+
-   | ``.rodata``                | Define uma secção com o nome '.rodata'.       |
+   | ``.rodata``                | Define uma secção com o nome ``.rodata``.     |
    +----------------------------+-----------------------------------------------+
-   | ``.data``                  | Define uma secção com o nome '.data'.         |
+   | ``.data``                  | Define uma secção com o nome ``.data``.       |
    +----------------------------+-----------------------------------------------+
-   | ``.bss``                   | Define uma secção com o nome '.bss'.          |
+   | ``.bss``                   | Define uma secção com o nome ``.bss``.        |
+   +----------------------------+-----------------------------------------------+
+   | ``.stack``                 | Define uma secção com o nome ``.stack``.      |
    +----------------------------+-----------------------------------------------+
 
-A inserção de uma diretiva de definição de secção no texto do programa
+A inserção de uma diretiva de definição de secção no texto do programa,
 significa que todos os elementos de programa, instruções ou variáveis,
-definidos à frente são alojados nessa secção.
+definidos depois dessa diretiva, são alojados nessa secção.
+
+.. rubric::  Directivas para definição de símbolos
 
 .. table:: Directiva para definição de símbolos
    :widths: 6 14
@@ -194,52 +208,68 @@ definidos à frente são alojados nessa secção.
    |                            | equivalente a *value*.                        |
    +----------------------------+-----------------------------------------------+
 
-A diretiva ``.equ`` permite definir um símbolo e associar-lhe um valor numérico.
+A diretiva ``.equ`` permite definir um símbolo e associar-lhe um valor.
+Esse valor pode ser expresso na forma de um número,
+outro símbolo também definido com ``.equ``, uma *label*
+ou uma expressão envolvendo qualquer um dos anteriores.
+O valor deve ser calculável pelo *assembler*, isto é,
+não pode envolver simbolos que não estejam definidos.
+
 Esta diretiva pode ser posicionada em qualquer lugar do texto do programa,
-tanto antes como depois da sua invocação.
+tanto antes como depois da invocação do respetivo símbolo.
 
 Símbolos
 --------
 
 Um símbolo é uma palavra iniciada por uma letra seguida de mais letras ou dígitos.
-Pode conter o carácter ``‘_’``, tanto no início da palavra, como entre caracteres.
+Pode conter o carácter ``'_'``, tanto no início da palavra, como entre caracteres.
 A formação de símbolos é *case sensitive* [#f1]_.
 
-Existem duas formas de definir símbolos: através de *labels*
-ou através da directiva ``.equ``.
+Os símbolos podem ser definidos através de *labels* ou da diretiva ``.equ``.
 
-A definição de *label* é formada pelo símbolo terminado com o carácter ``‘:’``.
-Na invocação utiliza-se apenas o símbolo sem o carácter ``‘:’``.
-Uma *label* é equivalente ao endereço da instrução ou da variável seguinte.
-Em geral, na definição de *labels* usam-se letras minúsculas
-e o carácter ``‘_’`` na separação de palavras em símbolos compostos.
+.. rubric:: *label*
 
-No caso da diretiva ``.equ``, o símbolo é equivalente ao valor numérico
-da expressão associada, que na forma mais simples pode ser um literal.
-A expressão pode conter outros símbolos definidos com ``.equ`` ou *labels*
-e deve ser calculável pelo *assembler*.
-Em geral. na definição de símbolos com ``.equ`` usam-se letras maiúsculas
-e o carácter ``‘_’`` na separação de palavras em símbolos compostos.
+Uma *label* é formada pelo símbolo seguido do carácter ``':'``.
+Na invocação de uma *label* utiliza-se apenas o símbolo sem o carácter ``':'``.
+Um símbolo do tipo *label* é equivalente ao endereço de memória
+onde o código binário da instrução ou o valor da variável que lhe sucede está alojado.
 
-.. code-block::
+No exemplo seguinte, a *label* ``counter:`` define o símbolo ``counter``,
+cujo valor associado é o endereço de memória onde está alojado o conteúdo
+da variável.
+
+.. code-block:: console
+
+   counter:
+   	.word	0
+
+Para melhor evidência, a *label* costuma colocar-se
+na linha anterior à da instrução ou variável a que se refere.
+
+.. rubric:: .equ
+
+No exemplo seguinte, a directiva ``.equ`` define o símbolo ``MODE_MASK``
+equivalente ao valor binário ``1110``.
+
+.. code-block:: console
 
    	.equ	MODE_MASK, 0b00001110
 
-Neste exemplo, a directiva ``.equ`` define o símbolo ``MODE_MASK``
-como equivalente ao valor binário ``1110``.
+Em geral, na composição de símbolos usam-se as seguintes convenções:
+   - na *label*, letras minúsculas
+     e o carácter ``'_'`` na separação de palavras em símbolos compostos.
+
+   - na diretiva ``.equ``, letras maiúsculas
+     e o carácter ``'_'`` na separação de palavras em símbolos compostos.
 
 Contador de localização
 -----------------------
+Existe um contador de localização, associado a cada secção,
+que é inicializado a zero.
 
-O contador de localização é uma variável interna do *assembler*
-e contém o endereço onde o código da instrução corrente pode eventualmente
-ser carregado em memória.
-Quando a tradução do programa começa, esta variável é inicializada a zero.
 À medida que as instruções ou directivas são processadas,
-o contador de localização é aumentado da dimensão necessária para armazenar
-o código máquina da instrução ou o conteúdo da variável.
-
-Existe um contador de localização para cada secção.
+o contador de localização é aumentado da dimensão de memória
+necessária para armazenar o código máquina da instrução ou o conteúdo da variável.
 
 A linguagem *assembly* do P16 usa o símbolo ``'.'`` (um ponto isolado)
 como identificador do contador de localização.
@@ -266,24 +296,23 @@ e as variáveis noutra secção.
 Antes de especificar qualquer instrução ou directiva
 deve-se definir a secção que as vai conter.
 A secção corrente é definida pela directiva ``.section``
-ou pelas directivas especificas ``.text``. ``.rodata``, ``.data`` ou ``.bss``.
+ou pelas directivas especificas ``.text``. ``.rodata``, ``.data``, ``.bss`` ou ``.stack``.
 
-O programa seguinte é composto pela secção ``.data``
-onde se alojam as variáveis ``x``e ``y``,
-pela secção ``.bss`` onde se aloja a variável ``z``
-e pela secção ``.text`` onde se aloja o código máquina do programa.
-A secção ``.data`` está localizada no endereço ``0x20a0`` e tem dimensão quatro.
-A secção ``.bss`` estaá localizada no endereço ``0x20a4`` e tem dimensão dois.
-A secção ``.text`` está localizada no endereço ``0xb000`` e tem a dimensão 22 (0x16).
+O programa da :numref:`ficheiro_seccoes1` é composto pela secção ``.data`` (linha 1)
+onde se alojam as variáveis ``x``, ``y`` e ``z``,
+especificadas pela diretivas que se seguem,
+e pela secção ``.text`` (linha 9) onde se aloja o código máquina das instruções que se seguem.
+A secção ``.data`` está localizada no endereço ``0x1000`` e tem dimensão de seis *bytes*.
+A secção ``.text`` está localizada no endereço ``0x4000`` e tem a dimensão de 22 (0x16) *bytes*.
 Os valores dos endereços usados neste exemplo são arbitrários.
-Conforme veremos mais adiante,
-os endereços das secções são atribuídos em fase posterior à da escrita do programa
-(Secção 16.4.1).
+Conforme se pode ver na :numref:`Localizacao_seccoes`,
+os endereços das secções são atribuídos em fase posterior à da escrita do programa.
 
 .. literalinclude:: /code/sections/seccoes1.lst
-   :language: asm
    :caption: Exemplo de utilização das secções ``.text``, ``.data`` e ``.bss``
    :name: ficheiro_seccoes1
+
+.. rubric:: Fragmentação
 
 Uma secção pode ser fragmentada ao longo do texto do programa.
 Por exemplo, para que as variáveis possam ser definidas
@@ -295,7 +324,6 @@ pela ordem em que aparecem ao longo da descrição do programa para formar
 a composição final de cada uma das secções.
 
 .. literalinclude:: /code/sections/seccoes2.lst
-   :language: asm
    :caption: Exemplo de secções entrecortadas
    :name: ficheiro_seccoes2
 
@@ -314,16 +342,180 @@ O código das funções ``strtok`` e ``accumulate`` ocupam também zonas de mem�
 respectivamente, a gama de endereços ``0x3000`` a ``0x3007``
 e a gama de endereços ``0x3008`` a ``0x300f``.
 
+Regras sintáticas
+-----------------
+
+A linguagem *assembly* do P16 é semelhante à usada pelo assembler AS da GNU
+quando usado no desenvolvimento de programas para a arquitectura ARM.
+O objectivo é facilitar ao estudante a transição para essa arquitectura.
+Na especificação de constantes a utilização de ``#`` é opcional,
+tal como na sintaxe unificada da arquitectura ARM.
+
+.. table:: Elementos da notação *Wirth Syntax Notation* (WSN)
+   :name: notacao WSN
+
+   +-----------+-------------------------------------------------------------------+
+   | ``[a]``   | O elemento ``a`` é opcional.                                      |
+   +-----------+-------------------------------------------------------------------+
+   | ``a | b`` | ``a`` ou ``b`` são elementos alternativos                         |
+   +-----------+-------------------------------------------------------------------+
+   | ``{a}``   | O elemento ``a`` pode não existir ou repetir-se indefinidamente   |
+   +-----------+-------------------------------------------------------------------+
+   | ``"a"``   | Elemento terminal                                                 |
+   +-----------+-------------------------------------------------------------------+
+
+Descrevem-se na :numref:`sintaxe`,
+em notação *Wirth Syntax Notation* (WSN) :numref:`notacao WSN` [#f2]_,
+as regras sintácticas a aplicar na escrita de programas em linguagem *assembly* do P16.
+
+.. code-block:: console
+   :caption: Regras sintáticas da linguagem *assembly*
+   :name: sintaxe
+
+   program = statement { statement }.
+
+   statement =
+     [label] [instruction | direcive] "EOL" .
+
+   directive =
+     ( ".section" symbol )
+     | ".text"
+     | ".rodata"
+     | ".data"
+     | ".bss"
+     | ".align" [ expression ]
+     | ".equ" symbol "," expression
+     | ( ".byte" | ".word" ) [ expression { "," expression } ]
+     | ".space" expression [ "," expression ]
+     | ( ".ascii" | ".asciz" ) string { "," string } .
+
+   instruction =
+     "ldr" reg0-15 "," ( ( "[" ("pc" | "r15") "," ["#"] expression "]" ) | identifier )
+     | ( ("ldr" | "str") ["b"] reg0-15 "," "[" reg0-7 ["," (reg0-15 | ["#"] expression)] "]"
+     | "mov"  reg0-15, (reg0-15 | ["#"] expression)
+     | "movt" reg0-15, ["#"] expression
+     | ( "push" | "pop" ) ["{"] reg0-15 ["}"]
+     | ( "add" | "sub" ) reg0-15, reg0-7, (reg0-15 | ["#"] expression)
+     | ( "adc" | "sbc" ) reg0-15, reg0-7,  reg0-15
+     | "cmp" reg0-7, reg0-15
+     | ( "and" | "orr" | "eor" ) reg0-15, reg0-7, reg0-15
+     | "mvn" reg0-15, reg0-15
+     | ( "lsl" | "lsr" | "asr" | "ror" ) reg0-15, reg0-7, ["#"] expression
+     | "rrx" reg0-15, reg0-7
+     | "msr" psw "," reg0-15
+     | "mrs" reg0-15 "," psw
+     | ( "bzs" | "beq" | "bzc" | "bne" | "bcs" | "blo" | "bcc" | "bhs"
+     | "blt" | "bge" | "bl" | "b" ) identifier
+     | "movs pc, lr" .
+
+   reg0-7 = "r0" | "r1" | "r2" | "r3" | "r4" | "r5" | "r6" | "r7" .
+      | "R0" | "R1" | "R2" | "R3" | "R4" | "R5" | "R6" | "R7" .
+
+   reg0-15 = reg0-7
+     | "r8" | "r9" | "r10" | "r11" | "r12" | "r13" | "r14" | "r15"
+     | "R8" | "R9" | "R10" | "R11" | "R12" | "R13" | "R14" | "R15"
+     | "sp" | "lr" | "pc" | "SP" | "LR" | "PC" .
+
+   psw = "cpsw" | "spsw" | "CPSW" | "SPSW".
+
+   expression = logical_or_expression
+     | logical_or_expression "?" expression ":" expression .
+
+   logical_or_expression = logical_and_expression
+     | logical_or_expression "||" logical_and_expression .
+
+   logical_and_expression = inclusive_or_expression
+     | logical_and_expression "&&" inclusive_or_expression .
+
+   inclusive_or_expression = exclusive_or_expression
+     | inclusive_or_expression "|" exclusive_or_expression .
+
+   exclusive_or_expression = and_expression
+     | exclusive_or_expression "^" and_expression .
+
+   and_expression = equality_expression
+     | and_expression "&" equality_expression .
+
+   equality_expression = relational_expression
+     | equality_expression "==" relational_expression
+     | equality_expression "!=" relational_expression .
+
+   relational_expression = shift_expression
+     | relational_expression "<" shift_expression
+     | relational_expression ">" shift_expression
+     | relational_expression "<=" shift_expression
+     | relational_expression ">=" shift_expression .
+
+   shift_expression = additive_expression
+     | shift_expression "<<" additive_expression
+     | shift_expression ">>" additive_expression .
+
+   additive_expression = multiplicative_expression
+     | additive_expression "+" multiplicative_expression
+     | additive_expression "-" multiplicative_expression .
+
+   multiplicative_expression = unary_expression
+     | multiplicative_expression "*" unary_expression
+     | multiplicative_expression "/" unary_expression
+     | multiplicative_expression "%" unary_expression .
+
+   unary_expression = primary_expression
+     | "+" primary_expression
+     | "-" primary_expression
+     | "!" primary_expression
+     | "~" primary_expression .
+
+   primary_expression = literal | identifier | "(" expression ")" .
+
+   identifier = (alphabet | "_") { alphabet | number | "_" }.
+
+   label =  identifier ":" .
+
+   literal = decimal | hexadecimal | octal | binary | "’” character "’” .
+
+   decimal = "0" | (("1" | ... | "9") { decimal_digit } ) .
+
+   hexadecimal = "0" ("x" | "X") hexadecimal_digit { hexadecimal_digit } .
+
+   octal = "0" ("1" | ... | "7") { octal_digit } .
+
+   binary = "0" ("b" | "B") ("0" | "1") { "0" | "1" } .
+
+   octal_digit = "0" | "1" | ... | "6" | "7" .
+
+   decimal_digit = "0" | "1" | ... | "8" | "9" .
+
+   hexadecimal_digit = decimal_digit | "a" | ... | "f" | "A" | ... | "F" .
+
+   alphabet = "a" | ... | "z" | "A" | ... | "Z" .
+
+   symbol = "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
+     | "=" | "|" | "&" | "%" | "$" | "#" | "/" | "?" | "!" | "_" | "*"
+     | "\b" | "\t" | "\n" | "\f" | "\r" | "\\" | "\"" | "\'"
+     | ( "\" ( decimal | hexadecimal | octal | binary ) ) .
+
+   character = alphabet | decimal_digit | symbol .
+
+   string = "\"” character { character } "\"” .
+
+   "EOL" = control character for end of line
+
+
 Limitações sintáticas
 ---------------------
 
 * Não é possível definir símbolos iguais a mnemónicas de instruções.
-  Por exemplo, não pode existir um símbolo “b”
+  Por exemplo, não pode existir um símbolo \"b\"
   porque coincide com a mnemónica da instrução *branch*.
 
-* A última linha do programa também deve ser terminada com "mudança de linha".
+* A última linha do programa também deve ser terminada com caráter \"mudança de linha\".
   Se o ficheiro do programa terminar numa linha incompleta é assinalado erro de sintaxe.
+
+* Se ocorrer omissão do último elemento sintático, a visualização do erro é assinalada corretamente, mas é dada indicação da linha seguinte.
 
 .. rubric:: Footnotes
 
 .. [#f1] https://pt.wikipedia.org/wiki/Case-sensitive
+
+.. [#f2] https://en.wikipedia.org/wiki/Wirth_syntax_notation
+

@@ -1,13 +1,6 @@
 Utilização
 ==========
 
-A partir de um ficheiro de texto em linguagem *assembly*, produzido num editor de programas,
-o PAS gera ficheiros com o código máquina específico do P16.
-
-O PAS é um *assembler* de uma única passagem, que por razões didácticas, processa um único ficheiro
-fonte e localiza o código gerado. A localização consiste em atribuir endereço absoluto ao programa,
-tarefa que não é normalmente realizada pelo *assembler*.
-
 Invocação
 ---------
 
@@ -37,7 +30,9 @@ assinalado como `<source filename>`, tem normalmente a extensão **'s'**.
    com informação legível, e um ficheiro com o código binário.
 
 A opção ``--output`` permite definir o nome base [#f2]_ dos ficheiros de saída.
-Se esta opção for omitida, os ficheiros produzidos terão o mesmo nome base que o ficheiro fonte.
+Se esta opção for omitida, os ficheiros produzidos terão
+o mesmo nome base do ficheiro fonte
+e serão localizados na mesma diretoria.
 
 A opção ``--section`` permite definir o endereço de localização das secções.
 Em caso de omissão desta opção as secções são localizadas a partir do endereço 0x0000,
@@ -61,6 +56,8 @@ A opção ``--interleave`` faz com que o código binário do programa seja repar
 e outro com os *bytes* respeitantes aos endereços ímpares.
 Esta opção é ignorada se também for mencionada a opção ``--format logisim16``.
 
+.. _Localizacao_seccoes:
+
 Localização das secções
 -----------------------
 A definição da localização em memória de cada secção pode ser explícita ou implícita.
@@ -68,7 +65,7 @@ A definição da localização em memória de cada secção pode ser explícita 
 A localização explícita é definida através da opção ``--section`` na invocação do PAS.
 
 A localização implícita aplica-se às secções omissas na localização explicita,
-localizando-as no endereço a seguir ao último endereço da secção
+localizando-as a seguir ao último endereço ocupado pela secção
 anterior, pela ordem em que estão escritas no ficheiro fonte do programa.
 
 No caso de não ser explicitada a localização da primeira secção definida no programa,
@@ -77,13 +74,15 @@ esta é localizada no endereço 0x0000.
 No caso da secção estar fragmentada, e aplicando-se a localização implícita,
 a sua localização é definida pela posição do primeiro fragmento.
 
-O início de uma secção é localizado automaticamente num endereço par.
+O início de uma secção é localizado num endereço par.
 
 Formatos de saída
 -----------------
 
 O código binário do programa é guardado em ficheiro num de três formatos:
 formato Intel HEX [#f1]_, formato binário e formato do simulador Logisim.
+
+O conteúdo das secções .stack e .bss não é transposto para os ficheiros de saída.
 
 Formato binário
 ^^^^^^^^^^^^^^^
@@ -98,16 +97,22 @@ serão preenchidos com o valor zero.
 Formato Logisim
 ^^^^^^^^^^^^^^^
 
-O simulador Logisim simula dispositivos de memória RAM ou ROM cujo conteúdo pode
+O simulador Logisim simula dispositivos de memória RAM ou ROM, cujo conteúdo pode
 ser carregado a partir de ficheiro.
-Na utilização do Logisim na simulação de sistemas baseados no P16
-é necessário carregar nesses dispositivos
-o código binário dos programas, produzido pelo PAS.
 
-O código binário é guardado em formato de texto como uma sequência
-de valores numéricos representados em base hexadecimal.
+Na utilização do Logisim na simulação de sistemas baseados no P16
+é necessário carregar nesses dispositivos o código binário dos programas,
+produzido pelo PAS.
+
+No Logisim os dispositivos de memória podem ter palavras com qualquer número de bits.
+Em ficheiro, o conteúdo da memória é guardado em formato de texto, como uma sequência
+de valores numéricos representados em base hexadecimal,
+em que cada valor corresponde a uma posição de memória.
+
 As ocorrências de sucessivos valores iguais são representadas pela sequência N*X.
 Sendo N o número de vezes que o valor ocorre e X o valor em si.
+
+O PAS gera ficheiros binários em formato Logisim para memórias com palavras de 8 ou 16 *bits*.
 
 Exemplo de utilização
 ---------------------
@@ -122,41 +127,49 @@ Considere-se o programa da :numref:`ficheiro_multiply_s` como conteúdo do fiche
    :caption: Ficheiro ``multiply.s``
    :name: ficheiro_multiply_s
 
+.. rubric:: Invocação
+
 No comando
 
    ``pas multiply.s -s .data=0x4000 -s .text=0x1000``
 
 a primeira ocorrência da opção ``-s`` define o endereços da secção ``.data`` em ``0x4000``
 e a segunda ocorrência define o endereço da secção ``.text`` em ``0x1000``.
-A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
-porque está definida em primeiro lugar no ficheiro fonte.
-A secção ``.bss`` é localizada no endereço ``0x4002``, também por localização implícita,
-porque está definida a seguir a ``.data`` que tem uma dimensão 2.
-Por fim, a secção .stack é localizada no endereço ``0x4006``, também por localização implícita,
-porque está definida a seguir a ``.bss`` que tem dimensão 4.
+A omissão de outras opções define que:
+os ficheiros de saída terão os mesmos nomes base -- ``multiply.*``;
+o ficheiro com o código binário terá o formato HEX Intel;
+o conteúdo binário não é filtrado por endereço;
+não serão gerados dois ficheiros binários com os dados intercalados.
 
-Os erros e avisos são assinalados na própria janela de comandos. Foi introduzido um
-erro de sintaxe apenas para exemplificar.
+.. rubric:: Mensagens de erro e de aviso
+
+Foram introduzidas modificações no ficheiro fonte
+para exemplificar e emissão de mensagens.
+
+O primeiro caso é um erro de sintaxe -- a definição duma mnemónica de instrução inexistente (ld).
 
 .. code-block:: console
 
    multiply.s (51): 	ld	r0, addressof_m
-   ----------------        ^^
+   ----------------     ^^
    ERROR!	syntax error
 
-Se o programa fonte não tiver erros, são produzidos dois ficheiros adicionais ``multiply.lst`` com
-informação legível e ``multiply.hex`` com o código máquina.
-
-A emissão de avisos não impede a geração do código binário como no seguinte caso:
+O segundo caso é um erro de domíno -- é escrito o número 17
+na posição de uma constante cujo domínio vai de 0 a 15.
 
 .. code-block:: console
 
    multiply.s (90): 	sub	r1, r1, 17
-   ----------------                        ^^
+   ----------------                     ^^
    WARNING!	Expression's value = 17 (0x11) not encodable in 4 bit, truncate to 1 (0x1)
 
-Faz parte de uma boa prática de programação corrigir o programa até suprimir a emissão de
-mensagens de aviso.
+Se forem assinaladas apenas mensagens de aviso o processamento prossegue com a
+geração dos ficheiros de saída -- ``multiply.lst`` e ``multiply.hex``.
+Note-se  que faz parte das boas práticas de programação corrigir o programa
+até suprimir a emissão de mensagens de aviso.
+
+.. rubric:: Organização
+
 
 Por uma questão de organização, é conveniente criar especificamente uma directoria para alojar os
 ficheiros relacionados com um dado programa. No exemplo seguinte a directoria ``multiply`` aloja
@@ -176,35 +189,44 @@ todos os ficheiros relacionados com este programa: ``multiply.s``, ``multiply.ls
                |-- multiply.lst
                |-- multiply.hex
 
-Em seguida apresenta-se o conteúdo do ficheiro ``lst``. Este contém a tabela de secções,
+.. rubric:: Ficheiro lst
+
+O ficheiro de extensão ``lst`` contém a tabela de secções,
 a tabela de símbolos e a listagem das instruções.
 
 Na tabela de secções listam-se as secções existentes, as gamas de endereços que ocupam e as
-respectivas dimensões.
+respectivas dimensões. A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
+porque está definida em primeiro lugar no ficheiro fonte. As secções .text e .data são localizadas,
+respetivamente, nos endereços 0x1000 e 0x4000 por localização explícita.
+A secção .stack é localizada no endereço ``0x4006``, por localização implícita,
+porque está definida a seguir a ``.data`` que tem a dimensão 6.
 
 Na tabela de símbolos listam-se os símbolos definidos através de *label* ou através da directiva ``.equ``.
 Por cada símbolo é dada a seguinte informação: identificador, tipo, valor associado e secção a que pertence.
 
 Na listagem das instruções, são apresentados do lado esquerdo, na primeira coluna o número da linha
-do ficheiro fonte, na segunda coluna os endereços da memória e na terceira coluna o respectivo conteúdo.
+do ficheiro fonte, na segunda coluna os endereços da memória e na terceira e quarta colunas o respectivo conteúdo.
 
 Na arquitectura do P16 as palavras formadas por dois *bytes* – designadas por *word* – ocupam duas
 posições de memória consecutivas, o *byte* de menor peso toma a posição de endereço menor
 e o *byte* de maior peso, a posição de endereço maior – *little ended format*.
 
-O conteúdo da memória – código das instruções e valor das variáveis – é escrito na terceira coluna
+O conteúdo da memória – código das instruções ou valor das variáveis – é escrito na terceira e quarta colunas
 como uma sequência de *bytes* pela ordem dos endereços que ocupam na memória. Por exemplo, na
-linha 7 o código máquina da instrução ``mov r1, pc`` que ocupa os endereços 8 e 9, e tem o valor
-``0xb781``, é representado pela sequência de *bytes* ``81`` ``B7``. Na linha 28,
-a variável ``m``, do tipo ``.byte``, ocupa o endereço ``0x0048`` e o seu valor é ``20 (0x14)``.
+linha 7, o código máquina da instrução ``add	lr, r0, 4``, que ocupa os endereços ``0008`` e ``0009``, e tem o valor
+``0xA20E``, é representado pela sequência de *bytes* ``0E`` ``A2``. Por exemplo, na linha 29,
+a variável ``m``, do tipo ``.byte``, ocupa o endereço ``0x0046`` e o seu valor é ``20 (0x14)``.
 
 .. literalinclude:: /code/multiply.lst
    :language: none
    :caption: Ficheiro ``multiply.lst``
    :name: ficheiro_multiply_lst
 
-O ficheiro de extensão ``hex``, em formato Intel HEX, contém apenas o código binário das instruções e os
-valores iniciais das variáveis, com a indicação dos endereços de memória onde serão carregados.
+.. rubric:: Ficheiro hex
+
+O ficheiro de extensão ``hex`` contém a informação binária do programa em formato Intel HEX.
+A informação é composta pelo código binário das instruções ou os valores iniciais das variáveis
+e a indicação dos endereços de memória onde serão carregados.
 
 .. literalinclude:: /code/multiply.hex
    :language: none

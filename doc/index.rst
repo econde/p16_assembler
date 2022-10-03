@@ -14,8 +14,10 @@ Manual de utilização do PAS
    :maxdepth: 2
    :numbered:
 
+   pas_introducao.rst
    pas_assembly_language.rst
    pas_utilizacao.rst
-   pas_assembly_syntax.rst
    pas_instalacao.rst
+   pas_anexos.rst
+   pas_referencias.rst
 

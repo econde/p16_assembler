@@ -4,14 +4,18 @@ Instalação
 Instalação do executável
 ------------------------
 
-Window
-^^^^^^
+Em Window
+^^^^^^^^^
    Descarregar `daqui <https://www.dropbox.com/s/pr1nl6yg2hbxkzd/pas.exe?dl=0>`_.
 
-   (Falta instruções de instalação)
+   Copiar para a diretoria de instalação. Por exemplo:
 
-Linux
-^^^^^
+   ``$ copy pas.exe C:\Users\<utilizador>\AppData\Roaming``
+
+   Acrescentar o caminho na variável de ambiente Path.
+
+Em Linux
+^^^^^^^^
    Descarregar `daqui <https://www.dropbox.com/s/dtw6l7li4cug9cc/pas?dl=0>`_.
 
    É necessário redefinir o atributo de executável:
@@ -26,8 +30,8 @@ Linux
 
    ``$ export $PATH:/usr/local/bin``
 
-Instalação a partir da fonte
-----------------------------
+Geração do executável
+---------------------
 
    Descarregar a fonte a partir do github.
 
@@ -36,16 +40,16 @@ Instalação a partir da fonte
    ``$ cd p16_assembler``
 
 
-Window
-^^^^^^
+Para Window
+^^^^^^^^^^^
 
-   Devem estar disponíveis as ferramentas *cygwin* .
+   Para gerar para Windows devem estar disponíveis as ferramentas *cygwin*.
 
    ``$ sudo apt install g++-mingw-w64``
 
-   ``$ make WINDOWS=1``
+   ``$ make WINDOWS=1``make
 
-Linux
-^^^^^
+Para Linux
+^^^^^^^^^^
 
    ``$ make``
