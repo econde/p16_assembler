@@ -3,10 +3,8 @@ x:
 	.word	30
 y:
 	.word	4
-
-	.bss
 z:
-	.word
+	.word	0
 
 	.text
 main:

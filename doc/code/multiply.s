@@ -92,4 +92,3 @@ while:
 while_end:
 	mov	r0, r2
 	mov	pc, lr
-
