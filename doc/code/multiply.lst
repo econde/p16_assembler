@@ -1,33 +1,33 @@
-P16 assembler v1.3.99 (Oct  3 2022)	multiply.lst	Mon Oct  3 13:28:16 2022
+P16 assembler v1.3.99 (Oct  3 2022)	multiply.lst	Mon Oct  3 13:34:44 2022
 
 Sections
 Index   Name            Addresses       Size
 0       .startup        0000 - 0011     0012 18
-1       .text           0012 - 0045     0034 52
-2       .data           0046 - 004B     0006 6
-3       .stack          004C - 044B     0400 1024
+1       .text           1000 - 1033     0034 52
+2       .data           4000 - 4005     0006 6
+3       .stack          4006 - 4405     0400 1024
 
 Symbols
 Name                    Type      Value       Section
 _start                  LABEL     0004 4      .startup
-addressof_m             LABEL     002E 46     .text
+addressof_m             LABEL     101C 4124   .text
 addressof_main          LABEL     0010 16     .startup
-addressof_n             LABEL     0030 48     .text
-addressof_p             LABEL     0032 50     .text
-addressof_q             LABEL     0034 52     .text
+addressof_n             LABEL     101E 4126   .text
+addressof_p             LABEL     1020 4128   .text
+addressof_q             LABEL     1022 4130   .text
 addressof_stack_top     LABEL     000E 14     .startup
 line#3                  LABEL     0002 2      .startup
 line#9                  LABEL     000C 12     .startup
-m                       LABEL     0046 70     .data
-main                    LABEL     0012 18     .text
-multiply                LABEL     0036 54     .text
-n                       LABEL     0047 71     .data
-p                       LABEL     0048 72     .data
-q                       LABEL     004A 74     .data
-stack                   LABEL     004C 76     .stack
-stack_top               LABEL     044C 1100   .stack
-while                   LABEL     003C 60     .text
-while_end               LABEL     0042 66     .text
+m                       LABEL     4000 16384  .data
+main                    LABEL     1000 4096   .text
+multiply                LABEL     1024 4132   .text
+n                       LABEL     4001 16385  .data
+p                       LABEL     4002 16386  .data
+q                       LABEL     4004 16388  .data
+stack                   LABEL     4006 16390  .stack
+stack_top               LABEL     4406 17414  .stack
+while                   LABEL     102A 4138   .text
+while_end               LABEL     1030 4144   .text
 
 Code listing
    1           		.section .startup
@@ -41,18 +41,18 @@ Code listing
    9 000C FF 5B		b	.
   10           	
   11           	addressof_stack_top:
-  12 000E 4C 04		.word	stack_top
+  12 000E 06 44		.word	stack_top
   13           	addressof_main:
-  14 0010 12 00		.word	main
+  14 0010 00 10		.word	main
   15           	
   16           		.text
   17           		.data
   18           	
   19           		.stack
   20           	stack:
-  21 004C 00   		.space	1024
+  21 4006 00   		.space	1024
   21 .... ..
-  21 044B 00
+  21 4405 00
   22           	stack_top:
   23           	
   24           	/*---------------------------------------------------
@@ -60,18 +60,18 @@ Code listing
   26           	*/
   27           		.data
   28           	m:
-  29 0046 14		.byte	20
+  29 4000 14		.byte	20
   30           	n:
-  31 0047 03		.byte	3
+  31 4001 03		.byte	3
   32           	
   33           	/*---------------------------------------------------
   34           	uint16_t p, q;
   35           	*/
   36           	
   37           	p:
-  38 0048 00 00		.word	0
+  38 4002 00 00		.word	0
   39           	q:
-  40 004A 00 00		.word	0
+  40 4004 00 00		.word	0
   41           	
   42           	/*---------------------------------------------------
   43           	int main() {
@@ -81,29 +81,29 @@ Code listing
   47           	*/
   48           		.text
   49           	main:
-  50 0012 0E 24		push	lr
-  51 0014 C0 0C		ldr	r0, addressof_m
-  52 0016 00 08		ldrb	r0, [r0]
-  53 0018 B1 0C		ldr	r1, addressof_n
-  54 001A 11 08		ldrb	r1, [r1]
-  55 001C 0C 5C		bl	multiply
-  56 001E 91 0C		ldr	r1, addressof_p
-  57 0020 10 20		str	r0, [r1]
-  58 0022 40 60		mov	r0, 4
-  59 0024 71 60		mov	r1, 7
-  60 0026 07 5C		bl	multiply
-  61 0028 51 0C		ldr	r1, addressof_q
-  62 002A 10 20		str	r0, [r1]
-  63 002C 0F 04		pop	pc
+  50 1000 0E 24		push	lr
+  51 1002 C0 0C		ldr	r0, addressof_m
+  52 1004 00 08		ldrb	r0, [r0]
+  53 1006 B1 0C		ldr	r1, addressof_n
+  54 1008 11 08		ldrb	r1, [r1]
+  55 100A 0C 5C		bl	multiply
+  56 100C 91 0C		ldr	r1, addressof_p
+  57 100E 10 20		str	r0, [r1]
+  58 1010 40 60		mov	r0, 4
+  59 1012 71 60		mov	r1, 7
+  60 1014 07 5C		bl	multiply
+  61 1016 51 0C		ldr	r1, addressof_q
+  62 1018 10 20		str	r0, [r1]
+  63 101A 0F 04		pop	pc
   64           	
   65           	addressof_m:
-  66 002E 46 00		.word	m
+  66 101C 00 40		.word	m
   67           	addressof_n:
-  68 0030 47 00		.word	n
+  68 101E 01 40		.word	n
   69           	addressof_p:
-  70 0032 48 00		.word	p
+  70 1020 02 40		.word	p
   71           	addressof_q:
-  72 0034 4A 00		.word	q
+  72 1022 04 40		.word	q
   73           	
   74           	/*---------------------------------------------------
   75           	<r0> int multiply(<r0> int multiplicand, <r1> int multiplier) {
@@ -116,13 +116,13 @@ Code listing
   82           	}
   83           	*/
   84           	multiply:
-  85 0036 02 60		mov	r2, 0
-  86 0038 11 A0		add	r1, r1, 0
-  87 003A 03 40		bzs	while_end
+  85 1024 02 60		mov	r2, 0
+  86 1026 11 A0		add	r1, r1, 0
+  87 1028 03 40		bzs	while_end
   88           	while:
-  89 003C A2 80		add	r2, r2, r1
-  90 003E 91 A8		sub	r1, r1, 1
-  91 0040 FD 47		bzc	while
+  89 102A A2 80		add	r2, r2, r1
+  90 102C 91 A8		sub	r1, r1, 1
+  91 102E FD 47		bzc	while
   92           	while_end:
-  93 0042 00 B1		mov	r0, r2
-  94 0044 0F B7		mov	pc, lr
+  93 1030 00 B1		mov	r0, r2
+  94 1032 0F B7		mov	pc, lr
