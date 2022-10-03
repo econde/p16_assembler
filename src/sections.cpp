@@ -202,7 +202,7 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 	for (size_t i = 0; i < table.size(); ++i) {
 		Section *section = table[i];
 		section->base_address = section_addresses->get_property(section->name, current_address);
-		if ( ! address_is_free(section)) {
+		if ( !address_is_free(section)) {
 			error_report("Section \"" + section->name
 						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
 										 ", this overlap another section.\n",
