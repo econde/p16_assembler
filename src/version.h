@@ -21,6 +21,6 @@ limitations under the License.
 #ifndef VERSION_H
 #define VERSION_H
 
-#define	VERSION	"1.3.3"
+#define	VERSION	"1.3.99"
 
 #endif	// VERSION_H
