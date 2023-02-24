@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 	string input_filename, output_filename;
 	Properties<string, unsigned> section_addresses;
 	int result = 0;
-	int verbose_flag = 0;
+	static int verbose_flag = 0;
 	const char *output_format = "hexintel";
 	auto word_size = 1U;
 	uint32_t lower_address, higher_address;
@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
 
 	if (input_filename.empty()) {
 		cerr << "Missing input file" << endl;
-		return -2;
+		return 1;
 	}
 
 	if (output_filename.empty())
@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
 		yyin = fopen(input_filename.c_str(), "r");
 		if (yyin == NULL) {
 			perror(input_filename.c_str());
-			return -1;
+			return 1;
 		}
 	}
 
@@ -206,13 +206,13 @@ int main(int argc, char **argv) {
 		cout << endl << "Syntatic analisis and AST generation" << endl << endl;
 
 	if (yyparse())
-		return -1;
+		return 1;
 
 	if ( ! input_filename.empty())
 		fclose(yyin);
 
 	if (error_count > 0) {
-		result = -2;
+		result = 1;
 		goto exit_error;
 	}
 
@@ -240,7 +240,7 @@ int main(int argc, char **argv) {
 	}
 
 	if (error_count > 0) {
-		result = -2;
+		result = 1;
 		goto exit_error;
 	}
 
@@ -251,7 +251,7 @@ int main(int argc, char **argv) {
 		Sections::listing(cout);
 
 	if (error_count > 0) {
-		result = -2;
+		result = 1;
 		goto exit_error;
 	}
 
@@ -262,7 +262,7 @@ int main(int argc, char **argv) {
 	Relocations::relocate();
 
 	if (error_count > 0) {
-		result = -2;
+		result = 1;
 		goto exit_error;
 	}
 
@@ -346,7 +346,7 @@ int main(int argc, char **argv) {
 
 	delete listing_gen;
 #endif
-	result = warning_count > 0 ? -1 : 0;
+	result = warning_count > 0 ? 2 : 0;
 
 exit_error:
 
