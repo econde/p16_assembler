@@ -85,9 +85,15 @@ void warning_report(ast::Location *location, std::string message) {
 }
 
 void error_report(std::string message) {
-	std::cerr << message << std::endl;
+	std::cerr << std::endl << "ERROR!\t" << message << std::endl;
 
 	error_count++;
+}
+
+void warning_report(std::string message) {
+	std::cerr << std::endl << "WARNING!\t" << message << std::endl;
+
+	warning_count++;
 }
 
 void yyerror(const char *s, ...) {
