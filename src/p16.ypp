@@ -169,9 +169,6 @@ instruction
 	|	LDR_STR register COMMA BRACKET_LEFT register BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, new ast::Value(0, LOCATION(@6)), LOCATION(@1)); }
 
-	|	LDR_STR register COMMA BRACKET_LEFT register COMMA expression BRACKET_RIGHT
-			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
-
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA CARDINAL expression BRACKET_RIGHT
 			{ $$ = new ast::Load_store_indirect($1, $2, $5, $8, LOCATION(@1)); }
 
@@ -185,16 +182,12 @@ instruction
 
 	|	ARITH register COMMA register COMMA register
 			{ $$ = new ast::Arith($1, $2, $4, $6, LOCATION(@1)); }
-	|	ARITH register COMMA register COMMA expression
-			{ $$ = new ast::Arith($1, $2, $4, $6, LOCATION(@1)); }
 	|	ARITH register COMMA register COMMA CARDINAL expression
 			{ $$ = new ast::Arith($1, $2, $4, $7, LOCATION(@1)); }
 
 	|	LOGIC register COMMA register COMMA register
 			{ $$ = new ast::Logic($1, $2, $4, $6, LOCATION(@1)); }
 
-	|	SHIFT register COMMA register COMMA expression
-			{ $$ = new ast::Shift($1, $2, $4, $6, LOCATION(@1)); }
 	|	SHIFT register COMMA register COMMA CARDINAL expression
 			{ $$ = new ast::Shift($1, $2, $4, $7, LOCATION(@1)); }
 
@@ -208,12 +201,8 @@ instruction
 
 	|	MOV register COMMA register
 			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
-	|	MOVT register COMMA expression
-			{ $$ = new ast::Move($1, $2, $4, LOCATION(@1)); }
 	|	MOVT register COMMA CARDINAL expression
 			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
-	|	MOV register COMMA expression
-			{ $$ = new ast::Move($1, $2, $4, LOCATION(@1)); }
 	|	MOV register COMMA CARDINAL expression
 			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
 
