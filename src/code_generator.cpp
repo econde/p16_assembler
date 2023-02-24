@@ -225,6 +225,9 @@ void Code_generator::visit(Branch *s) {
 												offset, offset, BRANCH_OFFSET_SIZE + 1));
 				offset >>= 1;
 			} else {    // A Label pertence a outra secção. Será resolvida na fase de relocalização
+				error_report(&s->expression->location,
+								string_printf( "Label \"%s\" is defined in another section", symbol.c_str()));
+#if 0
 				auto addend = s->expression->get_value() - 2;
 				if ((addend & 1) != 0)
 					warning_report(&s->expression->location, string_printf("Address of %s = 0x%x, must be even!", symbol.c_str(), addend));
@@ -232,6 +235,7 @@ void Code_generator::visit(Branch *s) {
 											BRANCH_OFFSET_POSITION, BRANCH_OFFSET_SIZE,
 											Relocation::Relocation_type::RELATIVE, symbol, addend};
 				Relocations::add(reloc);
+#endif
 			}
 		}
 	}
@@ -437,6 +441,12 @@ void Code_generator::visit(Push_pop *s) {
 void Code_generator::visit(Equ *e) {
 	if (e->symbol->type == UNDEFINED && e->symbol->value_expression != nullptr) {
 		e->symbol->value_expression->evaluate(); 	//	Valor ainda não avaliado
+		unsigned value = e->symbol->value_expression->get_value();
+		if ((abs(static_cast<int>(value)) & ~MAKE_MASK(16, 0)) != 0) {
+			error_report(&e->symbol->value_expression->location,
+				string_printf(".equ value = %d (0x%x) not encodable in a %d bit word",
+					value, value, 16));
+		}
 		e->symbol->type = e->symbol->value_expression->get_type();
 	}
 }
@@ -448,7 +458,7 @@ void Code_generator::visit(Space *s) {
 		if (size_type == ABSOLUTE) {
 			if (static_cast<int>(size_value) < 0) {
 				error_report(&s->size->location,
-					string_printf("Invalid: %d (%x), size must be a positive value.\n",
+					string_printf("Invalid: %d (0x%x), size must be a positive value.\n",
 								size_value, size_value));
 					size_value = 0;
 			}
