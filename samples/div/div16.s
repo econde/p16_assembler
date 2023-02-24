@@ -1,4 +1,4 @@
-	.syntax unified 
+	.syntax unified
 	.thumb
 
 	.section .startup, "ax"
@@ -7,9 +7,17 @@
 	b	.
 
 _start:
-	mov	sp, stack_top
-	bl	main
+	ldr	sp, addressof_stack_top
+	mov	r0, pc
+	add	lr, r0, #4
+	ldr	pc, addressof_main
 	b	.
+
+addressof_stack_top:
+	.word	stack_top
+
+addressof_main:
+	.word	main
 
 	.section .stack
 stack:
@@ -30,7 +38,7 @@ y:
 	.word	4
 z:
 	.word	0
-	
+
 	.text
 main:
 	ldr	r0, addressof_x
@@ -38,7 +46,7 @@ main:
 	ldr	r1, addressof_y
 	ldr	r1, [r1]
 	bl	div
-	ldr	r1, addressof_z	
+	ldr	r1, addressof_z
 	str	r0, [r1]
 
 	mov	pc, lr
@@ -72,18 +80,18 @@ div:
 	push	lr
 	push	r3
 	push	r4
-	mov	r4, 0
-	mov	r2, 16
+	mov	r4, #0
+	mov	r2, #16
 div_1:
-	lsl	r0, r0, 1
+	lsl	r0, r0, #1
 	adc	r3, r3, r3
-	lsl	r4, r4, 1
+	lsl	r4, r4, #1
 	cmp	r3, r1
 	blo	div_2
 	sub	r3, r3, r1
-	add	r4, r4, 1
+	add	r4, r4, #1
 div_2:
-	sub	r2, r2, 1
+	sub	r2, r2, #1
 	bne	div_1
 	mov	r1, r3
 	mov	r0, r4

@@ -4,7 +4,7 @@
 _start:
 	ldr	sp, addressof_stack_top
 	mov	r0, pc
-	add	lr, r0, 4
+	add	lr, r0, #4
 	ldr	pc, addressof_main
 	b	.
 
@@ -55,8 +55,8 @@ main:
 	bl	multiply
 	ldr	r1, addressof_p
 	str	r0, [r1]
-	mov	r0, 4
-	mov	r1, 7
+	mov	r0, #4
+	mov	r1, #7
 	bl	multiply
 	ldr	r1, addressof_q
 	str	r0, [r1]
@@ -82,12 +82,12 @@ addressof_q:
 }
 */
 multiply:
-	mov	r2, 0
-	add	r1, r1, 0
+	mov	r2, #0
+	add	r1, r1, #0
 	bzs	while_end
 while:
 	add	r2, r2, r1
-	sub	r1, r1, 1
+	sub	r1, r1, #1
 	bzc	while
 while_end:
 	mov	r0, r2

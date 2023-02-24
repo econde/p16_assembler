@@ -5,7 +5,7 @@
 _start:
 	ldr	sp, addressof_stack_top
 	mov	r0, pc
-	add	lr, r0, 4
+	add	lr, r0, #4
 	ldr	pc, addressof_main
 
 	b	.
@@ -98,18 +98,18 @@ result:
 	.text
 main:
 	push	lr
-	mov	r0, RESULT_SIZE
+	mov	r0, #RESULT_SIZE
 	push	r0
 	ldr	r0, addr_result
 	push	r0
 	ldr	r0, addr_luis_silva
 	push	r0
 	ldr	r0, addr_people
-	mov	r1, PEOPLE_SIZE
-	mov	r2, PERSON_SIZE
+	mov	r1, #PEOPLE_SIZE
+	mov	r2, #PERSON_SIZE
 	ldr	r3, addr_cmp_name
 	bl	find
-	mov	r1, 3 * 2
+	mov	r1, #3 * 2
 	add	sp, r1, sp
 	pop	pc
 
@@ -184,9 +184,9 @@ find:
 
 	mov	r8, r2
 	mov	r10, r3
-	ldr	r5, [r7, 6]	/* size_t result_size (r7[6]) (r5) */
+	ldr	r5, [r7, #6]	/* size_t result_size (r7[6]) (r5) */
 
-	ldr	r6, [r7, 4]	/* void **result_iter (r6) = result; */
+	ldr	r6, [r7, #4]	/* void **result_iter (r6) = result; */
 
 	mov	r4, r0		/* for (void *iter (r4) = array; */
 
@@ -199,23 +199,23 @@ for:
 	cmp	r4, r9		/* iter < last ;  iter - last */
 	bhs	for_end
 	mov	r0, r4		/* cmp(iter, context) */
-	ldr	r1, [r7, 2]
+	ldr	r1, [r7, #2]
 	mov	r2, pc
-	add	lr, r2, 4
+	add	lr, r2, #4
 	mov	pc, r10
-	sub	r0, r0, 0		/* if (cmp(iter, context) == 0) { */
+	sub	r0, r0, #0		/* if (cmp(iter, context) == 0) { */
 	bne	if_end
 	str	r4, [r6]	/* *result_iter++ = iter; */
-	add	r6, r6, 2
-	sub	r5, r5, 1		/* if (--result_size == 0) */
+	add	r6, r6, #2
+	sub	r5, r5, #1		/* if (--result_size == 0) */
 	beq	for_end		/*	break;	*/
 if_end:
 	add	r4, r4, r8	/* iter += elem_size) { */
 	b	for
 for_end:
-	ldr	r0, [r7, 4]	/* return result_iter - result; */
+	ldr	r0, [r7, #4]	/* return result_iter - result; */
 	sub	r0, r6, r0
-	lsr	r0, r0, 1
+	lsr	r0, r0, #1
 
 	pop	r10
 	pop	r9
@@ -244,24 +244,24 @@ cmp_name:
 	push	r6
 	mov	r4, r0
 	mov	r5, r1
-	ldr	r0, [r4, 0]	/* ((Person*)a)->name) */
+	ldr	r0, [r4, #0]	/* ((Person*)a)->name) */
 	bl	strlen
-	add	r6, r0, 1
-	ldr	r0, [r4, 2]	/* ((Person*)a)->surname) */
+	add	r6, r0, #1
+	ldr	r0, [r4, #2]	/* ((Person*)a)->surname) */
 	bl	strlen
-	add	r0, r0, 1
+	add	r0, r0, #1
 	add	r6, r6, r0
 	mov	r0, sp
 	sub	r0, r0, r6
 	mov	sp, r0		/* char full_name [ */
 	;mov	r0, sp
-	ldr	r1, [r4, 0]
+	ldr	r1, [r4, #0]
 	bl	strcpy		/* strcpy (full_name, ((Person*)a)->name); */
 	mov	r0, sp
 	ldr	r1, addr_space_string
 	bl	strcat		/* strcat (full_name, " "); */
 	mov	r0, sp
-	ldr	r1, [r4, 2]
+	ldr	r1, [r4, #2]
 	bl	strcat		/* strcat (full_name, ((Person*)a)->surname); */
 
 	mov	r0, sp
@@ -293,12 +293,12 @@ int strcmp(const char * str1, const char * str2) {
 strcmp:
 	b	strcmp_for_cond
 strcmp_for:
-	add	r0, r0, 1
-	add	r1, r1, 1
+	add	r0, r0, #1
+	add	r1, r1, #1
 strcmp_for_cond:
 	ldrb	r2, [r0]
 	ldrb	r3, [r1]
-	sub	r2, r2, 0
+	sub	r2, r2, #0
 	beq	strcmp_for_end
 	cmp	r2, r3
 	beq	strcmp_for
@@ -320,21 +320,21 @@ char *strcat(char *dst, const char *src) {
 strcat:
 	b	strcat_while1_cond
 strcat_while1:
-	add	r0, r0, 1
+	add	r0, r0, #1
 strcat_while1_cond:
 	ldrb	r2, [r0]
-	sub	r2, r2, 0
+	sub	r2, r2, #0
 	bne	strcat_while1
 	b	strcat_while2_cond
 strcat_while2:
 	strb	r2, [r0]
-	add	r0, r0, 1
-	add	r1, r1, 1
+	add	r0, r0, #1
+	add	r1, r1, #1
 strcat_while2_cond:
 	ldrb	r2, [r1]
-	sub	r2, r2, 0
+	sub	r2, r2, #0
 	bne	strcat_while2
-	mov	r2, 0
+	mov	r2, #0
 	strb	r2, [r0]
 	mov	pc, lr
 
@@ -351,13 +351,13 @@ strcpy:
 	b	strcpy_while_cond
 strcpy_while:
 	strb	r2, [r0]
-	add	r0, r0, 1
-	add	r1, r1, 1
+	add	r0, r0, #1
+	add	r1, r1, #1
 strcpy_while_cond:
 	ldrb	r2, [r1]
-	sub	r2, r2, 0
+	sub	r2, r2, #0
 	bne	strcpy_while
-	mov	r2, 0
+	mov	r2, #0
 	strb	r2, [r0]
 	mov	pc, lr
 
@@ -370,14 +370,14 @@ size_t strlen(const char *str) {
 }
 */
 strlen:
-	mov	r1, 0		/* i = 0 */
+	mov	r1, #0		/* i = 0 */
 	b	strlen_cond
 strlen_for:
-	add	r1, r1, 1	/* i++ */
+	add	r1, r1, #1	/* i++ */
 strlen_cond:
 	ldrb	r2, [r0]
-	add	r0, r0, 1
-	sub	r2, r2, 0
+	add	r0, r0, #1
+	sub	r2, r2, #0
 	bne	strlen_for
 	mov	r0, r1		/* return i */
 	mov	pc, lr
@@ -397,19 +397,19 @@ uint32_t multiply(uint16_t multiplicand, uint16_t multiplier) {
 multiply:
 	push	r4
 
-	mov	r3, 0	/* result = 0 */
-	mov	r2, 0
-	mov	r4, 0
+	mov	r3, #0	/* result = 0 */
+	mov	r2, #0
+	mov	r4, #0
 	b	multiply_while_cond
 multiply_while:
-	lsr	r1, r1, 1
+	lsr	r1, r1, #1
 	bcc	multiply_if_end
 	add	r2, r2, r0
 	adc	r3, r3, r4
 multiply_if_end:
-	lsl	r0, r0, 1
+	lsl	r0, r0, #1
 multiply_while_cond:
-	sub	r1, r1, 0
+	sub	r1, r1, #0
 	bne	multiply_while
 	mov	r1, r3
 	mov	r0, r2

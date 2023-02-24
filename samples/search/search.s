@@ -1,4 +1,4 @@
-	.syntax unified 
+	.syntax unified
 	.thumb
 
 	.section .startup, "ax"
@@ -8,14 +8,13 @@
 _start:
 	ldr	sp, addressof_stack_top
 	mov	r0, pc
-	add	lr, r0, 4
+	add	lr, r0, #4
 	ldr	pc, addressof_main
-
 	b	.
-	
+
 addressof_stack_top:
 	.word	stack_top
-	
+
 addressof_main:
 	.word	main
 
@@ -38,7 +37,7 @@ stack_top:
 */
 
 	.data
-	
+
 	.equ	TABLE1_SIZE, (table1_end - table1) / 2
 table1:
 	.word	10, 20, 5, 6, 34, 9
@@ -47,7 +46,7 @@ table1_end:
 table2:
 	.word	11, 22, 33
 table2_end:
-	
+
 p:
 	.word	0
 q:
@@ -60,19 +59,19 @@ q:
 main:
 	push	lr
 	ldr	r0, addressof_table1
-	mov	r1, TABLE1_SIZE
-	mov	r2, 20
+	mov	r1, #TABLE1_SIZE
+	mov	r2, #20
 	bl	search
 	ldr	r1, addressof_p
 	str	r0, [r1]
-	
+
 	ldr	r0, addressof_table2
-	mov	r1, (table2_end - table2) / 2
-	mov	r2, 44
+	mov	r1, #(table2_end - table2) / 2
+	mov	r2, #44
 	bl	search
 	ldr	r1, addressof_q
 	str	r0, [r1]
-	mov	r0, 0
+	mov	r0, #0
 	pop	pc
 
 addressof_table1:
@@ -98,24 +97,24 @@ addressof_q:
 search:
 	push	r3
 	push	r4
-	mov	r3, 0		/* r3 - i	*/
+	mov	r3, #0		/* r3 - i	*/
 for:
 	cmp	r3, r1		/* i - array_size	*/
 	bhs	for_end
 	ldr	r4, [r0, r3]	/* array[i] != value	*/
 	cmp	r4, r2
 	beq	for_end
-	add	r3, r3, 2 	/* ++i	*/
+	add	r3, r3, #2 	/* ++i	*/
 	b	for
 for_end:
 	cmp	r3, r1		/* if (i < array_size)	*/
 	bhs	if_end
-	
-	lsr	r0, r3, 1	/* return i	*/
+
+	lsr	r0, r3, #1	/* return i	*/
 	b	search_end
 if_end:
-	mov	r0, 0		/* return -1	*/
-	sub	r0, r0, 1
+	mov	r0, #0		/* return -1	*/
+	sub	r0, r0, #1
 search_end:
 	pop	r4
 	pop	r3
