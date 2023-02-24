@@ -1,6 +1,10 @@
-V1.3.99 (Em curso)
-
-- Alterações internas sem efeito na utilização 
+V1.4.0
+- Emitir erro de sintaxe no caso das constantes, operandos de instruções, não serem precedidas de #
+- Emitir aviso em caso de secção vazia
+- Não permitir saltos diretos (branch label) entre secções
+- Na diretiva EQU limitar as constantes à representação de 16 bits
+- Eliminação do endereço final das secssões na tabela de secções no ficheiro de listagem
+- Alterações internas sem efeito na utilização
 - Aceitar secções vazias
 - .byte e .word com argumento diferente de zero produz erro em .bss
 - .byte e .word sem argumento não produz efeito
