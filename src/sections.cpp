@@ -174,11 +174,10 @@ void Sections::set_section(std::string section_name) {
 
 void Sections::listing(std::ostream& lst_file) {
 	lst_file << "Sections\n";
-	ostream_printf(lst_file, "%-8s%-16s%-16s%s\n", "Index", "Name", "Addresses", "Size");
+	ostream_printf(lst_file, "%-8s%-16s%-10s%s\n", "Index", "Name", "Address", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
-		ostream_printf(lst_file, "%-8d%-16s%04X - %04X     %04X %d\n", i,
+		ostream_printf(lst_file, "%-8d%-16s%04X      %04X %d\n", i,
 						table[i]->name.c_str(), table[i]->base_address,
-						table[i]->base_address + table[i]->content_size - 1,
 						table[i]->content_size, table[i]->content_size);
 	}
 }
@@ -212,6 +211,8 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 		}
 					//	alinhar o início da secção em endereço par
 		current_address = align(section->base_address + section->content_size, 1);
+		if (section->content_size == 0)
+			warning_report("Section \"" + section->name + "\" is empty");
 	}
 }
 
