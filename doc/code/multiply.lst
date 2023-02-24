@@ -1,11 +1,11 @@
-P16 assembler v1.3.99 (Oct  3 2022)	multiply.lst	Mon Oct  3 13:34:44 2022
+P16 assembler v1.4.0 (Feb 24 2023)	multiply.lst	Fri Feb 24 12:16:35 2023
 
 Sections
-Index   Name            Addresses       Size
-0       .startup        0000 - 0011     0012 18
-1       .text           1000 - 1033     0034 52
-2       .data           4000 - 4005     0006 6
-3       .stack          4006 - 4405     0400 1024
+Index   Name            Address   Size
+0       .startup        0000      0012 18
+1       .text           1000      0034 52
+2       .data           4000      0006 6
+3       .stack          4006      0400 1024
 
 Symbols
 Name                    Type      Value       Section
@@ -36,7 +36,7 @@ Code listing
    4           	_start:
    5 0004 4D 0C		ldr	sp, addressof_stack_top
    6 0006 80 B7		mov	r0, pc
-   7 0008 0E A2		add	lr, r0, 4
+   7 0008 0E A2		add	lr, r0, #4
    8 000A 2F 0C		ldr	pc, addressof_main
    9 000C FF 5B		b	.
   10           	
@@ -89,8 +89,8 @@ Code listing
   55 100A 0C 5C		bl	multiply
   56 100C 91 0C		ldr	r1, addressof_p
   57 100E 10 20		str	r0, [r1]
-  58 1010 40 60		mov	r0, 4
-  59 1012 71 60		mov	r1, 7
+  58 1010 40 60		mov	r0, #4
+  59 1012 71 60		mov	r1, #7
   60 1014 07 5C		bl	multiply
   61 1016 51 0C		ldr	r1, addressof_q
   62 1018 10 20		str	r0, [r1]
@@ -116,12 +116,12 @@ Code listing
   82           	}
   83           	*/
   84           	multiply:
-  85 1024 02 60		mov	r2, 0
-  86 1026 11 A0		add	r1, r1, 0
+  85 1024 02 60		mov	r2, #0
+  86 1026 11 A0		add	r1, r1, #0
   87 1028 03 40		bzs	while_end
   88           	while:
   89 102A A2 80		add	r2, r2, r1
-  90 102C 91 A8		sub	r1, r1, 1
+  90 102C 91 A8		sub	r1, r1, #1
   91 102E FD 47		bzc	while
   92           	while_end:
   93 1030 00 B1		mov	r0, r2
