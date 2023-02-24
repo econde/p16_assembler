@@ -18,11 +18,11 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PAS - P16 Assembler'
-copyright = '2022, Ezequiel Conde'
+copyright = '2023, Ezequiel Conde'
 author = 'Ezequiel Conde'
 
 # The full version, including alpha/beta/rc tags
-release = '1.3.99'
+release = '1.4.0'
 
 
 # -- General configuration ---------------------------------------------------
