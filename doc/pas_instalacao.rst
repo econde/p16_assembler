@@ -10,7 +10,7 @@ Em Window
 
    Copiar para a diretoria de instalação. Por exemplo:
 
-   ``$ copy pas.exe C:\Users\<utilizador>\AppData\Roaming``
+   ``C:> copy pas.exe C:\Users\<utilizador>\AppData\Roaming``
 
    Acrescentar o caminho na variável de ambiente Path.
 
@@ -47,7 +47,7 @@ Para Window
 
    ``$ sudo apt install g++-mingw-w64``
 
-   ``$ make WINDOWS=1``make
+   ``$ make WINDOWS=1``
 
 Para Linux
 ^^^^^^^^^^
