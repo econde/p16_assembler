@@ -1,6 +1,6 @@
 ifdef WINDOWS
 
-EXECUTABLE = pas.exe
+EXECUTABLE = p16as.exe
 
 CXX = /usr/bin/x86_64-w64-mingw32-g++
 
@@ -8,7 +8,7 @@ LDFLAGS = -Wl,-static -static-libgcc -static-libstdc++
 
 else
 
-EXECUTABLE = pas
+EXECUTABLE = p16as
 
 CXX = g++
 

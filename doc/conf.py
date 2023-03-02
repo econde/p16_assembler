@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'PAS - P16 Assembler'
+project = 'p16as - P16 Assembler'
 copyright = '2023, Ezequiel Conde'
 author = 'Ezequiel Conde'
 
@@ -87,7 +87,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'PAS-manual.tex', u'PAS - Manual de utilização',
+    (master_doc, 'p16as-manual.tex', u'p16as - Manual de utilização',
      'Ezequiel Conde', 'manual')
 ]
 

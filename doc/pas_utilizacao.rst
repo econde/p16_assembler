@@ -4,11 +4,11 @@ Utilização
 Invocação
 ---------
 
-O PAS é invocado na janela de comando segundo a seguinte sintaxe:
+O *p16as* é invocado na janela de comando segundo a seguinte sintaxe:
 
    .. code-block:: console
 
-      pas [options] <source filename>
+      p16as [options] <source filename>
 
       options:
          --verbose
@@ -62,7 +62,7 @@ Localização das secções
 -----------------------
 A definição da localização em memória de cada secção pode ser explícita ou implícita.
 
-A localização explícita é definida através da opção ``--section`` na invocação do PAS.
+A localização explícita é definida através da opção ``--section`` na invocação do *p16as*.
 
 A localização implícita aplica-se às secções omissas na localização explicita,
 localizando-as a seguir ao último endereço ocupado pela secção
@@ -102,7 +102,7 @@ ser carregado a partir de ficheiro.
 
 Na utilização do Logisim na simulação de sistemas baseados no P16
 é necessário carregar nesses dispositivos o código binário dos programas,
-produzido pelo PAS.
+produzido pelo *p16as*.
 
 No Logisim os dispositivos de memória podem ter palavras com qualquer número de bits.
 Em ficheiro, o conteúdo da memória é guardado em formato de texto, como uma sequência
@@ -112,7 +112,7 @@ em que cada valor corresponde a uma posição de memória.
 As ocorrências de sucessivos valores iguais são representadas pela sequência N*X.
 Sendo N o número de vezes que o valor ocorre e X o valor em si.
 
-O PAS gera ficheiros binários em formato Logisim para memórias com palavras de 8 ou 16 *bits*.
+O *p16as* gera ficheiros binários em formato Logisim para memórias com palavras de 8 ou 16 *bits*.
 
 Exemplo de utilização
 ---------------------
@@ -131,7 +131,7 @@ Considere-se o programa da :numref:`ficheiro_multiply_s` como conteúdo do fiche
 
 No comando
 
-   ``pas multiply.s -s .data=0x4000 -s .text=0x1000``
+   ``p16as multiply.s -s .data=0x4000 -s .text=0x1000``
 
 a primeira ocorrência da opção ``-s`` define o endereços da secção ``.data`` em ``0x4000``
 e a segunda ocorrência define o endereço da secção ``.text`` em ``0x1000``.

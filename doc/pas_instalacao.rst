@@ -6,25 +6,25 @@ Instalação do executável
 
 Em Window
 ^^^^^^^^^
-   Descarregar `daqui <https://www.dropbox.com/s/pr1nl6yg2hbxkzd/pas.exe?dl=0>`_.
+   Descarregar `daqui <https://www.dropbox.com/s/38ntn2fucc5dgww/p16as.exe?dl=0>`_.
 
    Copiar para a diretoria de instalação. Por exemplo:
 
-   ``C:> copy pas.exe C:\Users\<utilizador>\AppData\Roaming``
+   ``C:> copy p16as.exe C:\Users\<utilizador>\AppData\Roaming``
 
    Acrescentar o caminho na variável de ambiente Path.
 
 Em Linux
 ^^^^^^^^
-   Descarregar `daqui <https://www.dropbox.com/s/dtw6l7li4cug9cc/pas?dl=0>`_.
+   Descarregar `daqui <https://www.dropbox.com/s/1yrdlmad3i8s2zt/p16as?dl=0>`_.
 
    É necessário redefinir o atributo de executável:
 
-   ``$ chmod 755 pas``
+   ``$ chmod 755 p16as``
 
    Copiar para a diretoria de instalação. Por exemplo:
 
-   ``$ cp pas /usr/local/bin``
+   ``$ cp p16as /usr/local/bin``
 
    Acrescentar o caminho ``/usr/local/bin`` na variável de ambiente ``PATH``.
 
