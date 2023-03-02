@@ -86,7 +86,7 @@ multiply:
 	add	r1, r1, #0
 	bzs	while_end
 while:
-	add	r2, r2, r1
+	add	r2, r2, r0
 	sub	r1, r1, #1
 	bzc	while
 while_end:

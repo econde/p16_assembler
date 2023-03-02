@@ -1,4 +1,4 @@
-P16 assembler v1.4.0 (Feb 24 2023)	multiply.lst	Fri Feb 24 12:16:35 2023
+P16 assembler v1.4.0 (Mar  2 2023)	multiply.lst	Thu Mar  2 18:00:01 2023
 
 Sections
 Index   Name            Address   Size
@@ -120,7 +120,7 @@ Code listing
   86 1026 11 A0		add	r1, r1, #0
   87 1028 03 40		bzs	while_end
   88           	while:
-  89 102A A2 80		add	r2, r2, r1
+  89 102A 22 80		add	r2, r2, r0
   90 102C 91 A8		sub	r1, r1, #1
   91 102E FD 47		bzc	while
   92           	while_end:
