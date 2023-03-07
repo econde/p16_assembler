@@ -34,3 +34,7 @@ bugs/
 *.iss
 !doc/code/multiply.hex
 !doc/code/multiply.lst
+!doc/code/sections/seccoes1.hex
+!doc/code/sections/seccoes1.lst
+!doc/code/sections/seccoes2.hex
+!doc/code/sections/seccoes2.lst

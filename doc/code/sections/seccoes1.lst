@@ -1,0 +1,43 @@
+P16 assembler v1.3.99 (Oct  3 2022)	sections/seccoes1.lst	Mon Oct  3 13:34:44 2022
+
+Sections
+Index   Name            Addresses       Size
+0       .data           0000 - 0005     0006 6
+1       .text           0006 - 001B     0016 22
+
+Symbols
+Name                    Type      Value       Section
+addressof_x             LABEL     0016 22     .text
+addressof_y             LABEL     0018 24     .text
+addressof_z             LABEL     001A 26     .text
+main                    LABEL     0006 6      .text
+x                       LABEL     0000 0      .data
+y                       LABEL     0002 2      .data
+z                       LABEL     0004 4      .data
+
+Code listing
+   1           		.data
+   2           	x:
+   3 0000 1E 00		.word	30
+   4           	y:
+   5 0002 04 00		.word	4
+   6           	z:
+   7 0004 00 00		.word	0
+   8           	
+   9           		.text
+  10           	main:
+  11 0006 70 0C		ldr	r0, addressof_x
+  12 0008 00 00		ldr	r0, [r0]
+  13 000A 61 0C		ldr	r1, addressof_y
+  14 000C 11 00		ldr	r1, [r1]
+  15 000E 80 80		add	r0, r0, r1
+  16 0010 41 0C		ldr	r1, addressof_z
+  17 0012 10 20		str	r0, [r1]
+  18 0014 0F B7		mov	pc, lr
+  19           	
+  20           	addressof_x:
+  21 0016 00 00		.word	x
+  22           	addressof_y:
+  23 0018 02 00		.word	y
+  24           	addressof_z:
+  25 001A 04 00		.word	z
