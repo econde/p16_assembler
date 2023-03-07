@@ -1,4 +1,4 @@
-P16 assembler v1.4.0 (Mar  2 2023)	multiply.lst	Thu Mar  2 18:00:01 2023
+P16 assembler v1.4.0 (Mar  6 2023)	multiply.lst	Tue Mar  7 13:06:11 2023
 
 Sections
 Index   Name            Address   Size
@@ -106,8 +106,8 @@ Code listing
   72 1022 04 40		.word	q
   73           	
   74           	/*---------------------------------------------------
-  75           	<r0> int multiply(<r0> int multiplicand, <r1> int multiplier) {
-  76           		<r2> int product = 0;
+  75           	<r0> uint16_t multiply(<r0> uint8_t multiplicand, <r1> uint8_t multiplier) {
+  76           		<r2> uint16_t product = 0;
   77           		while (multiplier > 0) {
   78           			product += multiplicand;
   79           			multiplier--;

@@ -72,8 +72,8 @@ addressof_q:
 	.word	q
 
 /*---------------------------------------------------
-<r0> int multiply(<r0> int multiplicand, <r1> int multiplier) {
-	<r2> int product = 0;
+<r0> uint16_t multiply(<r0> uint8_t multiplicand, <r1> uint8_t multiplier) {
+	<r2> uint16_t product = 0;
 	while (multiplier > 0) {
 		product += multiplicand;
 		multiplier--;
