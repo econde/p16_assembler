@@ -56,7 +56,8 @@ void listing_load_inputfile(const char *src_filename);
 }
 
 static void version() {
-	cout << "P16 assembler v" VERSION " (" __DATE__ ")" << endl;
+	cout << "p16as - Assembler para o P16" << endl;
+	cout << "Versão: " VERSION " (" __DATE__ ")" << endl;
 	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
 }
 static bool validate_output_format(const char *format) {
