@@ -1,12 +1,11 @@
 Introdução
 ==========
 
-O *p16as*, abreviatura de P16 Assembler, é um *assembler* para a arquitetura P16 [#f1]_ que,
-a partir de um ficheiro fonte em linguagem *assembly*,
+O *p16as* é um *assembler* para a arquitetura P16 [#f1]_.
+A partir de um ficheiro fonte em linguagem *assembly*,
 gera ficheiros com o código máquina específico para esta arquitetura.
 
-O *p16as*, o *debugger* P16 Debugger e o simulador P16 Simulator
-formam um conjunto de ferramentas
+O *p16as*, o *p16dbg* e o *p16sim* formam um conjunto de ferramentas
 que permitem criar, testar e depurar programas para a arquitetura P16.
 
 Por razões didácticas, o *p16as* processa apenas um ficheiro fonte e localiza o programa.
