@@ -512,6 +512,10 @@ void Code_generator::visit(Byte *s) {
 					s->grain_size, s->grain_size));
 	auto i = 0U;
 	auto mask = MAKE_MASK(s->grain_size * 8, 0);
+	if (s->value_list->empty()) {
+		warning_report(&s->location,
+			string_printf("Directives .byte or .word must have an argument"));
+	}
 	for (auto e: *s->value_list) {
 		auto value = 0U;
 		if (e->evaluate()) {
