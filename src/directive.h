@@ -93,9 +93,8 @@ struct Ascii: public Directive {
 		section_offset = Sections::current_section->content_size;
 		for (auto s: *string_list) {
 			Sections::append_block(Sections::current_section->number, (const uint8_t *)s.data(), s.size());
-		}
-		if (asciz) {
-			Sections::append8(Sections::current_section->number, 0);
+			if (asciz)
+				Sections::append8(Sections::current_section->number, 0);
 		}
 		size_in_memory = Sections::current_section->content_size - section_offset;
 	}
