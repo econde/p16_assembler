@@ -1,3 +1,8 @@
+V1.4.1
+- Correção de erro na diretiva ASCIZ (não colocava terminadores no caso de uma sequência de strings). 
+- Assinalar warning no caso de diretiva .byte ou .word sem argumento.
+- Aceitar que a última linha não possua caracter de mudança de linha.
+ 
 V1.4.0
 - Mudança de nome de "PAS" para "p16as"
 - Emitir erro de sintaxe no caso das constantes, operandos de instruções, não serem precedidas de #
