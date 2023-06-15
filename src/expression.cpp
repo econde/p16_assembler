@@ -104,6 +104,7 @@ namespace ast {
 		assert(type == ABSOLUTE);
 		switch (operation) {
 			case PLUS:
+				value = expression->get_value();
 				break;
 			case MINUS:
 				value = -expression->get_value();
