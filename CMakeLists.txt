@@ -13,7 +13,7 @@ ADD_FLEX_BISON_DEPENDENCY(p16_lexer p16_parser)
 
 include_directories(src ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(pas
+add_executable(p16as
 		${BISON_p16_parser_OUTPUTS}
 		${FLEX_p16_lexer_OUTPUTS}
         src/cpp_printf.cpp
