@@ -25,7 +25,7 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
 .. code-block:: console
    :caption: Regras sintáticas da linguagem *assembly*
    :name: sintaxe
-   
+
    program = statement { statement }.
 
    statement =
@@ -37,6 +37,7 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
      | ".rodata"
      | “.data”
      | ".bss"
+     | ".stack"
      | “.align” [ expression ]
      | “.equ” symbol “,” expression )
      | ( “.byte” | “.word” ) expression { “,” expression }
