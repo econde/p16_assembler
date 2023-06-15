@@ -1,4 +1,5 @@
 Permitir sintaxe ldr rd, [pc, imm6]
-Avisar ou aceitar a falta do enter na última linha do programa.
 Verificar se há código em secção não loadable
 Dar erro se for mencionada na linha de comando uma secção que não existe.
+Acrescentar uma opção para transformar avisos em erros e consequentemente não gerar executável.
+Em caso de erro eliminar o executável anterior.
