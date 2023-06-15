@@ -1,3 +1,6 @@
+V1.4.2
+- Correção de erro no operador unário +
+
 V1.4.1
 - Correção de erro na diretiva ASCIZ (não colocava terminadores no caso de uma sequência de strings). 
 - Assinalar warning no caso de diretiva .byte ou .word sem argumento.
