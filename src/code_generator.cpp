@@ -364,18 +364,18 @@ void Code_generator::visit(Move *s) {
 	} else {                        //      mov | movt      rd, constant
 		code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
 		if (s->constant->evaluate()) {
-			auto constant = s->constant->get_value();
-			auto const_type= s->constant->get_type();
-			if (const_type == ABSOLUTE ) {
-				if ((abs(static_cast<int>(constant)) & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
+			uint16_t constant_value = s->constant->get_value();
+			auto constant_type = s->constant->get_type();
+			if (constant_type == ABSOLUTE ) {
+				if ((constant_value & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
 					warning_report(&s->constant->location,
 						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-								constant, constant, MOV_CONST_SIZE,
-								constant & MAKE_MASK(MOV_CONST_SIZE, 0), constant & MAKE_MASK(MOV_CONST_SIZE, 0)));
+								constant_value, constant_value, MOV_CONST_SIZE,
+								constant_value & MAKE_MASK(MOV_CONST_SIZE, 0), constant_value & MAKE_MASK(MOV_CONST_SIZE, 0)));
 				}
-				code |= (constant & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
+				code |= (constant_value & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
 			}
-			else if (const_type == Value_type::LABEL) {
+			else if (constant_type == Value_type::LABEL) {
 				auto symbol = s->constant->get_symbol();
 				auto value = s->constant->get_value();
 				auto *reloc = new Relocation {&s->location, &s->constant->location, s->section_index, s->section_offset,
