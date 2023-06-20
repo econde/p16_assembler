@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
 			output_filename = optarg;
 			break;
 		case 's': {
-			regex re("^[\\s]*([\\._]?[a-zAZ][a-zA-Z0-9]*)[\\s]*=[\\s]*(0[xX][0-9a-fA-F]+)[\\s]*$");
+			regex re("^[\\s]*([\\._]?[a-zA-Z][.a-zA-Z0-9_]*)[\\s]*=[\\s]*(0[xX][0-9a-fA-F]+)[\\s]*$");
 			cmatch cm;
 			if (regex_match(optarg, cm, re)) {
 #ifdef DEBUG
