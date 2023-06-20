@@ -31,7 +31,7 @@ struct Relocation {
 	enum Relocation_type { ABSOLUTE, RELATIVE, RELATIVE_UNSIGNED };
 	Relocation_type type;
 	string symbol;			// simbolo que vai fornecer o valor
-	unsigned addend;		// valor a adicionar
+	int addend;				// valor a adicionar
 };
 
 class Relocations {

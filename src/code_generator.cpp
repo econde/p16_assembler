@@ -138,31 +138,36 @@ void Code_generator::visit(Load_store_indirect *s) {
 		auto constant_type = s->constant->get_type();
 		if (constant_type == ABSOLUTE) {
 			auto constant_value = s->constant->get_value();
-			if (byte) {
-				if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-					warning_report(&s->constant->location,
-							   string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
-											 " truncate to %d (0x%x)",
-											 constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-											 constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-											 constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
-				}
-				code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+			if (constant_value < 0) {
+				error_report(&s->constant->location,"Expression's value must a positive number");
 			}
 			else {
-				if ((constant_value & 1) != 0)
-					warning_report(&s->constant->location, string_printf(
-						"Expression's value = %d (0x%x) must be an even value", constant_value, constant_value));
-				constant_value /= 2;
-				if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
-					warning_report(&s->constant->location,
-							   string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
-											  "truncate to %d (0x%x)",
-											  constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
-											  constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
-											  constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+				if (byte) {
+					if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+						warning_report(&s->constant->location,
+								string_printf("Expression's value = %d (0x%x) not encodable in %d bit,"
+												" truncate to %d (0x%x)",
+												constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+					}
+					code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
 				}
-				code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+				else {
+					if ((constant_value & 1) != 0)
+						warning_report(&s->constant->location, string_printf(
+							"Expression's value = %d (0x%x) must be an even value", constant_value, constant_value));
+					constant_value /= 2;
+					if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+						warning_report(&s->constant->location,
+								string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
+												"truncate to %d (0x%x)",
+												constant_value, constant_value, LDR_STR_INDIRECT_CONST_INDEX_SIZE,
+												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
+												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
+					}
+					code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
+				}
 			}
 		}
 		else if (constant_type == Value_type::LABEL)
@@ -252,7 +257,10 @@ void Code_generator::visit(Shift *s) {
 		auto position_type = s->constant->get_type();
 		if (position_type == ABSOLUTE) {
 			auto constant = s->constant->get_value();
-			if ((constant & ~MAKE_MASK(SHIFT_CONST_SIZE, 0)) != 0) {
+			if (constant < 0) {
+				error_report(&s->constant->location,"Expression's value must be a positive number");
+			}
+			else if ((constant & ~MAKE_MASK(SHIFT_CONST_SIZE, 0)) != 0) {
 				warning_report(&s->constant->location,
 							   string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
 											 constant, constant, SHIFT_CONST_SIZE,
@@ -319,7 +327,10 @@ void Code_generator::visit(Arith *s) {
 			auto expression_type = s->expression->get_type();
 			if (expression_type == ABSOLUTE) {
 				auto constant = s->expression->get_value();
-				if ((constant & ~MAKE_MASK(ARITH_CONST_SIZE, 0)) != 0) {
+				if (constant < 0) {
+					error_report(&s->expression->location,"Expression's value must be a positive number");
+				}
+				else if ((constant & ~MAKE_MASK(ARITH_CONST_SIZE, 0)) != 0) {
 					warning_report(&s->expression->location,
 								   string_printf( "Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
 												  constant, constant, ARITH_CONST_SIZE,
@@ -364,13 +375,13 @@ void Code_generator::visit(Move *s) {
 	} else {                        //      mov | movt      rd, constant
 		code |= s->high == MOV_LOW ? MOV_CONST_OPCODE : MOVT_CONST_OPCODE;
 		if (s->constant->evaluate()) {
-			uint16_t constant_value = s->constant->get_value();
+			auto constant_value = s->constant->get_value();
 			auto constant_type = s->constant->get_type();
 			if (constant_type == ABSOLUTE ) {
 				if ((constant_value & ~MAKE_MASK(MOV_CONST_SIZE, 0)) != 0) {
 					warning_report(&s->constant->location,
-						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-								constant_value, constant_value, MOV_CONST_SIZE,
+						string_printf("Expression's value = %d (0x%x) exceeds domain(0-255), truncate to %d (0x%x)",
+								constant_value, constant_value,
 								constant_value & MAKE_MASK(MOV_CONST_SIZE, 0), constant_value & MAKE_MASK(MOV_CONST_SIZE, 0)));
 				}
 				code |= (constant_value & MAKE_MASK(MOV_CONST_SIZE, 0)) << MOV_CONST_POSITION;
@@ -496,8 +507,8 @@ void Code_generator::visit(Align *s) {
 		auto size_value = s->size->get_value();
 		auto size_type = s->size->get_type();
 		if (size_type == ABSOLUTE) {
-			if (size_value > 1)
-				warning_report(&s->size->location, "Invalid alignment. Must be 1 or 0");
+			if (size_value < 0 && size_value > 1)
+				warning_report(&s->size->location, "Invalid value for alignment. Must be 1 or 0");
 			Sections::fill(s->section_index, s->section_offset, 0, s->size_in_memory);
 		}
 		else if (size_type == Value_type::LABEL)
@@ -517,7 +528,7 @@ void Code_generator::visit(Byte *s) {
 			string_printf("Directives .byte or .word must have an argument"));
 	}
 	for (auto e: *s->value_list) {
-		auto value = 0U;
+		auto value = 0;
 		if (e->evaluate()) {
 			value = e->get_value();
 			if (value != 0 && (Sections::get_section(s->section_index)->flags & Section::BSS) != 0)
@@ -551,18 +562,3 @@ void Code_generator::visit(Byte *s) {
 	}
 }
 
-#if 0
-			if (exp_type == ABSOLUTE || exp_type == Value_type::LABEL) {
-				if (exp_type == Value_type::LABEL) {
-					auto symbol = e->get_symbol();
-					auto addend = e->get_value();
-					auto *reloc = new Relocation{&s->location, &e->location, s->section_index, s->section_offset + i,
-												0, s->grain_size * 8,
-												Relocation::Relocation_type::ABSOLUTE, symbol, addend};
-					Relocations::add(reloc);
-				}
-				if ((abs(static_cast<int>(value)) & ~mask) != 0)
-					warning_report(&e->location,
-						string_printf("Expression's value = %d (0x%x) not encodable in %d bit, truncate to %d (0x%x)",
-						value, value, s->grain_size * 8, value & mask, value & mask));
-#endif

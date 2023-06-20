@@ -41,7 +41,7 @@ namespace ast {
 			this->value_expression = value;
 		}
 
-		unsigned get_value();
+		int get_value();
 
 		Value_type get_type();
 	};
@@ -60,7 +60,7 @@ namespace ast {
 			return Sections::table.size();  //  Secção inexistente
 		}
 
-		static unsigned get_value(std::string name) {
+		static int get_value(std::string name) {
 			auto pair_symbol = table.find(name);
 			if (pair_symbol != table.end())
 				return pair_symbol->second->get_value();

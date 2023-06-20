@@ -27,11 +27,11 @@ namespace ast {
 
 		Location location;
 
-		unsigned value;		//	Valor associado à expressão
+		int value;			//	Valor associado à expressão
 		Value_type type;	//	Tipo associado à expressão
 		//	Estes campos apenas são atualizados no método evaluate
 
-		Expression(Location location, unsigned value, Value_type type)
+		Expression(Location location, int value, Value_type type)
 			: location{location} , value{value}, type{type} {}
 
 		Expression(Location location) : location{location} {}
@@ -40,7 +40,7 @@ namespace ast {
 
 		virtual std::string to_string() = 0;
 
-		unsigned get_value() { return value; }
+		int get_value() { return value; }
 		Value_type get_type() { return type; }
 
 		virtual bool evaluate() = 0;

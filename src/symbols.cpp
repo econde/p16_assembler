@@ -71,7 +71,7 @@ namespace ast {
 	 * O valor absoluto pode ser calculado, no respetivo contexto,
 	 * adicionando o endereço de início da secção.
 	 */
-	unsigned Symbol::get_value() {
+	int Symbol::get_value() {
 		if (type == ABSOLUTE || type == LABEL)
 			return value_expression->get_value();
 		return 0;

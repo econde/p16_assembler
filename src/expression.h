@@ -33,7 +33,7 @@ class Value: public Expression {
 
 public:
 
-	Value(unsigned value, Location location)
+	Value(int value, Location location)
 		: Expression {location, value, Value_type::ABSOLUTE} { }
 	~Value() { }
 
@@ -65,7 +65,6 @@ public:
 		}
 	}
 
-	unsigned get_value();
 	bool evaluate();
 	Value_type get_type() { return symbol->get_type(); }
 	string get_symbol() { return symbol->name; }
@@ -115,7 +114,6 @@ public:
 
 	string get_symbol() { return expression->get_symbol(); }
 	bool evaluate();
-	unsigned get_value();
 	Value_type get_type();
 
 	string to_string();
@@ -137,7 +135,6 @@ public:
 	}
 
 	string get_symbol();
-	unsigned get_value();
 	bool evaluate();
 	Value_type get_type();
 
