@@ -32,14 +32,14 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
      [label] [instruction | direcive] “EOL” .
 
    directive =
-     ( “.section” symbol )
+     ( “.section” identifier )
      | “.text”
      | ".rodata"
      | “.data”
      | ".bss"
      | ".stack"
      | “.align” [ expression ]
-     | “.equ” symbol “,” expression )
+     | “.equ” identifier “,” expression )
      | ( “.byte” | “.word” ) expression { “,” expression }
      | “.space” expression [ “,” expression ] )
      | ( “.ascii” | “.asciz” ) string { “,” string } .
@@ -61,7 +61,7 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
      | “msr” psw “," reg0-15
      | “mrs” reg0-15 “,” psw
      | ( “bzs” | “beq” | “bzc” | “bne” | “bcs” | “blo” | “bcc” | “bhs”
-     | “blt” | “bge” | “bl” | “b” ) symbol
+     | “blt” | “bge” | “bl” | “b” ) expression
      | “movs pc, lr” .
 
    reg0-7 = “r0” | “r1” | “r2” | “r3” | “r4” | “r5” | “r6” | “r7” .
@@ -123,7 +123,7 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
 
    primary_expression = literal | identifier | “(” expression “)” .
 
-   identifier = (alphabet | “_”) { alphabet | number | “_” }.
+   identifier = ("." | alphabet | “_”) { "." | alphabet | number | “_” }.
 
    label =  identifier “:” .
 
@@ -145,13 +145,12 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
 
    alphabet = “a” | ... | “z” | “A” | ... | “Z” .
 
-   symbol = “[” | “]” | “{” | “}” | “(” | “)” | “<” | “>”
+   character = alphabet | decimal_digit 
+     | “[” | “]” | “{” | “}” | “(” | “)” | “<” | “>”
      | “=” | “|” | “&” | “%” | “$” | “#” | “/” | “?” | “!” | “_” | “*”
      | “\b” | “\t” | “\n” | “\f” | “\r” | “\\” | “\"” | “\'”
      | ( “\” ( decimal | hexadecimal | octal | binary ) ) .
-
-   character = alphabet | decimal_digit | symbol .
-
+   
    string = “\”” character { character } “\”” .
 
    “EOL” = control character for end of line
