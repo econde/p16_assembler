@@ -23,37 +23,37 @@ podem ser escritos em letras maiúsculas ou minúsculas (*case insensitive* [#f1
       :widths: auto
       :name: instrucoes_p16
 
-      +------------------------------+--------------------------------+---------------------------+
-      | ``ldr   rd, label``          | ``add     rd, rn, rm``         | ``and  rd, rn, rm``       |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``pop   rd``                 | ``sub     rd, rn, rm``         | ``orr  rd, rn, rm``       |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``push  rs``                 | ``adc     rd, rn, rm``         | ``eor  rd, rn, rm``       |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``ldr   rd, [rn, constant]`` | ``sbc     rd, rn, rm``         | ``mvn  rd, rs``           |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``ldrb  rd, [rn, constant]`` | ``add     rd, rn, constant``   | ``lsl  rd, rn, constant`` |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``ldr   rd, [rn, rm]``       | ``sub     rd, rn, constant``   | ``lsr  rd, rn, constant`` |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``ldrb  rd, [rn, rm]``       | ``cmp     rn, rm``             | ``asr  rd, rn, constant`` |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``str   rs, [rn, constant]`` | ``bzs/beq label``              | ``ror  rd, rn, constant`` |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``strb  rs, [rn, constant]`` | ``bzc/bne label``              | ``rrx  rd, rn``           |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``str   rs, [rn, rm]``       | ``bcs/blo label``              | ``mov  rd, rs``           |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``strb  rs, [rn, rm]``       | ``bcc/bhs label``              | ``movs pc, lr``           |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``msr   cpsr, rs``           | ``bge     label``              | ``mov  rd, constant``     |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``msr   spsr, rs``           | ``blt     label``              | ``movt rd, constant``     |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``mrs   rd, cpsr``           | ``b       label``              |                           |
-      +------------------------------+--------------------------------+---------------------------+
-      | ``mrs   rd, spsr``           | ``bl      label``              |                           |
-      +------------------------------+--------------------------------+---------------------------+
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``ldr   rd, label``           | ``add     rd, rn, rm``         | ``and  rd, rn, rm``        |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``pop   rd``                  | ``sub     rd, rn, rm``         | ``orr  rd, rn, rm``        |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``push  rs``                  | ``adc     rd, rn, rm``         | ``eor  rd, rn, rm``        |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``ldr   rd, [rn, #constant]`` | ``sbc     rd, rn, rm``         | ``mvn  rd, rs``            |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``ldrb  rd, [rn, #constant]`` | ``add     rd, rn, constant``   | ``lsl  rd, rn, #constant`` |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``ldr   rd, [rn, rm]``        | ``sub     rd, rn, constant``   | ``lsr  rd, rn, #constant`` |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``ldrb  rd, [rn, rm]``        | ``cmp     rn, rm``             | ``asr  rd, rn, #constant`` |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``str   rs, [rn, #constant]`` | ``bzs/beq label``              | ``ror  rd, rn, #constant`` |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``strb  rs, [rn, #constant]`` | ``bzc/bne label``              | ``rrx  rd, rn``            |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``str   rs, [rn, rm]``        | ``bcs/blo label``              | ``mov  rd, rs``            |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``strb  rs, [rn, rm]``        | ``bcc/bhs label``              | ``movs pc, lr``            |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``msr   cpsr, rs``            | ``bge     label``              | ``mov  rd, #constant``     |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``msr   spsr, rs``            | ``blt     label``              | ``movt rd, #constant``     |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``mrs   rd, cpsr``            | ``b       label``              |                            |
+      +-------------------------------+--------------------------------+----------------------------+
+      | ``mrs   rd, spsr``            | ``bl      label``              |                            |
+      +-------------------------------+--------------------------------+----------------------------+
 
 .. rubric:: *Label*
 
@@ -63,7 +63,7 @@ precede-se essa instrução ou variável de uma *label*.
 .. code-block:: console
 
    cycle:
-           sub	r0, r0, 1
+           sub	r0, r0, #1
            . . .
            b 	cycle
 
@@ -261,6 +261,152 @@ Em geral, na composição de símbolos usam-se as seguintes convenções:
 
    - na diretiva ``.equ``, letras maiúsculas
      e o carácter ``'_'`` na separação de palavras em símbolos compostos.
+
+Expressões
+----------
+Os parâmetros constantes das instruções ou diretivas são definidos através de expressões.
+Estas podem ser valores numéricos simples ou expressões envolvendo vários operadores.
+
+**O valor de uma expressão é um valor relativos (conjunto Z), expresso a 16 bits em código de complemento para 2**.
+
+Exemplos de expressões: ::
+
+   mov    r0, #3
+   movt   r0, #((1 << 13) >> 8)
+
+   .word  1000 / 2 + 56
+
+As expressões podem conter símbolos definidos com diretiva ``.equ`` com base noutra expressão.
+
+Exemplo de expressão com símbolos: ::
+
+   .equ   MASK, 1 << 4
+   .equ   VALUE, 2055
+
+   mov    r0, #VALUE & MASK
+
+Operadores aritméticos
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. table:: Operadores aritméticos
+   :widths: 8 12
+   :name: operadores_aritmeticos
+
+   +------------+----+--------------------------+
+   | Binários   | \+ | adição                   |
+   |            +----+--------------------------+
+   |            | \- | subtração                |
+   |            +----+--------------------------+
+   |            | \* | multiplicação            |
+   |            +----+--------------------------+
+   |            | \/ | divisão                  |
+   |            +----+--------------------------+
+   |            | \% | resto da divisão inteira |
+   +------------+----+--------------------------+
+   | Unários    | \+ | valor positivo           |
+   |            +----+--------------------------+
+   |            | \- | valor negativo           |
+   +------------+----+--------------------------+
+
+Operadores relacionais
+^^^^^^^^^^^^^^^^^^^^^^
+.. table:: Operadores relacionais
+   :widths: 8 12
+   :name: operadores_relacionais
+   
+   +------------+-----+--------------------------+
+   | Ordem      | \<  | menor que                |
+   |            +-----+--------------------------+
+   |            | \<= | menor ou igual que       |
+   |            +-----+--------------------------+
+   |            | \>  | maior que                |
+   |            +-----+--------------------------+
+   |            | \>= | maior ou igual que       |
+   +------------+-----+--------------------------+
+   | Igualdade  | \== | igual a                  |
+   |            +-----+--------------------------+
+   |            | \!= | diferente de             |
+   +------------+-----+--------------------------+
+
+Os operadores relacionais produzem valores booleanos.
+O valor booleando **verdadeiro** é representado como o valor inteiro um,
+e o valor booleando **falso** é representado como o valor inteiro zero.
+
+Na seguinte instrução, o registo destino (R0) é afetado com o valor um. ::
+
+	mov    r0, #3 == (5 - 2)
+	
+
+Operadores lógicos
+^^^^^^^^^^^^^^^^^^
+.. table:: Operadores lógicos
+   :widths: 8 12
+   :name: operadores_lógicos
+   
+   +------------+-----+--------------------------+
+   | Binários   | \&& | conjunção                |
+   |            +-----+--------------------------+
+   |            | \|| | disjunção                |
+   +------------+-----+--------------------------+
+   | Unário     | \!  | negação                  |
+   +------------+-----+--------------------------+
+Nestas operações os operandos são valores numéricos encarados como valores booleanos.
+Um valor numérico zero é encarado como **falso**
+e um valor numérico diferente de zero é encarado como **verdadeiro**.
+
+Na seguinte instrução, o registo destino (R0) é afetado com o valor um.
+Ambos os valores, 4 e 2,
+são encarados como valores **booleanos** verdadeiro,
+por serem diferentes de zero::
+
+	mov    r0, #4 && 2
+
+
+Operadores *bit-a-bit*
+^^^^^^^^^^^^^^^^^^^^^^
+.. table:: Operadores *bit-a-bit*
+   :widths: 8 12
+   :name: operadores_bit_a_bit
+   
+   +------------+-----+-----------------------------+
+   | Binários   | \&  | conjunção (*and*)           |
+   |            +-----+-----------------------------+
+   |            | \|  | disjunção (*or*)            |
+   |            +-----+-----------------------------+
+   |            | \^  | disjunção exclusiva (*xor*) |
+   +------------+-----+-----------------------------+
+   | Unário     | \~  | negação                     |
+   +------------+-----+-----------------------------+
+
+Nestas operações, cada *bit* de um operando
+é operado com o *bit* da mesma posição do outro operando.
+
+Na seguinte instrução, o registo destino (R0) é afetado com o valor 6. ::
+
+	mov    r0, #7 & 0b1110
+
+Operadores deslocamento
+^^^^^^^^^^^^^^^^^^^^^^^
+.. table:: Operadores deslocamento
+   :widths: 8 12
+   :name: operadores_deslocamento
+   
+   +------+-----------------------------+
+   | \<<  | deslocar para a esquerda    |
+   +------+-----------------------------+
+   | \>>  | deslocar para a direita     |
+   +------+-----------------------------+
+
+Operador condicional
+^^^^^^^^^^^^^^^^^^^^
+Este operador tem o mesmo significado que na linguagem C. ::
+
+   condition_expression ? true_expression : false_expression 
+
+O valor produzido por este operador é igual ao da expressão ``true_expression``,
+se o valor de ``condition_expression`` for avaliado como verdadeiro
+ou é igual ao da expressão ``false_expression``
+se o valor de ``condition_expression`` for avaliado como falso. 
 
 Contador de localização
 -----------------------
