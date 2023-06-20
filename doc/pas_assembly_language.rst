@@ -23,37 +23,37 @@ podem ser escritos em letras maiúsculas ou minúsculas (*case insensitive* [#f1
       :widths: auto
       :name: instrucoes_p16
 
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``ldr   rd, label``           | ``add     rd, rn, rm``         | ``and  rd, rn, rm``        |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``pop   rd``                  | ``sub     rd, rn, rm``         | ``orr  rd, rn, rm``        |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``push  rs``                  | ``adc     rd, rn, rm``         | ``eor  rd, rn, rm``        |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``ldr   rd, [rn, #constant]`` | ``sbc     rd, rn, rm``         | ``mvn  rd, rs``            |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``ldrb  rd, [rn, #constant]`` | ``add     rd, rn, constant``   | ``lsl  rd, rn, #constant`` |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``ldr   rd, [rn, rm]``        | ``sub     rd, rn, constant``   | ``lsr  rd, rn, #constant`` |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``ldrb  rd, [rn, rm]``        | ``cmp     rn, rm``             | ``asr  rd, rn, #constant`` |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``str   rs, [rn, #constant]`` | ``bzs/beq label``              | ``ror  rd, rn, #constant`` |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``strb  rs, [rn, #constant]`` | ``bzc/bne label``              | ``rrx  rd, rn``            |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``str   rs, [rn, rm]``        | ``bcs/blo label``              | ``mov  rd, rs``            |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``strb  rs, [rn, rm]``        | ``bcc/bhs label``              | ``movs pc, lr``            |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``msr   cpsr, rs``            | ``bge     label``              | ``mov  rd, #constant``     |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``msr   spsr, rs``            | ``blt     label``              | ``movt rd, #constant``     |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``mrs   rd, cpsr``            | ``b       label``              |                            |
-      +-------------------------------+--------------------------------+----------------------------+
-      | ``mrs   rd, spsr``            | ``bl      label``              |                            |
-      +-------------------------------+--------------------------------+----------------------------+
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``ldr   rd, label``           | ``add     rd, rn, rm``          | ``and  rd, rn, rm``        |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``pop   rd``                  | ``sub     rd, rn, rm``          | ``orr  rd, rn, rm``        |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``push  rs``                  | ``adc     rd, rn, rm``          | ``eor  rd, rn, rm``        |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``ldr   rd, [rn, #constant]`` | ``sbc     rd, rn, rm``          | ``mvn  rd, rs``            |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``ldrb  rd, [rn, #constant]`` | ``add     rd, rn, #constant``   | ``lsl  rd, rn, #constant`` |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``ldr   rd, [rn, rm]``        | ``sub     rd, rn, #constant``   | ``lsr  rd, rn, #constant`` |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``ldrb  rd, [rn, rm]``        | ``cmp     rn, rm``              | ``asr  rd, rn, #constant`` |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``str   rs, [rn, #constant]`` | ``bzs/beq label``               | ``ror  rd, rn, #constant`` |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``strb  rs, [rn, #constant]`` | ``bzc/bne label``               | ``rrx  rd, rn``            |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``str   rs, [rn, rm]``        | ``bcs/blo label``               | ``mov  rd, rs``            |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``strb  rs, [rn, rm]``        | ``bcc/bhs label``               | ``movs pc, lr``            |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``msr   cpsr, rs``            | ``bge     label``               | ``mov  rd, #constant``     |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``msr   spsr, rs``            | ``blt     label``               | ``movt rd, #constant``     |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``mrs   rd, cpsr``            | ``b       label``               |                            |
+      +-------------------------------+---------------------------------+----------------------------+
+      | ``mrs   rd, spsr``            | ``bl      label``               |                            |
+      +-------------------------------+---------------------------------+----------------------------+
 
 .. rubric:: *Label*
 
@@ -248,6 +248,10 @@ na linha anterior à da instrução ou variável a que se refere.
 
 .. rubric:: .equ
 
+..
+   Um símbolo definido com a diretiva ``.equ``
+   tem um domínio de valores na gama :math:`-2^{16 - 1}` e :math:`+2^{16 - 1} - 1`.
+
 No exemplo seguinte, a directiva ``.equ`` define o símbolo ``MODE_MASK``
 equivalente ao valor binário ``1110``.
 
@@ -255,7 +259,7 @@ equivalente ao valor binário ``1110``.
 
    	.equ	MODE_MASK, 0b00001110
 
-Em geral, na composição de símbolos usam-se as seguintes convenções:
+Em geral, na composição léxica de símbolos usam-se as seguintes convenções:
    - na *label*, letras minúsculas
      e o carácter ``'_'`` na separação de palavras em símbolos compostos.
 
@@ -267,7 +271,9 @@ Expressões
 Os parâmetros constantes das instruções ou diretivas são definidos através de expressões.
 Estas podem ser valores numéricos simples ou expressões envolvendo vários operadores.
 
-**O valor de uma expressão é um valor relativos (conjunto Z), expresso a 16 bits em código de complemento para 2**.
+**O valor de uma expressão é um número relativo (conjunto Z).
+Ao nível do cálculo do valor das expressões, é representado pelo tipo int da linguagem C++.
+Numa máquina de arquitetura x86_64 é representado a 32 bits em código de complementos para 2**.
 
 Exemplos de expressões: ::
 
