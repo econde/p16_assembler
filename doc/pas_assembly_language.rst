@@ -271,9 +271,8 @@ Expressões
 Os parâmetros constantes das instruções ou diretivas são definidos através de expressões.
 Estas podem ser valores numéricos simples ou expressões envolvendo vários operadores.
 
-**O valor de uma expressão é um número relativo (conjunto Z).
-Ao nível do cálculo do valor das expressões, é representado pelo tipo int da linguagem C++.
-Numa máquina de arquitetura x86_64 é representado a 32 bits em código de complementos para 2**.
+O valor de uma expressão ou sub-expressão é um número natural (conjunto N)
+no domínio :math:`0` a :math:`2^{16} - 1`.
 
 Exemplos de expressões: ::
 
@@ -282,7 +281,8 @@ Exemplos de expressões: ::
 
    .word  1000 / 2 + 56
 
-As expressões podem conter símbolos definidos com diretiva ``.equ`` com base noutra expressão.
+As expressões podem conter símbolos definidos com a diretiva ``.equ``
+com base noutra expressão.
 
 Exemplo de expressão com símbolos: ::
 
@@ -290,6 +290,23 @@ Exemplo de expressão com símbolos: ::
    .equ   VALUE, 2055
 
    mov    r0, #VALUE & MASK
+
+No cálculo das expressões, o resultado de cada operação é avaliado.
+Se a sua magnitude for inferior a :math:`2^{16}` (não codificável a 16 *bits*),
+é emitida uma mensagem de aviso.
+
+No caso da subtração ou da operação unária negativo,
+um suposto resultado negativo com magnitude inferior a :math:`2^{16}`
+é tratado como um resultado correto.
+
+Por exemplo a expressão **-1** é codificada da mesma forma que a expressão **0xffff**.
+
+No seguinte exemplo, ambas as instruções carregam o valor **Oxff** em R0.
+
+::
+
+   mov	r0, #-1 >> 8
+   mov	r0, #0xffff >> 8
 
 Operadores aritméticos
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -335,10 +352,10 @@ Operadores relacionais
    +------------+-----+--------------------------+
 
 Os operadores relacionais produzem valores booleanos.
-O valor booleando **verdadeiro** é representado como o valor inteiro um,
-e o valor booleando **falso** é representado como o valor inteiro zero.
+O valor booleando **verdadeiro** é representado como o valor inteiro **1**,
+e o valor booleando **falso** é representado como o valor inteiro **0**.
 
-Na seguinte instrução, o registo destino (R0) é afetado com o valor um. ::
+Na seguinte instrução, o registo destino (R0) é afetado com o valor 1. ::
 
 	mov    r0, #3 == (5 - 2)
 	
@@ -360,7 +377,7 @@ Nestas operações os operandos são valores numéricos encarados como valores b
 Um valor numérico zero é encarado como **falso**
 e um valor numérico diferente de zero é encarado como **verdadeiro**.
 
-Na seguinte instrução, o registo destino (R0) é afetado com o valor um.
+Na seguinte instrução, o registo destino (R0) é afetado com o valor 1.
 Ambos os valores, 4 e 2,
 são encarados como valores **booleanos** verdadeiro,
 por serem diferentes de zero::
@@ -402,6 +419,11 @@ Operadores deslocamento
    +------+-----------------------------+
    | \>>  | deslocar para a direita     |
    +------+-----------------------------+
+
+A operação \<< insere zero na posição de menor peso do resultado.
+
+Como os valores são encarados como números naturais,
+a operação \>> insere sempre zero na posição de maior peso do resultado.
 
 Operador condicional
 ^^^^^^^^^^^^^^^^^^^^

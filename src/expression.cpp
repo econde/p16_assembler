@@ -17,6 +17,7 @@ limitations under the License.
 #include <assert.h>
 #include "p16.h"
 #include "p16_parser.hpp"
+#include "utils.h"
 
 namespace ast {
 
@@ -71,6 +72,15 @@ namespace ast {
 		}
 	}
 
+	bool Value::evaluate() {
+		if ((abs(value ) & ~MAKE_MASK(16, 0)) != 0) {
+			warning_report(&location,	string_printf("value = %d (0x%x) not encodable in a %d bit word",
+					value, value, 16));
+			return false;
+		}
+		return true;
+	}
+
 	bool Identifier::evaluate() {
 		auto symbol_type = symbol->get_type();
 		if (symbol_type == UNDEFINED) {
@@ -114,6 +124,11 @@ namespace ast {
 				break;
 			case EXCLAMATION:
 				value = !expression->get_value();
+		}
+		if ((abs(value) & ~MAKE_MASK(16, 0)) != 0) {
+			warning_report(&location,	string_printf("value = %d (0x%x) not encodable in a %d bit word",
+					value, value, 16));
+			return false;
 		}
 		return true;
 	}
@@ -211,8 +226,7 @@ namespace ast {
 				case ASTERISK:
 					value = left_value * right_value;
 					type = ABSOLUTE;
-					return true;
-
+					break;
 				case SLASH:
 					if (right_value == 0) {
 						error_report(&expression_right->location, "Division by zero");
@@ -221,7 +235,7 @@ namespace ast {
 					}
 					value = left_value / right_value;
 					type = ABSOLUTE;
-					return true;
+					break;
 				case PERCENT:
 					if (right_value == 0) {
 						error_report(&expression_right->location, "Division by zero");
@@ -230,39 +244,42 @@ namespace ast {
 					}
 					value = left_value % right_value;
 					type = ABSOLUTE;
-					return true;
-
+					break;
 				case SHIFT_LEFT:
 					value = left_value << right_value;
 					type = ABSOLUTE;
-					return true;
+					break;
 				case SHIFT_RIGHT:
 					value = left_value >> right_value;
 					type = ABSOLUTE;
-					return true;
-
+					break;
 				case AMPERSAND:
 					value = left_value & right_value;
 					type = ABSOLUTE;
-					return true;
+					break;
 				case CIRCUMFLEX:
 					value = left_value ^ right_value;
 					type = ABSOLUTE;
-					return true;
+					break;
 				case PIPE:
 					value = left_value | right_value;
 					type = ABSOLUTE;
-					return true;
-
+					break;
 				case AMPERSAND_AMPERSAND:
 					value = left_value != 0 && 0 != right_value ? 1 : 0;
 					type = ABSOLUTE;
-					return true;
+					break;
 				case PIPE_PIPE:
 					value = left_value != 0 || 0 != right_value ? 1 : 0;
 					type = ABSOLUTE;
-					return true;
+					break;
 			}
+			if ((abs(value) & ~MAKE_MASK(16, 0)) != 0) {
+				warning_report(&location,	string_printf(" result value = %d (0x%x) not encodable in a %d bit word",
+					value, value, 16));
+				return false;
+			}
+			return true;
 		}
 		if (operation == PLUS) {
 			if (left_type == LABEL && right_type == LABEL) {
@@ -276,6 +293,11 @@ namespace ast {
 				else
 					type = ABSOLUTE;
 				value = left_value + right_value;
+				if ((abs(value) & ~MAKE_MASK(16, 0)) != 0) {
+					error_report(&location,	string_printf(" result value = %d (0x%x) not encodable in a %d bit word",
+						value, value, 16));
+					return false;
+				}
 				return true;
 			}
 		}
@@ -293,6 +315,11 @@ namespace ast {
 			else
 				type = ABSOLUTE;
 			value = left_value - right_value;
+			if ((abs(value) & ~MAKE_MASK(16, 0)) != 0) {
+				warning_report(&location,	string_printf(" result value = %d (0x%x) not encodable in a %d bit word",
+					value, value, 16));
+				return false;
+			}
 			return true;
 		}
 		if (operation == EQUAL_EQUAL || operation == NOT_EQUAL
@@ -315,27 +342,27 @@ namespace ast {
 			}
 			switch(operation) {
 				case LESSER:
-					value = left_value - right_value < 0 ? 1 : 0;
+					value = left_value - right_value < 0;
 					type = ABSOLUTE;
 					return true;
 				case GREATER:
-					value = left_value - right_value > 0 ? 1 : 0;
+					value = left_value - right_value > 0;
 					type = ABSOLUTE;
 					return true;
 				case LESSER_EQUAL:
-					value = left_value - right_value <= 0 ? 1 : 0;
+					value = left_value - right_value <= 0;
 					type = ABSOLUTE;
 					return true;
 				case GREATER_EQUAL:
-					value = left_value - right_value >= 0 ? 1 : 0;
+					value = left_value - right_value >= 0;
 					type = ABSOLUTE;
 					return true;
 				case EQUAL_EQUAL:
-					value = left_value - right_value == 0 ? 1 : 0;
+					value = left_value - right_value == 0;
 					type = ABSOLUTE;
 					return true;
 				case NOT_EQUAL:
-					value = left_value - right_value != 0 ? 1 : 0;
+					value = left_value - right_value != 0;
 					type = ABSOLUTE;
 					return true;
 			}

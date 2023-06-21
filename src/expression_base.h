@@ -40,7 +40,7 @@ namespace ast {
 
 		virtual std::string to_string() = 0;
 
-		int get_value() { return value; }
+		uint16_t get_value() { return value; }
 		Value_type get_type() { return type; }
 
 		virtual bool evaluate() = 0;

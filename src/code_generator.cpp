@@ -154,11 +154,7 @@ void Code_generator::visit(Load_store_indirect *s) {
 					code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
 				}
 				else {
-					if ((constant_value & 1) != 0)
-						warning_report(&s->constant->location, string_printf(
-							"Expression's value = %d (0x%x) must be an even value", constant_value, constant_value));
-					constant_value /= 2;
-					if ((constant_value & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
+					if (((constant_value / 2) & ~MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) != 0) {
 						warning_report(&s->constant->location,
 								string_printf( "Expression's value / 2 = %d (0x%x) not encodable in %d bit,"
 												"truncate to %d (0x%x)",
@@ -166,6 +162,10 @@ void Code_generator::visit(Load_store_indirect *s) {
 												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0),
 												constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)));
 					}
+					if ((constant_value & 1) != 0)
+						warning_report(&s->constant->location, string_printf(
+							"Expression's value = %d (0x%x) must be an even value", constant_value, constant_value));
+					constant_value /= 2;
 					code |= ((constant_value & MAKE_MASK(LDR_STR_INDIRECT_CONST_INDEX_SIZE, 0)) << LDR_STR_INDIRECT_CONST_INDEX_POSITION);
 				}
 			}
@@ -452,12 +452,6 @@ void Code_generator::visit(Push_pop *s) {
 void Code_generator::visit(Equ *e) {
 	if (e->symbol->type == UNDEFINED && e->symbol->value_expression != nullptr) {
 		e->symbol->value_expression->evaluate(); 	//	Valor ainda não avaliado
-		unsigned value = e->symbol->value_expression->get_value();
-		if ((abs(static_cast<int>(value)) & ~MAKE_MASK(16, 0)) != 0) {
-			error_report(&e->symbol->value_expression->location,
-				string_printf(".equ value = %d (0x%x) not encodable in a %d bit word",
-					value, value, 16));
-		}
 		e->symbol->type = e->symbol->value_expression->get_type();
 	}
 }

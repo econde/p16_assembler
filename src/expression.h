@@ -37,7 +37,7 @@ public:
 		: Expression {location, value, Value_type::ABSOLUTE} { }
 	~Value() { }
 
-	bool evaluate() { return true; }
+	bool evaluate();
 
 	string get_symbol() { return string(); }	//	string vazia
 
