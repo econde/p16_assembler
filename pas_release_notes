@@ -1,3 +1,8 @@
+V1.4.3
+- Melhoramentos no manual.
+- Melhoramentos nas mensagens de erro.
+- Remoção de incoerências no cálculo de expressões.
+
 V1.4.2
 - Correção de erro na expressão regular da opção -s 
 - Correção de erro no operador unário +
