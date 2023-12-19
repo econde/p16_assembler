@@ -28,27 +28,27 @@ class Conditional_expression;
 
 class Statement_empty;
 
-class Load_relative;
-class Load_store_indirect;
-class Branch;
-class Arith;
-class Compare;
-class Logic;
-class Not;
-class Shift;
-class Rrx;
-class Move;
-class Moves;
-class Msr;
-class Mrs;
-class Push_pop;
+class Inst_load_relative;
+class Inst_load_store_indirect;
+class Inst_branch;
+class Inst_arith;
+class Inst_compare;
+class Inst_logic;
+class Inst_not;
+class Inst_shift;
+class Inst_rrx;
+class Inst_mov;
+class Inst_movs;
+class Inst_msr;
+class Inst_mrs;
+class Inst_push_pop;
 
-class DSection;
-class Byte;
-class Ascii;
-class Space;
-class Equ;
-class Align;
+class Dir_section;
+class Dir_byte;
+class Dir_ascii;
+class Dir_space;
+class Dir_equ;
+class Dir_align;
 
 }
 
@@ -57,27 +57,29 @@ public:
 	virtual ~Visitor() { }
 	virtual void visit(ast::Statement_empty *) = 0;
 
-	virtual void visit(ast::Load_relative *) = 0;
-	virtual void visit(ast::Load_store_indirect *) = 0;
-	virtual void visit(ast::Branch *) = 0;
-	virtual void visit(ast::Arith *) = 0;
-	virtual void visit(ast::Compare *) = 0;
-	virtual void visit(ast::Logic *) = 0;
-	virtual void visit(ast::Not *) = 0;
-	virtual void visit(ast::Shift *) = 0;
-	virtual void visit(ast::Rrx *) = 0;
-	virtual void visit(ast::Move *) = 0;
-	virtual void visit(ast::Moves *) = 0;
-	virtual void visit(ast::Msr *) = 0;
-	virtual void visit(ast::Mrs *) = 0;
-	virtual void visit(ast::Push_pop *) = 0;
+	virtual void visit(ast::Inst_load_relative *) = 0;
+	virtual void visit(ast::Inst_load_store_indirect *) = 0;
+	virtual void visit(ast::Inst_branch
+ *) = 0;
+	virtual void visit(ast::Inst_arith
+ *) = 0;
+	virtual void visit(ast::Inst_compare *) = 0;
+	virtual void visit(ast::Inst_logic *) = 0;
+	virtual void visit(ast::Inst_not *) = 0;
+	virtual void visit(ast::Inst_shift *) = 0;
+	virtual void visit(ast::Inst_rrx *) = 0;
+	virtual void visit(ast::Inst_mov *) = 0;
+	virtual void visit(ast::Inst_movs *) = 0;
+	virtual void visit(ast::Inst_msr *) = 0;
+	virtual void visit(ast::Inst_mrs *) = 0;
+	virtual void visit(ast::Inst_push_pop *) = 0;
 
-	virtual void visit(ast::DSection *) = 0;
-	virtual void visit(ast::Byte *) = 0;
-	virtual void visit(ast::Ascii *) = 0;
-	virtual void visit(ast::Space *) = 0;
-	virtual void visit(ast::Equ *) = 0;
-	virtual void visit(ast::Align *) = 0;
+	virtual void visit(ast::Dir_section *) = 0;
+	virtual void visit(ast::Dir_byte *) = 0;
+	virtual void visit(ast::Dir_ascii *) = 0;
+	virtual void visit(ast::Dir_space *) = 0;
+	virtual void visit(ast::Dir_equ *) = 0;
+	virtual void visit(ast::Dir_align *) = 0;
 
 	virtual void visit(ast::Value *) = 0;
 	virtual void visit(ast::Identifier *) = 0;

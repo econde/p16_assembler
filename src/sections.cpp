@@ -30,14 +30,16 @@ using namespace std;
 
 #define	CHUNK	1024
 
-void Section::enlarge(unsigned new_capacity) {
+void Section::enlarge(unsigned new_capacity)
+{
 	new_capacity = ((new_capacity + CHUNK - 1) / CHUNK) * CHUNK;
 	content = (uint8_t *)realloc(content, new_capacity);
-	assert(content != nullptr);	//	throw exception
+	assert(content != nullptr);	// throw exception
 	content_capacity = new_capacity;
 }
 
-void Section::write8(unsigned offset, uint8_t value) {
+void Section::write8(unsigned offset, uint8_t value)
+{
 	auto limit_superior = offset + 1;
 	if (limit_superior > content_capacity)
 		enlarge(limit_superior);
@@ -46,7 +48,8 @@ void Section::write8(unsigned offset, uint8_t value) {
 		content_size = offset + 1;
 }
 
-void Section::write16(unsigned offset, uint16_t value) {
+void Section::write16(unsigned offset, uint16_t value)
+{
 	auto limit_superior = offset + 2;
 	if (limit_superior > content_capacity)
 		enlarge(limit_superior);
@@ -56,7 +59,8 @@ void Section::write16(unsigned offset, uint16_t value) {
 		content_size = offset + 2;
 }
 
-void Section::write32(unsigned offset, uint32_t value) {
+void Section::write32(unsigned offset, uint32_t value)
+{
 	auto limit_superior = offset + 4;
 	if (limit_superior > content_capacity)
 		enlarge(limit_superior);
@@ -68,7 +72,8 @@ void Section::write32(unsigned offset, uint32_t value) {
 		content_size = offset + 4;
 }
 
-void Section::write_block(unsigned offset, const uint8_t *data, unsigned size) {
+void Section::write_block(unsigned offset, const uint8_t *data, unsigned size)
+{
 	auto limit_superior = offset + size;
 	while (limit_superior > content_capacity)
 		enlarge(limit_superior);
@@ -77,7 +82,8 @@ void Section::write_block(unsigned offset, const uint8_t *data, unsigned size) {
 		content_size += limit_superior - content_size;
 }
 
-void Section::fill(unsigned offset, uint8_t b, unsigned size) {
+void Section::fill(unsigned offset, uint8_t b, unsigned size)
+{
 	auto limit_superior = offset + size;
 	while (limit_superior > content_capacity)
 		enlarge(limit_superior);
@@ -86,13 +92,15 @@ void Section::fill(unsigned offset, uint8_t b, unsigned size) {
 		content_size += limit_superior - content_size;
 }
 
-uint8_t Section::read8(unsigned offset) {
+uint8_t Section::read8(unsigned offset)
+{
 	if (offset < content_size)
 		return *(content + offset);
 	return 0x55;
 }
 
-uint16_t Section::read16(unsigned offset) {
+uint16_t Section::read16(unsigned offset)
+{
 	uint16_t byte0 = 0x55, byte1 = 0x55;
 	if (offset < content_size)
 		byte0 = *(content + offset);
@@ -101,7 +109,8 @@ uint16_t Section::read16(unsigned offset) {
 	return (byte1 << 8) + byte0;
 }
 
-uint32_t Section::read32(unsigned offset) {
+uint32_t Section::read32(unsigned offset)
+{
 	uint32_t byte0 = 0x55, byte1 = 0x55, byte2 = 0x55, byte3 = 0x55;
 	if (offset < content_size)
 		byte0 = *(content + offset);
@@ -114,7 +123,8 @@ uint32_t Section::read32(unsigned offset) {
 	return (byte3 << 24) + (byte2 << 16) + (byte1 << 8) + byte0;
 }
 
-void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size) {
+void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size)
+{
 	if (offset >= content_capacity)
 		memset(buffer, 0x55, size);
 	else if (offset + size > content_capacity) {
@@ -130,18 +140,21 @@ void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size) {
 //-----------------------------------------------------------------------------
 
 vector<Section*> Sections::table;
+
 list<Section*> Sections::list;
 
 Section *Sections::current_section = nullptr;
 
-void Sections::deallocate() {
+void Sections::deallocate()
+{
 	for (auto s: table) {
 		free(s->content);
 		delete s;
 	}
 }
 
-void Sections::set_section(std::string section_name) {
+void Sections::set_section(std::string section_name)
+{
 	unsigned section_flags = 0;
 	if (section_name == ".bss")
 		section_flags = Section::BSS;
@@ -165,24 +178,26 @@ void Sections::set_section(std::string section_name) {
 	for (section_number = 0; section_number < table.size(); ++section_number)
 		if (section_name == table.at(section_number)->name) {
 			current_section = table.at(section_number);
-			return;	/*	Já existe */
+			return;	/* A secção já existe */
 		}
-	/* Nova secção */
+	/* Cria a nova secção */
 	table.push_back(new Section {section_name, section_number, section_flags});
 	current_section = table.back();
 }
 
-void Sections::listing(std::ostream& lst_file) {
+void Sections::listing(std::ostream& lst_file)
+{
 	lst_file << "Sections\n";
 	ostream_printf(lst_file, "%-8s%-16s%-10s%s\n", "Index", "Name", "Address", "Size");
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04X      %04X %d\n", i,
-						table[i]->name.c_str(), table[i]->base_address,
-						table[i]->content_size, table[i]->content_size);
+				table[i]->name.c_str(), table[i]->base_address,
+				table[i]->content_size, table[i]->content_size);
 	}
 }
 
-bool Sections::address_is_free(Section *s) {
+bool Sections::address_is_free(Section *s)
+{
 	auto iter = list.begin();
 	for (; iter != list.end(); ++iter) {
 		Section *r = *iter;
@@ -196,7 +211,8 @@ bool Sections::address_is_free(Section *s) {
 	return true;
 }
 
-void Sections::locate(Properties<string, unsigned> *section_addresses) {
+void Sections::locate(Properties<string, unsigned> *section_addresses)
+{
 	auto current_address = 0;
 	for (size_t i = 0; i < table.size(); ++i) {
 		Section *section = table[i];
@@ -204,12 +220,12 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 		if ( !address_is_free(section)) {
 			error_report("Section \"" + section->name
 						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
-										 ", this overlap another section.\n",
-										 section->content_size, section->content_size,
-										 section->base_address, section->base_address));
-			exit(1);
+									 ", this overlap another section.\n",
+									 section->content_size, section->content_size,
+									 section->base_address, section->base_address));
+			exit(EXIT_FAILURE);
 		}
-					//	alinhar o início da secção em endereço par
+		// alinhar o início da secção em endereço par
 		current_address = align(section->base_address + section->content_size, 1);
 		if (section->content_size == 0)
 			warning_report("Section \"" + section->name + "\" is empty");
@@ -222,7 +238,8 @@ void Sections::locate(Properties<string, unsigned> *section_addresses) {
 //	address space = 64K
 static	Memory_space memory = Memory_space(4 * 1024, 64 * 1024);
 
-void Sections::fill_memory_space() {
+void Sections::load_memory_space()
+{
 	for (auto i = 0U; i < Sections::table.size(); ++i) {
 		Section *section = Sections::table.at(i);
 		if ((section->flags & Section::LOADABLE) == 0)

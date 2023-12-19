@@ -57,58 +57,54 @@ static void underline(int offset, int left, int right, const char *text) {
 	// fprintf(stderr, " %d %d %d", offset, left, right);
 }
 
-void error_report(ast::Location *location, std::string message) {
+void error_report(ast::Location *location, std::string message)
+{
 	error_count++;
-//	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
 	int lineno =  location->line - 1;
 	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
 	fprintf(stderr, "%s\n", text);
 	underline(offset, location->first_column, location->last_column, text);
 	fprintf(stderr, "\nERROR!\t");
-
 	std::cerr << message << std::endl;
 }
 
-void warning_report(ast::Location *location, std::string message) {
-//	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
+void warning_report(ast::Location *location, std::string message)
+{
 	int lineno =  location->line - 1;
 	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "\n%s (%d): ", location->unit, location->line) - 1;
 	fprintf(stderr, "%s\n", text);
 	underline(offset, location->first_column, location->last_column, text);
 	fprintf(stderr, "\nWARNING!\t");
-
 	std::cerr << message << std::endl;
-
 	warning_count++;
 }
 
-void error_report(std::string message) {
+void error_report(std::string message)
+{
 	std::cerr << std::endl << "ERROR!\t" << message << std::endl;
-
 	error_count++;
 }
 
-void warning_report(std::string message) {
+void warning_report(std::string message)
+{
 	std::cerr << std::endl << "WARNING!\t" << message << std::endl;
-
 	warning_count++;
 }
 
-void yyerror(const char *s, ...) {
+void yyerror(const char *s, ...) 
+{
 	int lineno = yylloc.first_line - (yychar != EOL ?  1 : 2);
 	const char *text = srcfile.at(lineno).c_str();
 	auto offset = fprintf(stderr, "%s (%d): ", yyfilename, yylloc.first_line);
 	fprintf(stderr, "%s\n", text);
 	underline(offset, yylloc.first_column, yylloc.last_column, text);
 	fprintf(stderr, "\nERROR!\t");
-
 	va_list ap;
 	va_start(ap, s);
 	vfprintf(stderr, s, ap);
 	fprintf(stderr, "\n");
-
 	error_count++;
-	exit(-1);
+	exit(EXIT_FAILURE);
 }

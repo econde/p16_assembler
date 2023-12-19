@@ -28,7 +28,7 @@ using namespace std;
 
 struct Directive: public Statement {
 
-	Directive(Location l) : Statement {l} { }
+	Directive(Location l) : Statement {l} {}
 	virtual void accept(Visitor *v) = 0;
 
 	virtual string listing();
@@ -38,15 +38,9 @@ struct Directive: public Statement {
 //------------------------------------------------------------------------------
 //	.section
 
-struct DSection: public Directive {
+struct Dir_section: public Directive {
 	string name;
-	DSection(string name, Location left) :
-		Directive {left}, name {name} {
-		Sections::set_section(name);
-		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
-		size_in_memory = 0;
-	}
+	Dir_section(string name, Location left);
 
 	string listing() {
 		return string_printf("%4d%11c\t", location.line, ' ');
@@ -58,47 +52,23 @@ struct DSection: public Directive {
 //------------------------------------------------------------------------------
 //	.byte .word
 
-struct Byte: public Directive {
+struct Dir_byte: public Directive {
 	list<Expression*> *value_list;
 	unsigned grain_size;
-
-	Byte(unsigned s, list<Expression*> *vl, Location left) :
-		Directive {left}, value_list {vl}, grain_size {s} {
-		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
-		size_in_memory = grain_size * value_list->size();
-		Sections::increase(section_index, size_in_memory);
-	}
-	~Byte() {
-		for (auto s: *value_list)
-			delete s;
-		delete value_list;
-	}
-
+	Dir_byte(unsigned s, list<Expression*> *vl, Location left);
+	~Dir_byte();
 	string listing();
-
 	string more_listing();
-
 	void accept(Visitor *v) { v->visit(this); }
 };
 
 //------------------------------------------------------------------------------
 //	.ascii
 
-struct Ascii: public Directive {
+struct Dir_ascii: public Directive {
 	list<string> *string_list;
-	Ascii(unsigned asciz, list<string> *sl, Location left) :
-		Directive {left}, string_list {sl} {
-		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
-		for (auto s: *string_list) {
-			Sections::append_block(Sections::current_section->number, (const uint8_t *)s.data(), s.size());
-			if (asciz)
-				Sections::append8(Sections::current_section->number, 0);
-		}
-		size_in_memory = Sections::current_section->content_size - section_offset;
-	}
-	~Ascii() { delete string_list; }
+	Dir_ascii(unsigned asciz, list<string> *sl, Location left);
+	~Dir_ascii() { delete string_list; }
 
 	string listing();
 
@@ -110,71 +80,34 @@ struct Ascii: public Directive {
 //------------------------------------------------------------------------------
 //	.space
 
-struct Space: public Directive {
+struct Dir_space: public Directive {
 	Expression *size, *initial;
-	Space (Expression *s, Expression *i, Location left) :
-		Directive {left}, size {s}, initial {i} {
-		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
-		if (size->evaluate())
-			size_in_memory = size->get_value();
-		else
-			error_report(&size->location, "Size parameter for .space directive must be defined before");
-
-		Sections::increase(section_index, size_in_memory & 0xffff);
-	}
-	~Space() { delete size; delete initial; }
-
+	Dir_space (Expression *s, Expression *i, Location left);
+	~Dir_space() { delete size; delete initial; }
 	string more_listing();
-
 	void accept(Visitor *v) { v->visit(this); }
 };
 
 //------------------------------------------------------------------------------
 //	.equ
 
-struct Equ: public Directive {
+struct Dir_equ: public Directive {
 	Symbol *symbol;
-
-	Equ(Symbol *symbol, Expression *value, Location left) :
-		Directive {left}, symbol {symbol} {
-		section_index = Sections::current_section->number;		/* Um simbolo equ não pertence a uma secção ... */
-		section_offset = Sections::current_section->content_size;
-		size_in_memory = 0;
-		symbol->set_properties(UNDEFINED, Sections::current_section->number, value);
-		Symbol *s = Symbols::search(symbol->name);
-		if (s == nullptr) {
-			Symbols::add(symbol);
-		}
-		else if (s->value_expression == nullptr) {
-			s->set_properties(UNDEFINED, Sections::current_section->number, value);
-			delete symbol;
-		}
-		else
-			error_report(&symbol->location, "Symbol \"" + symbol->name + "\" is already defined");
-	}
-
+	Dir_equ(Symbol *symbol, Expression *value, Location left);
 	string listing() {
 		return string_printf("%4d%10c\t", location.line, ' ');
 	}
-
 	void accept(Visitor *v) { v->visit(this); }
 };
 
 //------------------------------------------------------------------------------
 //	.align
 
-struct Align: public Directive {
+struct Dir_align: public Directive {
 	Expression *size;
 
-	Align (Expression *size, Location left) :
-		Directive {left}, size {size} {
-		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
-		size_in_memory = Sections::align(section_offset, size->get_value()) - section_offset;
-		Sections::increase(section_index, size_in_memory);
-	}
-	~Align() { delete size; }
+	Dir_align (Expression *size, Location left);
+	~Dir_align() { delete size; }
 
 	string listing();
 

@@ -27,7 +27,6 @@ limitations under the License.
 
 #include "code_generator.h"
 #include "relocations.h"
-#include "listing_generator.h"
 #include "version.h"
 
 using namespace std;
@@ -40,7 +39,8 @@ extern const char *yytext;
 void listing(const char *lst_filename, std::list<Statement*> *ast_root);
 void listing_load_inputfile(const char *src_filename);
 
- static void help(char *prog_name) {
+ static void help(char *prog_name)
+ {
 	ostream_printf(cout, "Usage: %s [options] <source filename>\n"
 		"options:\n"
 		"\t--verbose\n"
@@ -55,19 +55,23 @@ void listing_load_inputfile(const char *src_filename);
 		prog_name);
 }
 
-static void version() {
+static void version()
+{
 	cout << "p16as - Assembler para o P16" << endl;
 	cout << "Versão: " VERSION " (" __DATE__ ")" << endl;
-	cout << "Ezequiel Conde (ezeq@cc.isel.ipl.pt)" << endl;
+	cout << "Ezequiel Conde (ezequiel.conde@isel.pt)" << endl;
 }
-static bool validate_output_format(const char *format) {
+
+static bool validate_output_format(const char *format)
+{
 	return strcmp(format, "hexintel") == 0
 		|| strcmp(format, "binary") == 0
 		|| strcmp(format, "logisim8") == 0
 		|| strcmp(format, "logisim16") == 0;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	string input_filename, output_filename;
 	Properties<string, unsigned> section_addresses;
 	int result = 0;
@@ -217,15 +221,6 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-#if 0
-	if (verbose_flag) {
-		Symbols::print(cout);
-		cout << endl << "Evaluate symbols" << endl << endl;
-	}
-
-	Symbols::evaluate();
-#endif
-
 	if (verbose_flag) {
 		cout << endl << "Print symbols" << endl << endl;
 		Symbols::print(cout);
@@ -267,7 +262,7 @@ int main(int argc, char **argv) {
 		goto exit_error;
 	}
 
-	Sections::fill_memory_space();
+	Sections::load_memory_space();
 
 	if (verbose_flag) {
 		cout << endl << "Generate listing" << endl;
@@ -338,15 +333,6 @@ int main(int argc, char **argv) {
 		}
 	}
 
-#if 0
-	Listing_generator *listing_gen = new Listing_generator();
-
-	for (auto s: *ast_root)
-//		cout << s->to_string() << endl;
-		s->accept(listing_gen);
-
-	delete listing_gen;
-#endif
 	result = warning_count > 0 ? 2 : 0;
 
 exit_error:

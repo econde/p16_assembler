@@ -24,13 +24,11 @@ limitations under the License.
 namespace ast {
 
 	struct Expression {
-
 		Location location;
-
-		int value;			//	Valor associado à expressão
-		Value_type type;	//	Tipo associado à expressão
-		//	Estes campos apenas são atualizados no método evaluate
-
+		int value;		// Valor associado à expressão
+		Value_type type;	// Tipo associado à expressão
+		// Estes campos apenas são atualizados no método evaluate
+	
 		Expression(Location location, int value, Value_type type)
 			: location{location} , value{value}, type{type} {}
 

@@ -29,17 +29,19 @@ limitations under the License.
 
 using namespace std;
 
-static unsigned mylog2(size_t n) {
+static unsigned mylog2(size_t n)
+{
 	unsigned bits = 0;
 	while (n > 1) {
-	  bits++;
-	  n >>= 1;
+		bits++;
+		n >>= 1;
 	}
 	return bits;
 }
 
-Memory_space::Memory_space(size_t pagex_size, size_t space_size) {
-	assert((pagex_size & (pagex_size - 1)) == 0);		//	power of 2
+Memory_space::Memory_space(size_t pagex_size, size_t space_size)
+{
+	assert((pagex_size & (pagex_size - 1)) == 0);	// power of 2
 	page_size = pagex_size;
 	page_bits = mylog2(page_size);
 	page_mask = page_size - 1;
@@ -57,7 +59,8 @@ Memory_space::Memory_space(size_t pagex_size, size_t space_size) {
 	}
 }
 
-Memory_space::~Memory_space() {
+Memory_space::~Memory_space()
+{
 	for (unsigned i = 0; i < page_table_size; ++i) {
 		if (page_table[i].present)
 			free(page_table[i].data);
@@ -66,7 +69,8 @@ Memory_space::~Memory_space() {
 	free(page_table);
 }
 
-void Memory_space::read(uint32_t address, uint8_t *buffer, size_t size) {
+void Memory_space::read(uint32_t address, uint8_t *buffer, size_t size)
+{
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
 	size_t buffer_size = size;
@@ -81,14 +85,15 @@ void Memory_space::read(uint32_t address, uint8_t *buffer, size_t size) {
 	}
 }
 
-void Memory_space::write(uint32_t address, uint8_t *data, size_t size) {
+void Memory_space::write(uint32_t address, uint8_t *data, size_t size)
+{
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
 	size_t data_size = size;
 	uint8_t *data_ptr = data;
 	while ( data_size > 0 ) {
 		size_t nbytes = min(data_size, (size_t)(page_size - byte_offset));
-		if ( ! page_table[page_index].present) {
+		if (!page_table[page_index].present) {
 			page_table[page_index].data = (uint8_t*)calloc(page_size, 1);
 			page_table[page_index].present = 1;
 		}
@@ -100,7 +105,8 @@ void Memory_space::write(uint32_t address, uint8_t *data, size_t size) {
 	}
 }
 
-void Memory_space::write8(uint32_t address, uint8_t data) {
+void Memory_space::write8(uint32_t address, uint8_t data)
+{
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
 	if ( ! page_table[page_index].present) {
@@ -110,7 +116,8 @@ void Memory_space::write8(uint32_t address, uint8_t data) {
 	*(page_table[page_index].data + byte_offset) = data;
 }
 
-void Memory_space::write16(uint32_t address, uint16_t data) {
+void Memory_space::write16(uint32_t address, uint16_t data)
+{
 	if ((address & 1) != 0) {
 		write8(address, data);
 		write8(address + 1, data >> 8);
@@ -124,7 +131,8 @@ void Memory_space::write16(uint32_t address, uint16_t data) {
 	*(uint16_t*)(page_table[page_index].data + byte_offset) = data;
 }
 
-void Memory_space::write32(uint32_t address, uint32_t data) {
+void Memory_space::write32(uint32_t address, uint32_t data)
+{
 	if ((address & 3) != 0) {
 		write8(address, data);
 		write8(address + 1, data >> 8);
@@ -140,13 +148,15 @@ void Memory_space::write32(uint32_t address, uint32_t data) {
 	*(uint32_t*)(page_table[page_index].data + byte_offset) = data;
 }
 
-uint8_t Memory_space::read8(uint32_t address) {
+uint8_t Memory_space::read8(uint32_t address)
+{
 	unsigned page_index = (address >> page_bits) & page_table_mask;
 	unsigned byte_offset = address & page_mask;
 	return *(page_table[page_index].data + byte_offset);
 }
 
-uint16_t Memory_space::read16(uint32_t address) {
+uint16_t Memory_space::read16(uint32_t address)
+{
 	if ((address & 1) != 0)
 		return read8(address) + (read8(address + 1) << 8);
 	unsigned page_index = (address >> page_bits) & page_table_mask;
@@ -154,7 +164,8 @@ uint16_t Memory_space::read16(uint32_t address) {
 	return *(uint16_t *)(page_table[page_index].data + byte_offset);
 }
 
-uint32_t Memory_space::read32(uint32_t address) {
+uint32_t Memory_space::read32(uint32_t address)
+{
 	if ((address & 3) != 0)
 		return read8(address) + (read8(address + 1) << 8) +
 			(read8(address + 2) << 16) + (read8(address + 3) << 24);

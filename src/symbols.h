@@ -24,71 +24,68 @@ limitations under the License.
 
 namespace ast {
 
-	struct Symbol {
-		Location location;
-		std::string name;	//	Nome do símbolo
-		Value_type type;	//
-		unsigned section;	//	Secção a que pertence
-		Expression *value_expression;	//	Expressão do valor associado ao símbolo
+struct Symbol {
+	Location location;
+	std::string name;
+	Value_type type;
+	unsigned section;		// Secção a que pertence
+	Expression *value_expression;	// Expressão do valor associado ao símbolo
 
-		Symbol(Location location, std::string name) : location{location}, name{name} { }
-		Symbol(Location location, std::string name, Value_type type, unsigned section, Expression *value) :
-				location{location}, name{name}, type{type}, section{section}, value_expression{value} { }
+	Symbol(Location location, std::string name) : location{location}, name{name} { }
+	Symbol(Location location, std::string name, Value_type type, unsigned section, Expression *value) :
+			location{location}, name{name}, type{type}, section{section}, value_expression{value} { }
 
-		void set_properties(Value_type type, unsigned section, Expression *value) {
-			this->section = section;
-			this->type = type;
-			this->value_expression = value;
+	void set_properties(Value_type type, unsigned section, Expression *value) {
+		this->section = section;
+		this->type = type;
+		this->value_expression = value;
+	}
+	int get_value();
+	Value_type get_type();
+};
+
+class Symbols {
+	static std::unordered_map<std::string, Symbol *> table;
+public:
+	static void deallocate();
+
+	static void add(Symbol *symbol)  { table[symbol->name] = symbol; }
+
+	static unsigned get_section(std::string name) {
+		auto pair_symbol = table.find(name);
+		if (pair_symbol != table.end())
+			return pair_symbol->second->section;
+		return Sections::table.size();  //  Secção inexistente
+	}
+
+	static int get_value(std::string name) {
+		auto pair_symbol = table.find(name);
+		if (pair_symbol != table.end())
+			return pair_symbol->second->get_value();
+		return 0;
+	}
+
+	static Value_type get_type(std::string name) {
+		auto pair_symbol = table.find(name);
+		if (pair_symbol != table.end()) {
+			auto symbol = pair_symbol->second;
+			return symbol->get_type();
 		}
+		return Value_type::UNDEFINED;
+	}
 
-		int get_value();
+	static Symbol *search(std::string name) {
+		auto pair_symbol = table.find(name);
+		if (pair_symbol != table.end())
+			return pair_symbol->second;
+		return nullptr;
+	}
 
-		Value_type get_type();
-	};
+	static void print(std::ostream &os);
 
-	class Symbols {
-		static std::unordered_map<std::string, Symbol *> table;
-	public:
-		static void deallocate();
+	static void listing(std::ostream &lst_file);
+};
 
-		static void add(Symbol *symbol)  { table[symbol->name] = symbol; }
-
-		static unsigned get_section(std::string name) {
-			auto pair_symbol = table.find(name);
-			if (pair_symbol != table.end())
-				return pair_symbol->second->section;
-			return Sections::table.size();  //  Secção inexistente
-		}
-
-		static int get_value(std::string name) {
-			auto pair_symbol = table.find(name);
-			if (pair_symbol != table.end())
-				return pair_symbol->second->get_value();
-			return 0;
-		}
-
-		static Value_type get_type(std::string name) {
-			auto pair_symbol = table.find(name);
-			if (pair_symbol != table.end()) {
-				auto symbol = pair_symbol->second;
-				return symbol->get_type();
-			}
-			return Value_type::UNDEFINED;
-		}
-
-		static Symbol *search(std::string name) {
-			auto pair_symbol = table.find(name);
-			if (pair_symbol != table.end())
-				return pair_symbol->second;
-			return nullptr;
-		}
-
-		static void print(std::ostream &os);
-
-		static void listing(std::ostream &lst_file);
-
-		static void evaluate();
-	};
-}
+} // namespace ast
 
 #endif

@@ -21,13 +21,13 @@ namespace ast {
 
 //  Tipo do valor associado a uma expressão:
 //      - ABSOLUTE - valores absolutos calculáveis imediatamente
-//      - LABEL - endereço é relativo à secção a que esta label pertence
+//      - LABEL - endereço relativo à secção a que esta label pertence
 //      - UNDEFINED - apenas se aplica a simbolos; antes de ser avaliado ou símbolo indefinido
 //      - INVALID - expressão que envolva operações invalidas sobre labels;
 //          (label * CONST) (label + label) ...
 
 enum Value_type {
-    ABSOLUTE, LABEL, UNDEFINED, INVALID
+	ABSOLUTE, LABEL, UNDEFINED, INVALID
 };
 
 extern const char *value_type_name[];

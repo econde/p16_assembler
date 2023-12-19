@@ -52,7 +52,8 @@ struct Statement {
 		label = l->substr(0, l->find(':'));
 		Symbol *symbol = Symbols::search(label);
 		if (symbol == nullptr) {
-			symbol = new Symbol(location, label, Value_type::LABEL, section_index, new Value(section_offset, location));
+			symbol = new Symbol(location, label, Value_type::LABEL,
+						section_index, new Value(section_offset, location));
 			Symbols::add(symbol);
 		}
 		else if (symbol->get_type() == Value_type::UNDEFINED)
@@ -82,15 +83,15 @@ public:
 		Statement {left} { }
 
 	 string to_string() {
-		 return label.empty() ? label : (label + ':');
+		return label.empty() ? label : (label + ':');
 	 }
 
 	 string listing() {
-		 return string_printf("%4d%11c\t", location.line, ' ');
+		return string_printf("%4d%11c\t", location.line, ' ');
 	 }
 
 	 void accept(Visitor *v) {
-		 v->visit(this);
+		v->visit(this);
 	 }
 };
 

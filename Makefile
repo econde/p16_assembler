@@ -37,7 +37,7 @@ DEPENDENCIES = $(OBJECTS:%.o=%.d)
 
 all: build_dir build/$(EXECUTABLE)
 
-CXXFLAGS = -MMD -c -g -Wall -std=c++11 -Ibuild -Isrc
+CXXFLAGS = -MMD -c -g -Wall -std=c++20 -Ibuild -Isrc
 
 build_dir:
 	mkdir -p build/src build/build

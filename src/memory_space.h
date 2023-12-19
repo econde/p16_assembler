@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 /*	
-	Simulação de sistema de memória paginado de um nível.
+	Simulação de espaço de memória paginado de um nível.
 
 	Dimensão da página e dimensão total do espaço de endereçamento parametrizáveis.
 
@@ -28,12 +28,12 @@ limitations under the License.
 
 class Memory_space {
 	typedef struct page_entry {
-			uint32_t present: 1;
-			uint8_t *data;
+		uint32_t present: 1;
+		uint8_t *data;
 	} Page_entry;
 
 	unsigned page_size, page_bits, page_mask,
-			 page_table_size, page_table_bits, page_table_mask;
+		page_table_size, page_table_bits, page_table_mask;
 	Page_entry *page_table;
 	uint8_t *page_zero;
 public:

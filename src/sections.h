@@ -67,7 +67,8 @@ struct Section {
 };
 
 class Sections {
-	// Lista das secções por ordem de endereço
+	// Lista das secções utilizada na fase de localização
+	// É ordenada por ordem de endereço
 	static std::list<Section*> list;
 public:
 	static int align(unsigned address, unsigned alignment) {
@@ -75,7 +76,8 @@ public:
 					/ (1 << alignment)) * (1 << alignment);
 	}
 
-	//	Tabela das secções existentes
+	// Tabela das secções existentes
+	// O índice corresponde ao número da secção
 	static std::vector<Section*> table;
 
 	static void deallocate();
@@ -93,7 +95,7 @@ public:
 		return table.at(section)->base_address;
 	}
 
-	//	Definir conteúdos de uma dada secção.
+	// Definir conteúdos de uma dada secção.
 
 	static void write8(unsigned section, unsigned offset, uint8_t b) {
 		table.at(section)->write8(offset, b);
@@ -127,7 +129,7 @@ public:
 		table.at(section)->increase(size);
 	}
 
-	//	Ler conteúdos de uma dada secção.
+	// Ler conteúdos de uma dada secção.
 
 	static uint8_t read8(unsigned section, unsigned offset) {
 		return table.at(section)->read8(offset);
@@ -143,32 +145,33 @@ public:
 
 	static void listing(std::ostream& lst_file);
 
-	//	Coloca as secções em lista ordenada por endereços.
+	// Coloca as secções em lista ordenada por endereços.
 	static bool address_is_free(Section *s);
 
-	//	Localiza as secções.
+	// Localiza as secções.
 	static void locate(Properties<std::string, unsigned> *section_addresses);
 
-	//	Produz um ficheiro em formato Hex Intel com o conteúdo das secções.
-	static void binary_hex_intel(const char *file_name,
-								unsigned word_size, unsigned byte_order,
-								unsigned lower_address, unsigned higher_address);
+	// Carrega o conteúdo das secções na memória virtual
+	static void load_memory_space();
 
-	//	Produz um ficheiro no formato usado no Logisim com o conteúdo das secções.
-	static void binary_logisim(const char *file_name,
-								unsigned word_size, unsigned byte_order,
-								unsigned lower_address, unsigned higher_address);
-
-	//	Produz um ficheiro no formato usado no Logisim com o conteúdo das secções,
-	//	em palavras de 16 bits
-	static void binary_logisim16(const char *file_name,
-								unsigned lower_address, unsigned higher_address);
-
+	// Produz um ficheiro em formato binário
 	static void binary_raw(const char *file_name,
-								unsigned word_size, unsigned byte_order,
-								unsigned lower_address, unsigned higher_address);
+					unsigned word_size, unsigned byte_order,
+					unsigned lower_address, unsigned higher_address);
 
-	static void fill_memory_space();
+	// Produz um ficheiro em formato Hex Intel
+	static void binary_hex_intel(const char *file_name,
+					unsigned word_size, unsigned byte_order,
+					unsigned lower_address, unsigned higher_address);
+
+	// Produz um ficheiro no formato usado no Logisim
+	static void binary_logisim(const char *file_name,
+					unsigned word_size, unsigned byte_order,
+					unsigned lower_address, unsigned higher_address);
+
+	// Produz um ficheiro no formato usado no Logisim, em palavras de 16 bits
+	static void binary_logisim16(const char *file_name,
+					unsigned lower_address, unsigned higher_address);
 
 	static uint32_t lower_address() {
 		return list.empty() ? 0 : list.front()->base_address;
@@ -177,7 +180,6 @@ public:
 	static uint32_t higher_address() {
 		return list.empty() ? 0 : list.back()->base_address + list.back()->content_size;
 	}
-
 };
 
 }

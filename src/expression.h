@@ -32,20 +32,19 @@ using namespace std;
 class Value: public Expression {
 
 public:
-
 	Value(int value, Location location)
 		: Expression {location, value, Value_type::ABSOLUTE} { }
 	~Value() { }
 
 	bool evaluate();
 
-	string get_symbol() { return string(); }	//	string vazia
+	string get_symbol() { return {string()}; }	//	string vazia
 
 	string to_string() { return string_printf("%d", value); }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-	//-----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 class Identifier: public Expression {
 	Symbol *symbol;
@@ -60,7 +59,7 @@ public:
 		else {
 			symbol = Symbols::search(name);
 			if (symbol == nullptr)
-			symbol = new Symbol(location, name, Value_type::UNDEFINED, 0, nullptr);
+				symbol = new Symbol(location, name, Value_type::UNDEFINED, 0, nullptr);
 			Symbols::add(symbol);
 		}
 	}
@@ -69,13 +68,11 @@ public:
 	Value_type get_type() { return symbol->get_type(); }
 	string get_symbol() { return symbol->name; }
 
-//	void set_value(int v) { value = v; }
-
 	string to_string() { return symbol->name; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-	//-----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 class Priority: public Expression {
 	Expression *expression;
@@ -101,14 +98,14 @@ public:
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-	//-----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 class Unary_expression: public Expression {
 	Expression *expression;
 	int operation;
 public:
 	Unary_expression(int op, Expression *e, Location location):
-			Expression {location}, expression {e}, operation {op} { }
+		Expression {location}, expression {e}, operation {op} { }
 
 	~Unary_expression() { delete expression; }
 
@@ -120,14 +117,14 @@ public:
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-	//-----------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 
 class Binary_expression: public Expression {
 	Expression *expression_left, *expression_right;
 	int operation;
 public:
 	Binary_expression(Expression *el, int op, Expression *er, Location location) :
-			Expression {location}, expression_left {el}, expression_right(er), operation(op) { }
+		Expression {location}, expression_left {el}, expression_right(er), operation(op) { }
 
 	virtual ~Binary_expression() {
 		 delete expression_left;
@@ -142,11 +139,13 @@ public:
 	void accept(Visitor *v) { v->visit(this); }
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+
 class Conditional_expression: public Expression {
 	Expression *logical_expression, *true_expression, *false_expression;
 public:
 	Conditional_expression(Expression *le, Expression *e, Expression *ce, Location location) :
-			Expression {location}, logical_expression {le}, true_expression{e}, false_expression{ce} { }
+		Expression {location}, logical_expression {le}, true_expression{e}, false_expression{ce} { }
 
 	virtual ~Conditional_expression() {
 		 delete logical_expression;

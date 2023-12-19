@@ -181,8 +181,7 @@ void Code_generator::visit(Inst_load_store_indirect *s)
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(code));
 }
 
-void Code_generator::visit(Inst_branch
- *s)
+void Code_generator::visit(Inst_branch *s)
 {
 	s->check_alignment();
 	auto code = 0U;

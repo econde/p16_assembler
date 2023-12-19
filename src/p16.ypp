@@ -164,61 +164,62 @@ statement
 
 instruction
 	:	LDR_STR register COMMA expression
-			{ $$ = new ast::Load_relative($1, $2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_load_relative($1, $2, $4, LOCATION(@1)); }
 
 	|	LDR_STR register COMMA BRACKET_LEFT register BRACKET_RIGHT
-			{ $$ = new ast::Load_store_indirect($1, $2, $5, new ast::Value(0, LOCATION(@6)), LOCATION(@1)); }
+			{ $$ = new ast::Inst_load_store_indirect($1, $2, $5, new ast::Value(0, LOCATION(@6)), LOCATION(@1)); }
 
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA CARDINAL expression BRACKET_RIGHT
-			{ $$ = new ast::Load_store_indirect($1, $2, $5, $8, LOCATION(@1)); }
+			{ $$ = new ast::Inst_load_store_indirect($1, $2, $5, $8, LOCATION(@1)); }
 
 	|	LDR_STR register COMMA BRACKET_LEFT register COMMA register BRACKET_RIGHT
-			{ $$ = new ast::Load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
+			{ $$ = new ast::Inst_load_store_indirect($1, $2, $5, $7, LOCATION(@1)); }
 
 	|	PUSH_POP BRACE_LEFT register BRACE_RIGHT
-			{ $$ = new ast::Push_pop($1, $3, LOCATION(@1)); }
+			{ $$ = new ast::Inst_push_pop($1, $3, LOCATION(@1)); }
 	|	PUSH_POP register
-			{ $$ = new ast::Push_pop($1, $2, LOCATION(@1)); }
+			{ $$ = new ast::Inst_push_pop($1, $2, LOCATION(@1)); }
 
 	|	ARITH register COMMA register COMMA register
-			{ $$ = new ast::Arith($1, $2, $4, $6, LOCATION(@1)); }
+			{ $$ = new ast::Inst_arith
+($1, $2, $4, $6, LOCATION(@1)); }
 	|	ARITH register COMMA register COMMA CARDINAL expression
-			{ $$ = new ast::Arith($1, $2, $4, $7, LOCATION(@1)); }
+			{ $$ = new ast::Inst_arith
+($1, $2, $4, $7, LOCATION(@1)); }
 
 	|	LOGIC register COMMA register COMMA register
-			{ $$ = new ast::Logic($1, $2, $4, $6, LOCATION(@1)); }
+			{ $$ = new ast::Inst_logic($1, $2, $4, $6, LOCATION(@1)); }
 
 	|	SHIFT register COMMA register COMMA CARDINAL expression
-			{ $$ = new ast::Shift($1, $2, $4, $7, LOCATION(@1)); }
+			{ $$ = new ast::Inst_shift($1, $2, $4, $7, LOCATION(@1)); }
 
 	|	RRX register COMMA register
-			{ $$ = new ast::Rrx($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_rrx($2, $4, LOCATION(@1)); }
 
 	|	CMP register COMMA register
-			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
-//	|	CMP register COMMA expression
-//			{ $$ = new ast::Compare($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_compare($2, $4, LOCATION(@1)); }
 
 	|	MOV register COMMA register
-			{ $$ = new ast::Move($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_mov($2, $4, LOCATION(@1)); }
 	|	MOVT register COMMA CARDINAL expression
-			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
+			{ $$ = new ast::Inst_mov($1, $2, $5, LOCATION(@1)); }
 	|	MOV register COMMA CARDINAL expression
-			{ $$ = new ast::Move($1, $2, $5, LOCATION(@1)); }
+			{ $$ = new ast::Inst_mov($1, $2, $5, LOCATION(@1)); }
 
 	|	MOVS register COMMA register
-			{ $$ = new ast::Moves($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_movs($2, $4, LOCATION(@1)); }
 
 	|	NOT register COMMA register
-			{ $$ = new ast::Not($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_not($2, $4, LOCATION(@1)); }
 
 	|	MSR SPECIAL COMMA register
-			{ $$ = new ast::Msr(new ast::Register($2, LOCATION(@2)), $4, LOCATION(@1)); }
+			{ $$ = new ast::Inst_msr(new ast::Register($2, LOCATION(@2)), $4, LOCATION(@1)); }
 	|	MRS register COMMA SPECIAL
-			{ $$ = new ast::Mrs($2, new ast::Register($4, LOCATION(@4)), LOCATION(@1)); }
+			{ $$ = new ast::Inst_mrs($2, new ast::Register($4, LOCATION(@4)), LOCATION(@1)); }
 
 	|	BRANCH expression
-			{ $$ = new ast::Branch($1, $2, LOCATION(@1)); }
+			{ $$ = new ast::Inst_branch
+($1, $2, LOCATION(@1)); }
 	;
 
 register
@@ -229,53 +230,53 @@ register
 
 directive
 	:	SECTION IDENTIFIER
-			{ $$ = new ast::DSection(*$2, LOCATION(@1)); delete($2); }
+			{ $$ = new ast::Dir_section(*$2, LOCATION(@1)); delete($2); }
 	|	SECTION IDENTIFIER COMMA STRING_LITERAL
-			{ $$ = new ast::DSection(*$2, LOCATION(@1)); delete($2); delete($4); }
+			{ $$ = new ast::Dir_section(*$2, LOCATION(@1)); delete($2); delete($4); }
 	|	SECTION TEXT
-			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".text"), LOCATION(@1)); }
 	|	SECTION RODATA
-			{ $$ = new ast::DSection(std::string(".rodata"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".rodata"), LOCATION(@1)); }
 	|	SECTION DATA
-			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".data"), LOCATION(@1)); }
 	|	SECTION BSS
-			{ $$ = new ast::DSection(std::string(".bss"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".bss"), LOCATION(@1)); }
 	|	SECTION STACK
-			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".stack"), LOCATION(@1)); }
 	|	TEXT
-			{ $$ = new ast::DSection(std::string(".text"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".text"), LOCATION(@1)); }
 	|	RODATA
-			{ $$ = new ast::DSection(std::string(".rodata"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".rodata"), LOCATION(@1)); }
 	|	DATA
-			{ $$ = new ast::DSection(std::string(".data"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".data"), LOCATION(@1)); }
 	|	BSS
-			{ $$ = new ast::DSection(std::string(".bss"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".bss"), LOCATION(@1)); }
 	|	STACK
-			{ $$ = new ast::DSection(std::string(".stack"), LOCATION(@1)); }
+			{ $$ = new ast::Dir_section(std::string(".stack"), LOCATION(@1)); }
 
 	|	EQU IDENTIFIER COMMA expression
-			{ $$ = new ast::Equ(new ast::Symbol(LOCATION(@2), *$2), $4, LOCATION(@1)); delete($2); }
+			{ $$ = new ast::Dir_equ(new ast::Symbol(LOCATION(@2), *$2), $4, LOCATION(@1)); delete($2); }
 
 	|	BYTE
-			{ $$ = new ast::Byte($1, new std::list<ast::Expression*>, LOCATION(@1)); }
+			{ $$ = new ast::Dir_byte($1, new std::list<ast::Expression*>, LOCATION(@1)); }
 
 	|	BYTE value_list
-			{ $$ = new ast::Byte($1, $2, LOCATION(@1)); }
+			{ $$ = new ast::Dir_byte($1, $2, LOCATION(@1)); }
 
 	|	SPACE expression
-			{ $$ = new ast::Space($2, new ast::Value(0, LOCATION(@2)), LOCATION(@1)); }
+			{ $$ = new ast::Dir_space($2, new ast::Value(0, LOCATION(@2)), LOCATION(@1)); }
 
 	|	SPACE expression COMMA expression
-			{ $$ = new ast::Space($2, $4, LOCATION(@1)); }
+			{ $$ = new ast::Dir_space($2, $4, LOCATION(@1)); }
 
 	|	ASCII string_list
-			{ $$ = new ast::Ascii($1, $2, LOCATION(@1)); }
+			{ $$ = new ast::Dir_ascii($1, $2, LOCATION(@1)); }
 
 	|	ALIGN expression
-			{ $$ = new ast::Align($2, LOCATION(@1)); }
+			{ $$ = new ast::Dir_align($2, LOCATION(@1)); }
 
 	|	ALIGN
-			{ $$ = new ast::Align(new ast::Value(1, LOCATION(@1)), LOCATION(@1)); }
+			{ $$ = new ast::Dir_align(new ast::Value(1, LOCATION(@1)), LOCATION(@1)); }
 	;
 
 value_list

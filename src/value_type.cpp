@@ -18,6 +18,6 @@ limitations under the License.
 
 namespace ast {
 
-    const char *value_type_name[] = {"ABSOLUTE", "LABEL", "UNDEFINED", "INVALID"};
+const char *value_type_name[] = {"ABSOLUTE", "LABEL", "UNDEFINED", "INVALID"};
 
 }

@@ -22,8 +22,8 @@ limitations under the License.
 namespace ast {
 
 struct Location {
-		const char *unit;
-		int line, first_column, last_column;
+	const char *unit;
+	int line, first_column, last_column;
 };
 
 }

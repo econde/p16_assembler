@@ -26,7 +26,8 @@ using namespace std;
 
 vector<string>	srcfile;
 
-void listing_load_inputfile(const char *src_filename) {
+void listing_load_inputfile(const char *src_filename)
+{
 	try {
 		std::ifstream src (src_filename);
 		while ( ! src.eof()) {
@@ -40,7 +41,8 @@ void listing_load_inputfile(const char *src_filename) {
 	}
 }
 
-void listing(const char *lst_filename, std::list<Statement*> *ast_root) {
+void listing(const char *lst_filename, std::list<Statement*> *ast_root)
+{
 	try {
 		std::ofstream lst (lst_filename);
 		int current_line = 1;

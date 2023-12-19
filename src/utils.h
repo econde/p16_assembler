@@ -31,6 +31,19 @@ limitations under the License.
 
 #define MAKE_MASK(width, position) ((~(~0U << static_cast<unsigned>(width)) << static_cast<unsigned>(position)))
 
+#ifndef INT_WIDTH
+#define INT_WIDTH (sizeof (int) * CHAR_BIT)
+#endif
+
+static inline unsigned mask(unsigned width, unsigned position)
+{
+	if (width < INT_WIDTH && position < INT_WIDTH)
+		return ~(~0U << width) << position;
+	if (width >= INT_WIDTH && position < INT_WIDTH)
+		return ~0U << position;
+	return 0;
+}
+
 static inline int get_bits(uint32_t value, unsigned bit_first, unsigned bit_last) {
 	return (value >> bit_first) & MAKE_MASK(bit_last - bit_first + 1, 0);
 }
