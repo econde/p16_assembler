@@ -26,7 +26,8 @@ pas_setup.exe
 *.tab.hpp
 *.zip
 a.out
-test/
+test/build
+test/reference
 bugs/
 .vscode/
 *.cson
@@ -38,3 +39,4 @@ bugs/
 !doc/code/sections/seccoes1.lst
 !doc/code/sections/seccoes2.hex
 !doc/code/sections/seccoes2.lst
+.idea

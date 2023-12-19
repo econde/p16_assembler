@@ -1,0 +1,37 @@
+Casos que não devem assinalar erro
+----------------------------------
+test1	- Constantes com e sem cardinal
+test2	- Letras maiúsculas e minusculas
+test3	- case insensitive nas mnemónicas e diretivas
+test6	- teste dos limites de alcance do branch
+test20	- subtração de labels
+test29	- teste das diretivas ascii e asciz
+test30	- constantes nas instruções mov e movt
+
+Casos que devem assinalar erro ou warning
+-----------------------------------------
+test4	- teste do ldr	rd, label
+test5	- constantes grandes e negativas no mov e movt
+test7	- teste dos limites de codificação dos endereçamentos indiretos com constante
+test8	- nomes das secções conhecidas, diretiva byte/word sem argumentos e desalinhamento de instruções e diretivas
+test9	- parâmetros da diretiva space com valores negativos
+test10	- movt com dois registos como operandos
+text11	- Emitir aviso em caso de existir uma secção vazia
+test12	- divisao por zero
+test13	- subtração de labels dá um valor absoluto
+test14	- expressoes com parcelas indefinidas
+test15	- parâmetros da diretiva space
+test16	- labels não definidas
+test17	- simbolo duplamente definido
+test18	- expressões com valores indefinidos
+test19	- simbolo invocado antes de definido
+test21	- dimensao da diretiva .space definida depois de .space
+test22	- diretiva equ definida à frente
+test23	- label pertencente a outra secção
+test24	- diretivas .byte e .word sem argumentos
+test25	- diretiva .byte iniciada com valor diferente de zero na secção .bss
+test26	- branch para label noutra secção
+test27	- Valor associado a um simbolo .equ não deve exceder a capacidade de codificação de 16 bits
+test28	- Aviso de secções vazias
+test31	- Constantes negativas nos campos immed
+
