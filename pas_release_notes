@@ -1,3 +1,6 @@
+V1.4.99
+- Mudança blo/bcs e bhs/bcc para blo/bcc e bhs/bcs devido a alteração do significado da flag C.
+
 V1.4.3
 - Melhoramentos no manual.
 - Melhoramentos nas mensagens de erro.

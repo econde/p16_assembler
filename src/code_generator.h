@@ -27,35 +27,37 @@ class Code_generator: public Visitor {
 public:
 	void visit(Statement_empty *) {}
 
-	//------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 	//	Instruction
 
-	void visit(Load_relative *s);
-	void visit(Load_store_indirect *s);
-	void visit(Branch *s);
-	void visit(Shift *s);
-	void visit(Rrx *s);
-	void visit(Arith *s);
-	void visit(Logic *s);
-	void visit(Not *s);
-	void visit(Move *s);
-	void visit(Moves *s);
-	void visit(Compare *s);
-	void visit(Msr *s);
-	void visit(Mrs *s);
-	void visit(Push_pop *s);
+	void visit(Inst_load_relative *s);
+	void visit(Inst_load_store_indirect *s);
+	void visit(Inst_branch
+ *s);
+	void visit(Inst_shift *s);
+	void visit(Inst_rrx *s);
+	void visit(Inst_arith
+ *s);
+	void visit(Inst_logic *s);
+	void visit(Inst_not *s);
+	void visit(Inst_mov *s);
+	void visit(Inst_movs *s);
+	void visit(Inst_compare *s);
+	void visit(Inst_msr *s);
+	void visit(Inst_mrs *s);
+	void visit(Inst_push_pop *s);
 
-	//------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 	//	Directive
 
-	void visit(DSection *) {}
-	void visit(Ascii *) {}
-	void visit(Equ *);
-	void visit(Space *);
-	void visit(Align *);
-	void visit(Byte *);
+	void visit(Dir_section *) {}
+	void visit(Dir_ascii *) {}
+	void visit(Dir_equ *);
+	void visit(Dir_space *);
+	void visit(Dir_align *);
+	void visit(Dir_byte *);
 
-	//------------------------------------------------------------------------------------------
+	//----------------------------------------------------------------------
 	//	Expression
 
 	void visit(Value *) {}
