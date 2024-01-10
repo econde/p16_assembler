@@ -9,7 +9,7 @@ seguida dos parâmetros.
 No exemplo, ``sub`` é a mnemónica da instrução e ``r0, r0, 1``
 são os parâmetros.
 
-   ``sub	r0, r0, 1``
+   ``sub	r0, r0, #1``
 
 O P16 dispõe das instruções listadas na tabela (:numref:`instrucoes_p16`)
 :ref:`[2]<ref2>`.
@@ -67,9 +67,9 @@ precede-se essa instrução ou variável de uma *label*.
            . . .
            b 	cycle
 
-No exemplo acima, precede-se a instrução ``sub  r0, r0, 1`` da label ``cycle:``
+No exemplo acima, a *label* ``cycle:`` precede a instrução ``sub  r0, r0, #1`` 
 para indicar o local para onde a instrução ``b  cycle`` deve "saltar"
-para iniciar novo ciclo.
+ao reiniciar um novo ciclo.
 
 .. rubric:: Comentários
 
@@ -519,11 +519,9 @@ e a gama de endereços ``0x3008`` a ``0x300f``.
 Regras sintáticas
 -----------------
 
-A linguagem *assembly* do P16 é semelhante à usada pelo assembler AS da GNU
+A linguagem *assembly* do P16 é semelhante à usada pelo *assembler* AS da GNU
 quando usado no desenvolvimento de programas para a arquitectura ARM.
 O objectivo é facilitar ao estudante a transição para essa arquitectura.
-Na especificação de constantes a utilização de ``#`` é opcional,
-tal como na sintaxe unificada da arquitectura ARM.
 
 .. table:: Elementos da notação *Wirth Syntax Notation* (WSN)
    :name: notacao WSN
@@ -568,20 +566,20 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
      “ldr” reg0-15 “,” ( “[” (“pc” | “r15”) “,” expression “]” ) | identifier
 
      | ( ( “ldr” | “str” ) [“b”] reg0-15 “,”
-        ( “[“ reg0-7 [“,” (reg0-15 | expression)] “]” )
-     | ( "mov" | “movt” ) reg0-15, (reg0-15 | expression)
+        ( “[“ reg0-7 [“,” (reg0-15 | #expression)] “]” )
+     | ( "mov" | “movt” ) reg0-15, (reg0-15 | #expression)
      | ( “push” | “pop” ) [“{“] reg0-15
-     | ( “add” | “sub” ) reg0-15, reg0-7, (reg0-15 | expression)
+     | ( “add” | “sub” ) reg0-15, reg0-7, (reg0-15 | #expression)
      | ( “adc” | “sbc” ) reg0-15, reg0-7,  reg0-15
      | “cmp” reg0-7, reg0-15
      | ( “and” | “orr” | “eor” ) reg0-15, reg0-7, reg0-15
      | ( “mvn” | “not”) reg0-15, reg0-15
-     | ( “lsl” | “lsr” | “asr” | “ror” )	reg0-15, reg0-7, expression
+     | ( “lsl” | “lsr” | “asr” | “ror” )	reg0-15, reg0-7, #expression
      | “rrx” reg0-15, reg0-7
      | “msr” psw “," reg0-15
      | “mrs” reg0-15 “,” psw
      | ( “bzs” | “beq” | “bzc” | “bne” | “bcs” | “blo” | “bcc” | “bhs”
-     | “blt” | “bge” | “bl” | “b” ) expression
+     | “blt” | “bge” | “bl” | “b” ) identifier
      | “movs pc, lr” .
 
    reg0-7 = “r0” | “r1” | “r2” | “r3” | “r4” | “r5” | “r6” | “r7” .

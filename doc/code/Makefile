@@ -7,4 +7,4 @@ sections/seccoes1.hex: sections/seccoes1.s
 	../../build/p16as sections/seccoes1.s
 
 sections/seccoes2.hex: sections/seccoes2.s
-	../../build/p16as sections/seccoes2.s
+	../../build/p16as sections/seccoes2.s --section .data=0x1000 --section .text=0x3000

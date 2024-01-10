@@ -1,9 +1,9 @@
-P16 assembler v1.3.99 (Oct  3 2022)	sections/seccoes1.lst	Mon Oct  3 13:34:44 2022
+P16 assembler v1.4.99 (Jan 10 2024)	sections/seccoes1.lst	Wed Jan 10 14:22:21 2024
 
 Sections
-Index   Name            Addresses       Size
-0       .data           0000 - 0005     0006 6
-1       .text           0006 - 001B     0016 22
+Index   Name            Address   Size
+0       .data           0000      0006 6
+1       .text           0006      0016 22
 
 Symbols
 Name                    Type      Value       Section
@@ -41,3 +41,4 @@ Code listing
   23 0018 02 00		.word	y
   24           	addressof_z:
   25 001A 04 00		.word	z
+  25           	
