@@ -218,8 +218,7 @@ instruction
 			{ $$ = new ast::Inst_mrs($2, new ast::Register($4, LOCATION(@4)), LOCATION(@1)); }
 
 	|	BRANCH expression
-			{ $$ = new ast::Inst_branch
-($1, $2, LOCATION(@1)); }
+			{ $$ = new ast::Inst_branch($1, $2, LOCATION(@1)); }
 	;
 
 register

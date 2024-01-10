@@ -192,11 +192,11 @@ void Code_generator::visit(Inst_branch *s)
 	case NE:
 		code = BNE_OPCODE;
 		break;
-		case CS:
+	case CC:
        	case LO:
 		code = BCC_OPCODE;
 		break;
-	case CC:
+	case CS:
 	case HS:
 		code = BCS_OPCODE;
 		break;

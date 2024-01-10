@@ -26,12 +26,14 @@ limitations under the License.
 
 namespace ast {
 
+#if 0
 std::string register_name(int r);
 std::string register_special_name(int r);
 std::string arith_name(int operation);
 std::string logic_name(int operation);
 std::string shift_name(int operation);
 std::string branch_name(int operation);
+#endif
 
 struct Register {
 	unsigned n;
@@ -87,34 +89,27 @@ struct Inst_load_store_indirect: public Instruction {
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-struct Inst_branch
-: public Instruction {
+struct Inst_branch: public Instruction {
 	Expression *expression;
 	unsigned condition;
-	Inst_branch
-(unsigned condition, Expression *e, Location left) :
+	Inst_branch(unsigned condition, Expression *e, Location left) :
 		Instruction {left}, expression {e}, condition {condition} { }
-	~Inst_branch
-() { delete expression; }
+	~Inst_branch() { delete expression; }
 	void accept(Visitor *v) { v->visit(this); }
 };
 
-struct Inst_arith
-: public Instruction {
+struct Inst_arith: public Instruction {
 	Register *rd, *rn, *rm;
 	Expression *expression;
 	unsigned operation;
 
-	Inst_arith
-(unsigned o, Register *rd, Register *rn, Register *rm, Location left) :
+	Inst_arith(unsigned o, Register *rd, Register *rn, Register *rm, Location left) :
 		Instruction {left}, rd {rd}, rn {rn}, rm {rm}, expression {nullptr}, operation {o} { }
 
-	Inst_arith
-(unsigned o, Register *rd, Register *rn, Expression *e, Location left) :
+	Inst_arith(unsigned o, Register *rd, Register *rn, Expression *e, Location left) :
 		Instruction {left}, rd {rd}, rn {rn}, expression {e}, operation {o} { }
 
-	~Inst_arith
-() { delete expression; }
+	~Inst_arith() { delete expression; }
 
 	void accept(Visitor *v) { v->visit(this); }
 };

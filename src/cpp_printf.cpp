@@ -19,6 +19,8 @@ limitations under the License.
 #include <iostream>
 #include <memory>
 
+#include "cpp_printf.h"
+
 #define	DEFAULT_SIZE	128
 
 std::string string_printf(const char* fmt, ...) {

@@ -21,6 +21,8 @@ limitations under the License.
 
 namespace ast {
 
+#if 0
+
 std::string register_name(int r)
 {
 	switch (r) {
@@ -113,5 +115,7 @@ std::string branch_name(int condition)
 	}
 	return std::string("???");
 }
+
+#endif
 
 }

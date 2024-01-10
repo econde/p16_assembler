@@ -26,6 +26,7 @@ struct Location {
 	int line, first_column, last_column;
 };
 
+
 }
 
 #endif
