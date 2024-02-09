@@ -8,7 +8,7 @@ gera ficheiros com o código máquina específico para esta arquitetura.
 O *p16as*, o *p16dbg* e o *p16sim* formam um conjunto de ferramentas
 que permitem criar, testar e depurar programas para a arquitetura P16.
 
-Por razões didácticas, o *p16as* processa apenas um ficheiro fonte e localiza o programa.
+Por razões didáticas, o *p16as* processa apenas um ficheiro fonte e localiza o programa.
 A localização consiste em atribuir endereço absoluto ao código gerado, tarefa
 que não é normalmente realizada pelo *assembler*.
 

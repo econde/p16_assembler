@@ -90,19 +90,19 @@ ou depois do carácter ``';'`` até ao fim da linha.
 Diretivas
 ---------
 
-Directivas de compilação são comandos que permitem controlar
+Diretivas de compilação são comandos que permitem controlar
 a operação do *assembler*.
 
-Sintacticamente uma directiva é identificada por uma palavra chave iniciada pelo carácter \'.\'.
-No texto do programa, uma directiva e os seus parâmetros ocupam
-a mesma posição da mnemónica da instrução e dos respectivos parâmetros.
+Sintaticamente uma diretiva é identificada por uma palavra chave iniciada pelo carácter \'.\'.
+No texto do programa, uma diretiva e os seus parâmetros ocupam
+a mesma posição da mnemónica da instrução e dos respetivos parâmetros.
 
-Na linguagem *assembly* do P16 existem directivas para definir dados do programa,
+Na linguagem *assembly* do P16 existem diretivas para definir dados do programa,
 para controlar a localização dos dados e do código máquina em memória e para definir símbolos.
 
-.. rubric::  Directivas para definição de dados do programa
+.. rubric::  Diretivas para definição de dados do programa
 
-.. table:: Directivas para definição de dados do programa
+.. table:: Diretivas para definição de dados do programa
   :widths: 7 12
   :name: diretiva_dados
 
@@ -139,7 +139,7 @@ para controlar a localização dos dados e do código máquina em memória e par
   |                                                 | ``.align 1``.                                                     |
   +-------------------------------------------------+-------------------------------------------------------------------+
 
-Exemplo de utilização da directiva ``.word`` na definição de uma variável de 16 *bits*
+Exemplo de utilização da diretiva ``.word`` na definição de uma variável de 16 *bits*
 inicializada com o valor mil. Este valor é representado a 16 *bits* (0000 0011 1110 1000),
 sendo o *byte* de menor peso guardado na posição de memória de endereço menor
 e o *byte* de maior peso guardado na posição de endereço maior.
@@ -149,7 +149,7 @@ e o *byte* de maior peso guardado na posição de endereço maior.
    counter:
    	.word	1000
 
-Exemplo de utilização da directiva ``.byte`` na definição de um *array*
+Exemplo de utilização da diretiva ``.byte`` na definição de um *array*
 de três posições iniciadas com 3, 4 e 5, sucessivamente. São ocupadas três
 posições de memória. A posição de endereço mais baixo recebe o valor 3,
 a seguinte o valor 4 e a última o valor 5.
@@ -159,7 +159,7 @@ a seguinte o valor 4 e a última o valor 5.
    array:
    	.byte	3, 4, 5
 
-Exemplo de utilização da directiva ``.asciz`` para definição de um *array*
+Exemplo de utilização da diretiva ``.asciz`` para definição de um *array*
 de caracteres iniciado com a *string* \"Portugal\", no formato da linguagem C.
 Neste formato cada posição do *array* guarda o código de um carácter,
 começando no endereço mais baixo e pela ordem de escrita.
@@ -173,9 +173,9 @@ oito para os códigos dos caracteres e uma para o terminador.
    message:
    	.asciz	"Portugal"
 
-.. rubric::  Directivas para definição de secções
+.. rubric::  Diretivas para definição de secções
 
-.. table:: Directivas para definição de secções
+.. table:: Diretivas para definição de secções
    :widths: 8 12
    :name: diretiva_seccoes
 
@@ -197,9 +197,9 @@ A inserção de uma diretiva de definição de secção no texto do programa,
 significa que todos os elementos de programa, instruções ou variáveis,
 definidos depois dessa diretiva, são alojados nessa secção.
 
-.. rubric::  Directivas para definição de símbolos
+.. rubric::  Diretivas para definição de símbolos
 
-.. table:: Directiva para definição de símbolos
+.. table:: Diretiva para definição de símbolos
    :widths: 6 14
    :name: diretiva_simbolos
 
@@ -213,7 +213,7 @@ Esse valor pode ser expresso na forma de um número,
 outro símbolo também definido com ``.equ``, uma *label*
 ou uma expressão envolvendo qualquer um dos anteriores.
 O valor deve ser calculável pelo *assembler*, isto é,
-não pode envolver simbolos que não estejam definidos.
+não pode envolver símbolos que não estejam definidos.
 
 Esta diretiva pode ser posicionada em qualquer lugar do texto do programa,
 tanto antes como depois da invocação do respetivo símbolo.
@@ -252,7 +252,7 @@ na linha anterior à da instrução ou variável a que se refere.
    Um símbolo definido com a diretiva ``.equ``
    tem um domínio de valores na gama :math:`-2^{16 - 1}` e :math:`+2^{16 - 1} - 1`.
 
-No exemplo seguinte, a directiva ``.equ`` define o símbolo ``MODE_MASK``
+No exemplo seguinte, a diretiva ``.equ`` define o símbolo ``MODE_MASK``
 equivalente ao valor binário ``1110``.
 
 .. code-block:: console
@@ -292,7 +292,7 @@ Exemplo de expressão com símbolos: ::
    mov    r0, #VALUE & MASK
 
 No cálculo das expressões, o resultado de cada operação é avaliado.
-Se a sua magnitude for inferior a :math:`2^{16}` (não codificável a 16 *bits*),
+Se a sua magnitude não for inferior a :math:`2^{16}` (não codificável a 16 *bits*),
 é emitida uma mensagem de aviso.
 
 No caso da subtração ou da operação unária negativo,
@@ -301,7 +301,7 @@ um suposto resultado negativo com magnitude inferior a :math:`2^{16}`
 
 Por exemplo a expressão **-1** é codificada da mesma forma que a expressão **0xffff**.
 
-No seguinte exemplo, ambas as instruções carregam o valor **Oxff** em R0.
+No seguinte exemplo, ambas as instruções carregam o valor **0xff** em R0.
 
 ::
 
@@ -352,8 +352,8 @@ Operadores relacionais
    +------------+-----+--------------------------+
 
 Os operadores relacionais produzem valores booleanos.
-O valor booleando **verdadeiro** é representado como o valor inteiro **1**,
-e o valor booleando **falso** é representado como o valor inteiro **0**.
+O valor booleano **verdadeiro** é representado como o valor inteiro **1**,
+e o valor booleano **falso** é representado como o valor inteiro **0**.
 
 Na seguinte instrução, o registo destino (R0) é afetado com o valor 1. ::
 
@@ -373,6 +373,7 @@ Operadores lógicos
    +------------+-----+--------------------------+
    | Unário     | \!  | negação                  |
    +------------+-----+--------------------------+
+
 Nestas operações os operandos são valores numéricos encarados como valores booleanos.
 Um valor numérico zero é encarado como **falso**
 e um valor numérico diferente de zero é encarado como **verdadeiro**.
@@ -441,14 +442,14 @@ Contador de localização
 Existe um contador de localização, associado a cada secção,
 que é inicializado a zero.
 
-À medida que as instruções ou directivas são processadas,
+À medida que as instruções ou diretivas são processadas,
 o contador de localização é aumentado da dimensão de memória
 necessária para armazenar o código máquina da instrução ou o conteúdo da variável.
 
 A linguagem *assembly* do P16 usa o símbolo ``'.'`` (um ponto isolado)
 como identificador do contador de localização.
 No contexto da linguagem *assembly*,
-este símbolo substitui a *label* referente à instrução ou directiva corrente.
+este símbolo substitui a *label* referente à instrução ou diretiva corrente.
 
 .. code-block::
 
@@ -467,10 +468,10 @@ segundo critérios de afinidade.
 O caso mais simples consiste em agrupar o código das instruções numa secção
 e as variáveis noutra secção.
 
-Antes de especificar qualquer instrução ou directiva
+Antes de especificar qualquer instrução ou diretiva
 deve-se definir a secção que as vai conter.
-A secção corrente é definida pela directiva ``.section``
-ou pelas directivas especificas ``.text``. ``.rodata``, ``.data``, ``.bss`` ou ``.stack``.
+A secção corrente é definida pela diretiva ``.section``
+ou pelas diretivas especificas ``.text``. ``.rodata``, ``.data``, ``.bss`` ou ``.stack``.
 
 O programa da :numref:`ficheiro_seccoes1` é composto pela secção ``.data`` (linha 1)
 onde se alojam as variáveis ``x``, ``y`` e ``z``,
@@ -513,15 +514,15 @@ Na memória as duas variáveis ocupam posições contíguas
 -- ``ptr`` ocupa as posições de endereço ``0x1000`` e ``0x1001``
 e ``counter`` a posição de endereço ``0x1002``.
 O código das funções ``strtok`` e ``accumulate`` ocupam também zonas de memória contíguas,
-respectivamente, a gama de endereços ``0x3000`` a ``0x3007``
+respetivamente, a gama de endereços ``0x3000`` a ``0x3007``
 e a gama de endereços ``0x3008`` a ``0x300f``.
 
 Regras sintáticas
 -----------------
 
 A linguagem *assembly* do P16 é semelhante à usada pelo *assembler* AS da GNU
-quando usado no desenvolvimento de programas para a arquitectura ARM.
-O objectivo é facilitar ao estudante a transição para essa arquitectura.
+quando usado no desenvolvimento de programas para a arquitetura ARM.
+O objetivo é facilitar ao estudante a transição para essa arquitetura.
 
 .. table:: Elementos da notação *Wirth Syntax Notation* (WSN)
    :name: notacao WSN
@@ -538,7 +539,7 @@ O objectivo é facilitar ao estudante a transição para essa arquitectura.
 
 Descrevem-se na :numref:`sintaxe`,
 em notação *Wirth Syntax Notation* (WSN) :numref:`notacao WSN` [#f2]_,
-as regras sintácticas a aplicar na escrita de programas em linguagem *assembly* do P16.
+as regras sintáticas a aplicar na escrita de programas em linguagem *assembly* do P16.
 
 .. code-block:: console
    :caption: Regras sintáticas da linguagem *assembly*
@@ -547,131 +548,131 @@ as regras sintácticas a aplicar na escrita de programas em linguagem *assembly*
    program = statement { statement }.
 
    statement =
-     [label] [instruction | direcive] “EOL” .
+     [label] [instruction | directive] "EOL" .
 
    directive =
-     ( “.section” identifier )
-     | “.text”
+     ( ".section" identifier )
+     | ".text"
      | ".rodata"
-     | “.data”
+     | ".data"
      | ".bss"
      | ".stack"
-     | “.align” [ expression ]
-     | “.equ” identifier “,” expression )
-     | ( “.byte” | “.word” ) expression { “,” expression }
-     | “.space” expression [ “,” expression ] )
-     | ( “.ascii” | “.asciz” ) string { “,” string } .
+     | ".align" [ expression ]
+     | ".equ" identifier "," expression )
+     | ( ".byte" | ".word" ) expression { "," expression }
+     | ".space" expression [ "," expression ] )
+     | ( ".ascii" | ".asciz" ) string { "," string } .
 
    instruction =
-     “ldr” reg0-15 “,” ( “[” (“pc” | “r15”) “,” expression “]” ) | identifier
+     "ldr" reg0-15 "," ( "[" ("pc" | "r15") "," expression "]" ) | identifier
 
-     | ( ( “ldr” | “str” ) [“b”] reg0-15 “,”
-        ( “[“ reg0-7 [“,” (reg0-15 | #expression)] “]” )
-     | ( "mov" | “movt” ) reg0-15, (reg0-15 | #expression)
-     | ( “push” | “pop” ) [“{“] reg0-15
-     | ( “add” | “sub” ) reg0-15, reg0-7, (reg0-15 | #expression)
-     | ( “adc” | “sbc” ) reg0-15, reg0-7,  reg0-15
-     | “cmp” reg0-7, reg0-15
-     | ( “and” | “orr” | “eor” ) reg0-15, reg0-7, reg0-15
-     | ( “mvn” | “not”) reg0-15, reg0-15
-     | ( “lsl” | “lsr” | “asr” | “ror” )	reg0-15, reg0-7, #expression
-     | “rrx” reg0-15, reg0-7
-     | “msr” psw “," reg0-15
-     | “mrs” reg0-15 “,” psw
-     | ( “bzs” | “beq” | “bzc” | “bne” | “bcs” | “blo” | “bcc” | “bhs”
-     | “blt” | “bge” | “bl” | “b” ) identifier
-     | “movs pc, lr” .
+     | ( ( "ldr" | "str" ) ["b"] reg0-15 ","
+        ( "[" reg0-7 ["," (reg0-15 | #expression)] "]" )
+     | ( "mov" | "movt" ) reg0-15, (reg0-15 | #expression)
+     | ( "push" | "pop" ) ["{"] reg0-15
+     | ( "add" | "sub" ) reg0-15, reg0-7, (reg0-15 | #expression)
+     | ( "adc" | "sbc" ) reg0-15, reg0-7,  reg0-15
+     | "cmp" reg0-7, reg0-15
+     | ( "and" | "orr" | "eor" ) reg0-15, reg0-7, reg0-15
+     | ( "mvn" | "not") reg0-15, reg0-15
+     | ( "lsl" | "lsr" | "asr" | "ror" )	reg0-15, reg0-7, #expression
+     | "rrx" reg0-15, reg0-7
+     | "msr" psw "," reg0-15
+     | "mrs" reg0-15 "," psw
+     | ( "bzs" | "beq" | "bzc" | "bne" | "bcs" | "blo" | "bcc" | "bhs"
+     | "blt" | "bge" | "bl" | "b" ) identifier
+     | "movs pc, lr" .
 
-   reg0-7 = “r0” | “r1” | “r2” | “r3” | “r4” | “r5” | “r6” | “r7” .
-      | “R0” | “R1” | “R2” | “R3” | “R4” | “R5” | “R6” | “R7” .
+   reg0-7 = "r0" | "r1" | "r2" | "r3" | "r4" | "r5" | "r6" | "r7" .
+      | "R0" | "R1" | "R2" | "R3" | "R4" | "R5" | "R6" | "R7" .
 
    reg0-15 = reg0-7
-     | “r8” | “r9” | “r10” | “r11” | “r12” | “r13” | “r14” | “r15”
-     | “R8” | “R9” | “R10” | “R11” | “R12” | “R13” | “R14” | “R15”
-     | “sp” | “lr” | “pc” | “SP” | “LR” | “PC” .
+     | "r8" | "r9" | "r10" | "r11" | "r12" | "r13" | "r14" | "r15"
+     | "R8" | "R9" | "R10" | "R11" | "R12" | "R13" | "R14" | "R15"
+     | "sp" | "lr" | "pc" | "SP" | "LR" | "PC" .
 
-   psw = “cpsw” | “spsw” | “CPSW” | “SPSW”.
+   psw = "cpsr" | "spsr" | "CPSR" | "SPSR".
 
    expression = logical_or_expression
-     | logical_or_expression “?” expression “:” expression .
+     | logical_or_expression "?" expression ":" expression .
 
    logical_or_expression = logical_and_expression
-     | logical_or_expression “||” logical_and_expression .
+     | logical_or_expression "||" logical_and_expression .
 
    logical_and_expression = inclusive_or_expression
-     | logical_and_expression “&&” inclusive_or_expression .
+     | logical_and_expression "&&" inclusive_or_expression .
 
    inclusive_or_expression = exclusive_or_expression
-     | inclusive_or_expression “|” exclusive_or_expression .
+     | inclusive_or_expression "|" exclusive_or_expression .
 
    exclusive_or_expression = and_expression
-     | exclusive_or_expression “^” and_expression .
+     | exclusive_or_expression "^" and_expression .
 
    and_expression = equality_expression
-     | and_expression “&” equality_expression .
+     | and_expression "&" equality_expression .
 
    equality_expression = relational_expression
-     | equality_expression “==” relational_expression
-     | equality_expression “!=” relational_expression .
+     | equality_expression "==" relational_expression
+     | equality_expression "!=" relational_expression .
 
    relational_expression = shift_expression
-     | relational_expression “<” shift_expression
-     | relational_expression “>” shift_expression
-     | relational_expression “<=” shift_expression
-     | relational_expression “>=” shift_expression .
+     | relational_expression "<" shift_expression
+     | relational_expression ">" shift_expression
+     | relational_expression "<=" shift_expression
+     | relational_expression ">=" shift_expression .
 
    shift_expression = additive_expression
-     | shift_expression “<<” additive_expression
-     | shift_expression “>>” additive_expression .
+     | shift_expression "<<" additive_expression
+     | shift_expression ">>" additive_expression .
 
    additive_expression = multiplicative_expression
-     | additive_expression “+” multiplicative_expression
-     | additive_expression “-” multiplicative_expression .
+     | additive_expression "+" multiplicative_expression
+     | additive_expression "-" multiplicative_expression .
 
    multiplicative_expression = unary_expression
-     | multiplicative_expression “*” unary_expression
-     | multiplicative_expression “/” unary_expression
-     | multiplicative_expression “%” unary_expression .
+     | multiplicative_expression "*" unary_expression
+     | multiplicative_expression "/" unary_expression
+     | multiplicative_expression "%" unary_expression .
 
    unary_expression = primary_expression
-     | “+” primary_expression
-     | “-” primary_expression
-     | “!” primary_expression
-     | “~” primary_expression .
+     | "+" primary_expression
+     | "-" primary_expression
+     | "!" primary_expression
+     | "~" primary_expression .
 
-   primary_expression = literal | identifier | “(” expression “)” .
+   primary_expression = literal | identifier | "(" expression ")" .
 
-   identifier = ("." | alphabet | “_”) { "." | alphabet | number | “_” }.
+   identifier = ("." | alphabet | "_") { "." | alphabet | number | "_" }.
 
-   label =  identifier “:” .
+   label =  identifier ":" .
 
-   literal = decimal | hexadecimal | octal | binary | “’” character “’” .
+   literal = decimal | hexadecimal | octal | binary | "'" character "'" .
 
-   decimal = “0” | ((“1” | ... | “9”) { decimal_digit } ) .
+   decimal = "0" | (("1" | ... | "9") { decimal_digit } ) .
 
-   hexadecimal = “0” (“x” | “X”) hexadecimal_digit { hexadecimal_digit } .
+   hexadecimal = "0" ("x" | "X") hexadecimal_digit { hexadecimal_digit } .
 
-   octal = “0” (“1” | ... | “7”) { octal_digit } .
+   octal = "0" ("1" | ... | "7") { octal_digit } .
 
-   binary = “0” (“b” | “B”) (“0” | “1”) { “0” | “1” } .
+   binary = "0" ("b" | "B") ("0" | "1") { "0" | "1" } .
 
-   octal_digit = “0” | “1” | ... | “6” | “7” .
+   octal_digit = "0" | "1" | ... | "6" | "7" .
 
-   decimal_digit = “0” | “1” | ... | “8” | “9” .
+   decimal_digit = "0" | "1" | ... | "8" | "9" .
 
-   hexadecimal_digit = decimal_digit | “a” | ... | “f” | “A” | ... | “F” .
+   hexadecimal_digit = decimal_digit | "a" | ... | "f" | "A" | ... | "F" .
 
-   alphabet = “a” | ... | “z” | “A” | ... | “Z” .
+   alphabet = "a" | ... | "z" | "A" | ... | "Z" .
 
    character = alphabet | decimal_digit 
-     | “[” | “]” | “{” | “}” | “(” | “)” | “<” | “>”
-     | “=” | “|” | “&” | “%” | “$” | “#” | “/” | “?” | “!” | “_” | “*”
-     | “\b” | “\t” | “\n” | “\f” | “\r” | “\\” | “\"” | “\'”
-     | ( “\” ( decimal | hexadecimal | octal | binary ) ) .
+     | "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
+     | "=" | "|" | "&" | "%" | "$" | "#" | "/" | "?" | "!" | "_" | "*"
+     | "\b" | "\t" | "\n" | "\f" | "\r" | "\\" | "\"" | "\'"
+     | ( "\" ( decimal | hexadecimal | octal | binary ) ) .
    
-   string = “\”” character { character } “\”” .
+   string = "\"" character { character } "\"" .
 
-   “EOL” = control character for end of line
+   "EOL" = control character for end of line
 
 Limitações sintáticas
 ---------------------

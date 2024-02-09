@@ -1,18 +1,18 @@
-P16 assembler v1.3.99 (Oct  3 2022)	sections/seccoes2.lst	Mon Oct  3 13:34:44 2022
+P16 assembler v1.4.99 (Jan 10 2024)	sections/seccoes2.lst	Wed Jan 10 14:40:42 2024
 
 Sections
-Index   Name            Addresses       Size
-0       .data           0000 - 0002     0003 3
-1       .text           0004 - 0013     0010 16
+Index   Name            Address   Size
+0       .data           1000      0003 3
+1       .text           3000      0010 16
 
 Symbols
 Name                    Type      Value       Section
-accumulate              LABEL     000C 12     .text
-addr_counter            LABEL     0012 18     .text
-addr_ptr                LABEL     000A 10     .text
-counter                 LABEL     0002 2      .data
-ptr                     LABEL     0000 0      .data
-strtok                  LABEL     0004 4      .text
+accumulate              LABEL     3008 12296  .text
+addr_counter            LABEL     300E 12302  .text
+addr_ptr                LABEL     3006 12294  .text
+counter                 LABEL     1002 4098   .data
+ptr                     LABEL     1000 4096   .data
+strtok                  LABEL     3000 12288  .text
 
 Code listing
    1           	/*--------------------------------------------
@@ -20,31 +20,32 @@ Code listing
    3           	*/
    4           		.data
    5           	ptr:
-   6 0000 00 00		.word	0
+   6 1000 00 00		.word	0
    7           	
    8           		.text
    9           	strtok:
-  10 0004 20 0C		ldr	r0, addr_ptr
-  11 0006 00 00		ldr	r0, [r0]
+  10 3000 20 0C		ldr	r0, addr_ptr
+  11 3002 00 00		ldr	r0, [r0]
   12           		; ...
-  13 0008 0F B7		mov	pc, lr
+  13 3004 0F B7		mov	pc, lr
   14           	
   15           	addr_ptr:
-  16 000A 00 00		.word	ptr
+  16 3006 00 10		.word	ptr
   17           	
   18           	/*--------------------------------------------
   19           		Function accumulate;
   20           	*/
   21           		.data
   22           	counter:
-  23 0002 00		.byte	0
+  23 1002 00		.byte	0
   24           		
   25           		.text
   26           	accumulate:
-  27 000C 20 0C		ldr	r0, addr_counter
-  28 000E 00 08		ldrb	r0, [r0]
+  27 3008 20 0C		ldr	r0, addr_counter
+  28 300A 00 08		ldrb	r0, [r0]
   29           		; ...
-  30 0010 0F B7		mov	pc, lr
+  30 300C 0F B7		mov	pc, lr
   31           	
   32           	addr_counter:
-  33 0012 02 00		.word	counter
+  33 300E 02 10		.word	counter
+  33           	

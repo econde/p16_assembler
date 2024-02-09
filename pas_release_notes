@@ -1,5 +1,7 @@
-V1.4.99
-- Mudança blo/bcs e bhs/bcc para blo/bcc e bhs/bcs devido a alteração do significado da flag C.
+V1.5
+- Mudança de blo/bcs e bhs/bcc para blo/bcc e bhs/bcs, respetivamente.
+  Mudança devida a alteração do significado da flag C nas instruções de subtração.
+- Atualização do manual de utilização.
 
 V1.4.3
 - Melhoramentos no manual.

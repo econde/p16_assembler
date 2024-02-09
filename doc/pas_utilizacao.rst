@@ -49,7 +49,7 @@ Formatos possíveis para o ficheiro com o código binário:
 * ``--format logisim16``: ficheiro binário em formato Logisim, organizado em palavras de 16 *bits*.
 
 A opção ``--addresses`` permite definir a gama de endereços cujo conteúdo é transcrito para o ficheiro binário de saída.
-O conteúdo respeitante a endereços fora do intervalo especificado é excluido do ficheiro binário de saída.
+O conteúdo respeitante a endereços fora do intervalo especificado é excluído do ficheiro binário de saída.
 
 A opção ``--interleave`` faz com que o código binário do programa seja repartido por dois ficheiros
 -- um com os *bytes* respeitantes aos endereços pares
@@ -154,7 +154,7 @@ O primeiro caso é um erro de sintaxe -- a definição duma mnemónica de instru
    ----------------     ^^
    ERROR!	syntax error
 
-O segundo caso é um erro de domíno -- é escrito o número 17
+O segundo caso é um erro de domínio -- é escrito o número 17
 na posição de uma constante cujo domínio vai de 0 a 15.
 
 .. code-block:: console
@@ -171,8 +171,8 @@ até suprimir a emissão de mensagens de aviso.
 .. rubric:: Organização
 
 
-Por uma questão de organização, é conveniente criar especificamente uma directoria para alojar os
-ficheiros relacionados com um dado programa. No exemplo seguinte a directoria ``multiply`` aloja
+Por uma questão de organização, é conveniente criar especificamente uma diretoria para alojar os
+ficheiros relacionados com um dado programa. No exemplo seguinte a diretoria ``multiply`` aloja
 todos os ficheiros relacionados com este programa: ``multiply.s``, ``multiply.lst`` e ``multiply.hex``.
 
 .. code-block:: console
@@ -195,26 +195,26 @@ O ficheiro de extensão ``lst`` contém a tabela de secções,
 a tabela de símbolos e a listagem das instruções.
 
 Na tabela de secções listam-se as secções existentes, as gamas de endereços que ocupam e as
-respectivas dimensões. A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
+respetivas dimensões. A secção ``.startup`` é localizada no endereço ``0x0000``, por localização implícita,
 porque está definida em primeiro lugar no ficheiro fonte. As secções .text e .data são localizadas,
 respetivamente, nos endereços 0x1000 e 0x4000 por localização explícita.
 A secção .stack é localizada no endereço ``0x4006``, por localização implícita,
 porque está definida a seguir a ``.data`` que tem a dimensão 6.
 
-Na tabela de símbolos listam-se os símbolos definidos através de *label* ou através da directiva ``.equ``.
+Na tabela de símbolos listam-se os símbolos definidos através de *label* ou através da diretiva ``.equ``.
 Por cada símbolo é dada a seguinte informação: identificador, tipo, valor associado e secção a que pertence.
 
 Na listagem das instruções, são apresentados do lado esquerdo, na primeira coluna o número da linha
-do ficheiro fonte, na segunda coluna os endereços da memória e na terceira e quarta colunas o respectivo conteúdo.
+do ficheiro fonte, na segunda coluna os endereços da memória e na terceira e quarta colunas o respetivo conteúdo.
 
-Na arquitectura do P16 as palavras formadas por dois *bytes* – designadas por *word* – ocupam duas
+Na arquitetura do P16 as palavras formadas por dois *bytes* -- designadas por *word* -- ocupam duas
 posições de memória consecutivas, o *byte* de menor peso toma a posição de endereço menor
-e o *byte* de maior peso, a posição de endereço maior – *little ended format*.
+e o *byte* de maior peso, a posição de endereço maior -- *little ended format*.
 
-O conteúdo da memória – código das instruções ou valor das variáveis – é escrito na terceira e quarta colunas
+O conteúdo da memória -- código das instruções ou valor das variáveis -- é escrito na terceira e quarta colunas
 como uma sequência de *bytes* pela ordem dos endereços que ocupam na memória. Por exemplo, na
-linha 7, o código máquina da instrução ``add	lr, r0, 4``, que ocupa os endereços ``0008`` e ``0009``, e tem o valor
-``0xA20E``, é representado pela sequência de *bytes* ``0E`` ``A2``. Por exemplo, na linha 29,
+linha 7, o código máquina da instrução ``add	lr, r0, 4``, que ocupa os endereços ``0008`` e ``0009``,
+e tem o valor ``0xA20E``, é representado pela sequência de *bytes* ``0E`` ``A2``. Por exemplo, na linha 29,
 a variável ``m``, do tipo ``.byte``, ocupa o endereço ``0x0046`` e o seu valor é ``20 (0x14)``.
 
 .. literalinclude:: /code/multiply.lst
@@ -235,7 +235,7 @@ e a indicação dos endereços de memória onde serão carregados.
 
 O seu conteúdo é composto por tramas, formadas por uma marca inicial, a dimensão dos dados,
 o endereço onde os dados serão carregados, o tipo da trama, os dados contidos na trama e um código
-para detecção de eventual corrupção dos dados – soma de controlo.
+para deteção de eventual corrupção dos dados -- soma de controlo.
 
 .. figure:: figures/hexintel.png
    :name: hexintel
@@ -245,7 +245,7 @@ para detecção de eventual corrupção dos dados – soma de controlo.
 
    Formato de uma trama Intel Hex.
 
-A soma de contolo é calculada de modo que a adição, em módulo 0x100,
+A soma de controlo é calculada de modo que a adição, em módulo 0x100,
 de todos os *bytes* que formam a trama, some zero.
 
 A trama ``:00 0000 01 FF`` tem dimensão zero, invoca virtualmente o endereço zero
