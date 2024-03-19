@@ -67,7 +67,7 @@ precede-se essa instrução ou variável de uma *label*.
            . . .
            b 	cycle
 
-No exemplo acima, a *label* ``cycle:`` precede a instrução ``sub  r0, r0, #1`` 
+No exemplo acima, a *label* ``cycle:`` precede a instrução ``sub  r0, r0, #1``
 para indicar o local para onde a instrução ``b  cycle`` deve "saltar"
 ao reiniciar um novo ciclo.
 
@@ -336,7 +336,7 @@ Operadores relacionais
 .. table:: Operadores relacionais
    :widths: 8 12
    :name: operadores_relacionais
-   
+
    +------------+-----+--------------------------+
    | Ordem      | \<  | menor que                |
    |            +-----+--------------------------+
@@ -358,14 +358,14 @@ e o valor booleano **falso** é representado como o valor inteiro **0**.
 Na seguinte instrução, o registo destino (R0) é afetado com o valor 1. ::
 
 	mov    r0, #3 == (5 - 2)
-	
+
 
 Operadores lógicos
 ^^^^^^^^^^^^^^^^^^
 .. table:: Operadores lógicos
    :widths: 8 12
    :name: operadores_lógicos
-   
+
    +------------+-----+--------------------------+
    | Binários   | \&& | conjunção                |
    |            +-----+--------------------------+
@@ -391,7 +391,7 @@ Operadores *bit-a-bit*
 .. table:: Operadores *bit-a-bit*
    :widths: 8 12
    :name: operadores_bit_a_bit
-   
+
    +------------+-----+-----------------------------+
    | Binários   | \&  | conjunção (*and*)           |
    |            +-----+-----------------------------+
@@ -414,7 +414,7 @@ Operadores deslocamento
 .. table:: Operadores deslocamento
    :widths: 8 12
    :name: operadores_deslocamento
-   
+
    +------+-----------------------------+
    | \<<  | deslocar para a esquerda    |
    +------+-----------------------------+
@@ -430,12 +430,12 @@ Operador condicional
 ^^^^^^^^^^^^^^^^^^^^
 Este operador tem o mesmo significado que na linguagem C. ::
 
-   condition_expression ? true_expression : false_expression 
+   condition_expression ? true_expression : false_expression
 
 O valor produzido por este operador é igual ao da expressão ``true_expression``,
 se o valor de ``condition_expression`` for avaliado como verdadeiro
 ou é igual ao da expressão ``false_expression``
-se o valor de ``condition_expression`` for avaliado como falso. 
+se o valor de ``condition_expression`` for avaliado como falso.
 
 Contador de localização
 -----------------------
@@ -664,12 +664,12 @@ as regras sintáticas a aplicar na escrita de programas em linguagem *assembly* 
 
    alphabet = "a" | ... | "z" | "A" | ... | "Z" .
 
-   character = alphabet | decimal_digit 
+   character = alphabet | decimal_digit
      | "[" | "]" | "{" | "}" | "(" | ")" | "<" | ">"
      | "=" | "|" | "&" | "%" | "$" | "#" | "/" | "?" | "!" | "_" | "*"
      | "\b" | "\t" | "\n" | "\f" | "\r" | "\\" | "\"" | "\'"
      | ( "\" ( decimal | hexadecimal | octal | binary ) ) .
-   
+
    string = "\"" character { character } "\"" .
 
    "EOL" = control character for end of line
