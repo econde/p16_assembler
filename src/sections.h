@@ -23,6 +23,7 @@ limitations under the License.
 #include <string>
 #include <map>
 #include <fstream>
+#include <vector>
 
 #include "properties.h"
 
@@ -36,6 +37,7 @@ struct Section {
 	enum {LOADABLE = 1, BSS = 2};
 	unsigned content_capacity, content_size;
 	uint8_t *content;
+	std::vector<uint8_t> data;
 
 	void enlarge(unsigned new_capacity);
 
@@ -43,6 +45,8 @@ struct Section {
 			: name {name}, number{number}, base_address {0}, flags {flags},
 			  content_capacity {0}, content_size {0}, content(nullptr) { }
 
+	void _write8(unsigned offset, uint8_t value) { data[offset] = value; }
+	
 	void write8(unsigned offset, uint8_t value);
 	void write16(unsigned offset, uint16_t value);
 	void write32(unsigned offset, uint32_t b);

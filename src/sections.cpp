@@ -249,8 +249,8 @@ void Sections::load_memory_space()
 }
 
 void Sections::binary_hex_intel(const char *file_name,
-								unsigned word_size, unsigned byte_order,
-								unsigned lower_address, unsigned higher_address) {
+				unsigned word_size, unsigned byte_order,
+				unsigned lower_address, unsigned higher_address) {
 	try {
 		std::ofstream file(file_name);
 		for (size_t i = 0; i < table.size(); ++i) {
@@ -259,7 +259,6 @@ void Sections::binary_hex_intel(const char *file_name,
 				continue;
 			if (higher_address < section->base_address)
 				break;
-
 			if (lower_address >= section->base_address + section->content_size)
 				continue;
 
@@ -269,7 +268,7 @@ void Sections::binary_hex_intel(const char *file_name,
 			auto address = section_lower_address + byte_order;
 			auto size = (section_higher_address - section_lower_address) / word_size;
 
-			do {
+			while (size > 0) {
 				auto rec_len = min(16U, size);
 				auto load_address = address / word_size;
 				uint8_t cheksum = (rec_len + load_address + (load_address >> 8));
@@ -281,7 +280,7 @@ void Sections::binary_hex_intel(const char *file_name,
 				}
 				ostream_printf(file, "%02X\n", static_cast<uint8_t >(-cheksum));
 				size -= rec_len;
-			} while (size > 0);
+			};
 		}
 		ostream_printf(file, ":00000001FF\n");
 		file.close();
