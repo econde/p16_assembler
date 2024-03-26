@@ -230,8 +230,8 @@ int main(int argc, char **argv)
 		cout << endl << "Code generation" << endl << endl;
 	{
 		Code_generator code_gen;
-		for (auto s: *ast_root) {
-			s->accept(&code_gen);
+		for (auto statement: *ast_root) {
+			statement->accept(&code_gen);
 		}
 	}
 

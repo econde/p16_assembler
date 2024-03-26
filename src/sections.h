@@ -45,7 +45,7 @@ struct Section {
 			: name {name}, number{number}, base_address {0}, flags {flags},
 			  content_capacity {0}, content_size {0}, content(nullptr) { }
 
-	void _write8(unsigned offset, uint8_t value) { data[offset] = value; }
+//	void _write8(unsigned offset, uint8_t value) { data[offset] = value; }
 	
 	void write8(unsigned offset, uint8_t value);
 	void write16(unsigned offset, uint16_t value);

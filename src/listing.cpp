@@ -54,8 +54,7 @@ void listing(const char *lst_filename, std::list<Statement*> *ast_root)
 		Symbols::listing(lst);
 
 		lst << "Code listing" << endl;
-		for (auto s: *ast_root) {
-			Statement *statement = s;
+		for (auto statement: *ast_root) {
 			std::string line;
 			for (; current_line < statement->location.line; ++current_line) {
 			//	linhas em branco e comentários
