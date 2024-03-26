@@ -25,8 +25,6 @@ limitations under the License.
 /* handle locations */
 int yycolumn = 0;
 
-int eof_state = 0;
-
 #define YY_USER_ACTION yylloc.filename = yyfilename; \
     yylloc.first_line = yylloc.last_line = yylineno; \
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
@@ -197,7 +195,7 @@ BinDigit			[01]
 
 {LineTerminator}	{ yycolumn = 0; return EOL; }
 
-<INITIAL><<EOF>>	{ yycolumn = 0; if (eof_state == 0) { eof_state = 1; return EOL;} yyterminate(); }
+<INITIAL><<EOF>>	{ if (yycolumn > 0) { yycolumn = 0; return EOL;} yyterminate(); }
 
 	/* ------------------------ comments -------------------------------------*/
 

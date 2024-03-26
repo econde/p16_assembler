@@ -7,6 +7,7 @@ test6	- teste dos limites de alcance do branch
 test20	- subtração de labels
 test29	- teste das diretivas ascii e asciz
 test30	- constantes nas instruções mov e movt
+test33	- última linha do programa sem EOL
 
 Casos que devem assinalar erro ou warning
 -----------------------------------------
@@ -34,4 +35,5 @@ test26	- branch para label noutra secção
 test27	- Valor associado a um simbolo .equ não deve exceder a capacidade de codificação de 16 bits
 test28	- Aviso de secções vazias
 test31	- Constantes negativas nos campos immed
+test32	- ficheiro vazio
 
