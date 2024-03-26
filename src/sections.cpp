@@ -30,111 +30,91 @@ using namespace std;
 
 #define	CHUNK	1024
 
-void Section::enlarge(unsigned new_capacity)
-{
-	new_capacity = ((new_capacity + CHUNK - 1) / CHUNK) * CHUNK;
-	content = (uint8_t *)realloc(content, new_capacity);
-	assert(content != nullptr);	// throw exception
-	content_capacity = new_capacity;
+
+void Section::ensures_space(unsigned offset) {
+	auto needed_size = offset + 1; 
+	if (needed_size > contents.size()) {
+		contents.resize(needed_size);
+	}
 }
 
 void Section::write8(unsigned offset, uint8_t value)
 {
-	auto limit_superior = offset + 1;
-	if (limit_superior > content_capacity)
-		enlarge(limit_superior);
-	content[offset] = value;
-	if (limit_superior > content_size)
-		content_size = offset + 1;
+	ensures_space(offset);
+	contents.at(offset) = value;
 }
 
 void Section::write16(unsigned offset, uint16_t value)
 {
-	auto limit_superior = offset + 2;
-	if (limit_superior > content_capacity)
-		enlarge(limit_superior);
-	content[offset]     = static_cast<uint8_t >(value);
-	content[offset + 1] = static_cast<uint8_t >(value >> 8);
-	if (limit_superior >= content_size)
-		content_size = offset + 2;
+	ensures_space(offset + 1);
+	contents.at(offset) =  static_cast<uint8_t >(value);
+	contents.at(offset + 1) =  static_cast<uint8_t >(value >> 8);
 }
 
 void Section::write32(unsigned offset, uint32_t value)
 {
-	auto limit_superior = offset + 4;
-	if (limit_superior > content_capacity)
-		enlarge(limit_superior);
-	content[offset]     = static_cast<uint8_t >(value);
-	content[offset + 1] = static_cast<uint8_t >(value >> 8);
-	content[offset + 2] = static_cast<uint8_t >(value >> 16);
-	content[offset + 3] = static_cast<uint8_t >(value >> 24);
-	if (limit_superior > content_size)
-		content_size = offset + 4;
+	ensures_space(offset + 3);
+	contents.at(offset) =  static_cast<uint8_t >(value);
+	contents.at(offset + 1) =  static_cast<uint8_t >(value >> 8);
+	contents.at(offset + 2) =  static_cast<uint8_t >(value >> 16);
+	contents.at(offset + 3) =  static_cast<uint8_t >(value >> 24);
 }
 
 void Section::write_block(unsigned offset, const uint8_t *data, unsigned size)
 {
-	auto limit_superior = offset + size;
-	while (limit_superior > content_capacity)
-		enlarge(limit_superior);
-	memcpy(content + offset, data, size);
-	if (limit_superior > content_size)
-		content_size += limit_superior - content_size;
+	ensures_space(offset + size - 1);
+	memcpy(contents.data() + offset, data, size);
 }
 
 void Section::fill(unsigned offset, uint8_t b, unsigned size)
 {
-	auto limit_superior = offset + size;
-	while (limit_superior > content_capacity)
-		enlarge(limit_superior);
-	memset(content + offset, b, size);
-	if (limit_superior > content_size)
-		content_size += limit_superior - content_size;
+	ensures_space(offset + size - 1);
+	memset(contents.data() + offset, b, size);
 }
 
 uint8_t Section::read8(unsigned offset)
 {
-	if (offset < content_size)
-		return *(content + offset);
+	if (offset < contents.size())
+		return contents.at(offset);
 	return 0x55;
 }
 
 uint16_t Section::read16(unsigned offset)
 {
 	uint16_t byte0 = 0x55, byte1 = 0x55;
-	if (offset < content_size)
-		byte0 = *(content + offset);
-	if (offset + 1 < content_size)
-		byte1 = *(content + offset + 1);
+	if (offset < contents.size())
+		byte0 = contents.at(offset);
+	if (offset + 1 < contents.size())
+		byte1 = contents.at(offset + 1);
 	return (byte1 << 8) + byte0;
 }
 
 uint32_t Section::read32(unsigned offset)
 {
 	uint32_t byte0 = 0x55, byte1 = 0x55, byte2 = 0x55, byte3 = 0x55;
-	if (offset < content_size)
-		byte0 = *(content + offset);
-	if (offset + 1 < content_size)
-		byte1 = *(content + offset + 1);
-	if (offset + 2 < content_size)
-		byte2 = *(content + offset + 2);
-	if (offset + 3 < content_size)
-		byte3 = *(content + offset + 3);
+	if (offset < contents.size())
+		byte0 = contents.at(offset);
+	if (offset + 1 < contents.size())
+		byte1 = contents.at(offset + 1);
+	if (offset + 2 < contents.size())
+		byte2 = contents.at(offset + 2);
+	if (offset + 3 < contents.size())
+		byte3 = contents.at(offset + 3);
 	return (byte3 << 24) + (byte2 << 16) + (byte1 << 8) + byte0;
 }
 
 void Section::read_block(unsigned offset, uint8_t *buffer, unsigned size)
 {
-	if (offset >= content_capacity)
+	if (offset >= contents.size())
 		memset(buffer, 0x55, size);
-	else if (offset + size > content_capacity) {
-		size_t fill_offset = content_capacity - offset;
+	else if (offset + size > contents.size()) {
+		size_t fill_offset = contents.size() - offset;
 		size_t fill_size = size - fill_offset;
 		memset(buffer + fill_offset, 0x55, fill_size);
-		memcpy(buffer, content + offset, fill_offset);
+		memcpy(buffer, contents.data() + offset, fill_offset);
 	}
 	else
-		memcpy(buffer, content + offset, size);
+		memcpy(buffer, contents.data() + offset, size);
 }
 
 //-----------------------------------------------------------------------------
@@ -147,10 +127,8 @@ Section *Sections::current_section = nullptr;
 
 void Sections::deallocate()
 {
-	for (auto s: table) {
-		free(s->content);
-		delete s;
-	}
+	for (auto section: table)
+		delete section;
 }
 
 void Sections::set_section(std::string section_name)
@@ -168,7 +146,7 @@ void Sections::set_section(std::string section_name)
 	 * Se o utilizador começar por definir uma secção,
 	 * esta vai substituir a secção .text inicialmente criada.
 	 */
-	if (table.size() == 1 && table.at(0)->content_size == 0) {
+	if (table.size() == 1 && table.at(0)->contents.size() == 0) {
 		table.at(0)->name = section_name;
 		table.at(0)->flags = section_flags;
 		return;
@@ -192,7 +170,7 @@ void Sections::listing(std::ostream& lst_file)
 	for (size_t i = 0; i < table.size(); ++i) {
 		ostream_printf(lst_file, "%-8d%-16s%04X      %04X %d\n", i,
 				table[i]->name.c_str(), table[i]->base_address,
-				table[i]->content_size, table[i]->content_size);
+				table[i]->contents.size(), table[i]->contents.size());
 	}
 }
 
@@ -201,10 +179,10 @@ bool Sections::address_is_free(Section *s)
 	auto iter = list.begin();
 	for (; iter != list.end(); ++iter) {
 		Section *r = *iter;
-		if (s->base_address + s->content_size > r->base_address
-				&& r->base_address + r->content_size > s->base_address)
+		if (s->base_address + s->contents.size() > r->base_address
+				&& r->base_address + r->contents.size() > s->base_address)
 			return false;
-		if (s->base_address + s->content_size <= r->base_address)
+		if (s->base_address + s->contents.size() <= r->base_address)
 			break;
 	}
 	list.insert(iter, s);
@@ -221,13 +199,13 @@ void Sections::locate(Properties<string, unsigned> *section_addresses)
 			error_report("Section \"" + section->name
 						 + string_printf("\" with size %d (0x%x) can't be located in address %d (0x%x)"
 									 ", this overlap another section.\n",
-									 section->content_size, section->content_size,
+									 section->contents.size(), section->contents.size(),
 									 section->base_address, section->base_address));
 			exit(EXIT_FAILURE);
 		}
 		// alinhar o início da secção em endereço par
-		current_address = align(section->base_address + section->content_size, 1);
-		if (section->content_size == 0)
+		current_address = align(section->base_address + section->contents.size(), 1);
+		if (section->contents.size() == 0)
 			warning_report("Section \"" + section->name + "\" is empty");
 	}
 }
@@ -244,7 +222,7 @@ void Sections::load_memory_space()
 		Section *section = Sections::table.at(i);
 		if ((section->flags & Section::LOADABLE) == 0)
 			continue;
-		memory.write(section->base_address, section->content, section->content_size);
+		memory.write(section->base_address, section->contents.data(), section->contents.size());
 	}
 }
 
@@ -259,11 +237,11 @@ void Sections::binary_hex_intel(const char *file_name,
 				continue;
 			if (higher_address < section->base_address)
 				break;
-			if (lower_address >= section->base_address + section->content_size)
+			if (lower_address >= section->base_address + section->contents.size())
 				continue;
 
 			auto section_lower_address = max(lower_address, section->base_address);
-			auto section_higher_address = min(higher_address, section->base_address + section->content_size);
+			auto section_higher_address = min(higher_address, section->base_address + section->size());
 
 			auto address = section_lower_address + byte_order;
 			auto size = (section_higher_address - section_lower_address) / word_size;

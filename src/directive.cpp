@@ -47,7 +47,7 @@ Dir_section::Dir_section(string name, Location left) :
 {
 	Sections::set_section(name);
 	section_index = Sections::current_section->number;
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	size_in_memory = 0;
 }
 
@@ -88,13 +88,13 @@ Dir_ascii::Dir_ascii(unsigned asciz, list<string> *sl, Location left) :
 	Directive {left}, string_list {sl}
 {
 	section_index = Sections::current_section->number;
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	for (auto s: *string_list) {
 		Sections::append_block(Sections::current_section->number, (const uint8_t *)s.data(), s.size());
 		if (asciz)
 			Sections::append8(Sections::current_section->number, 0);
 	}
-	size_in_memory = Sections::current_section->content_size - section_offset;
+	size_in_memory = Sections::current_section->size() - section_offset;
 }
 
 string Dir_ascii::listing()
@@ -128,7 +128,7 @@ Dir_byte::Dir_byte(unsigned s, list<Expression*> *vl, Location left) :
 	Directive {left}, value_list {vl}, grain_size {s}
 {
 	section_index = Sections::current_section->number;
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	size_in_memory = grain_size * value_list->size();
 	Sections::increase(section_index, size_in_memory);
 }
@@ -171,7 +171,7 @@ Dir_space::Dir_space (Expression *s, Expression *i, Location left) :
 	Directive {left}, size {s}, initial {i}
 {
 	section_index = Sections::current_section->number;
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	if (size->evaluate())
 		size_in_memory = size->get_value();
 	else
@@ -204,7 +204,7 @@ Dir_equ::Dir_equ(Symbol *symbol, Expression *value, Location left) :
 	Directive {left}, symbol {symbol}
 {
 	section_index = Sections::current_section->number;	/* Um simbolo equ não pertence a uma secção ... */
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	size_in_memory = 0;
 	symbol->set_properties(UNDEFINED, Sections::current_section->number, value);
 	Symbol *s = Symbols::search(symbol->name);
@@ -226,7 +226,7 @@ Dir_align::Dir_align (Expression *size, Location left) :
 	Directive {left}, size {size} 
 {
 	section_index = Sections::current_section->number;
-	section_offset = Sections::current_section->content_size;
+	section_offset = Sections::current_section->size();
 	size_in_memory = Sections::align(section_offset, size->get_value()) - section_offset;
 	Sections::increase(section_index, size_in_memory);
 }

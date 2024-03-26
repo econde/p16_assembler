@@ -53,7 +53,7 @@ public:
 		Expression {location} {
 		if (name.compare(0, 5, "line#") == 0)	{ //	Simbolo .	 (ponto)
 			symbol = new Symbol(location, name, Value_type::LABEL, Sections::current_section->number,
-						 new Value(Sections::current_section->content_size, location));
+						 new Value(Sections::current_section->size(), location));
 			Symbols::add(symbol);
 		}
 		else {

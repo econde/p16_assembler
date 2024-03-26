@@ -76,7 +76,7 @@ public:
 	Statement_empty(string *l, Location left):
 		Statement {left} {
 		section_index = Sections::current_section->number;
-		section_offset = Sections::current_section->content_size;
+		section_offset = Sections::current_section->size();
 		add_label(l);
 	 }
 	 Statement_empty(Location left):

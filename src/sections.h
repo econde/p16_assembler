@@ -35,44 +35,44 @@ struct Section {
 	unsigned base_address;
 	unsigned flags;
 	enum {LOADABLE = 1, BSS = 2};
-	unsigned content_capacity, content_size;
-	uint8_t *content;
-	std::vector<uint8_t> data;
+	std::vector<uint8_t> contents;
+	unsigned size() { return contents.size(); }
 
-	void enlarge(unsigned new_capacity);
+	void ensures_space(unsigned offset);
 
 	Section(std::string name, unsigned number, unsigned flags)
-			: name {name}, number{number}, base_address {0}, flags {flags},
-			  content_capacity {0}, content_size {0}, content(nullptr) { }
-
-//	void _write8(unsigned offset, uint8_t value) { data[offset] = value; }
+			: name {name}, number{number}, base_address {0}, flags {flags} { }
 	
 	void write8(unsigned offset, uint8_t value);
 	void write16(unsigned offset, uint16_t value);
-	void write32(unsigned offset, uint32_t b);
+	void write32(unsigned offset, uint32_t value);
 	void write_block(unsigned offset, const uint8_t *data, unsigned size);
-	void fill(unsigned offset, uint8_t b, unsigned size);
+	void fill(unsigned offset, uint8_t value, unsigned size);
 	uint8_t read8(unsigned offset);
 	uint16_t read16(unsigned offset);
 	uint32_t read32(unsigned offset);
 	void read_block(unsigned offset, uint8_t *buffer, unsigned size);
 	void append8(uint8_t value) {
-		write8(content_size, value);
+		write8(contents.size(), value);
 	}
 	void append16(uint16_t value) {
-		write16(content_size, value);
+		write16(contents.size(), value);
 	}
-	void append_block(const uint8_t *data, unsigned size) {
-		write_block(content_size, data, size);
+
+	void append_block(const uint8_t *data, unsigned size)
+	{
+		write_block(contents.size(), data, size);
 	}
+
 	void increase(unsigned size) {
-		fill(content_size, 0x55, size);
+		fill(contents.size(), 0x55, size);
 	}
+
 };
 
 class Sections {
-	// Lista das secções utilizada na fase de localização
-	// É ordenada por ordem de endereço
+	// Lista das secções utilizada na fase de localização.
+	// É ordenada por ordem de endereço.
 	static std::list<Section*> list;
 public:
 	static int align(unsigned address, unsigned alignment) {
@@ -182,7 +182,7 @@ public:
 	}
 
 	static uint32_t higher_address() {
-		return list.empty() ? 0 : list.back()->base_address + list.back()->content_size;
+		return list.empty() ? 0 : list.back()->base_address + list.back()->contents.size();
 	}
 };
 
