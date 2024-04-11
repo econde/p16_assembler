@@ -113,12 +113,18 @@ void Code_generator::visit(Inst_load_relative *s)
 	if (s->target->evaluate()) {
 		auto target_type = s->target->get_type();
 		if (target_type == Value_type::LABEL) {
-			string symbol = s->target->get_symbol();
-			auto addend = s->target->get_value() - 2;
-			auto *reloc = new Relocation{&s->location, &s->target->location, s->section_index, s->section_offset,
-							LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
-							Relocation::Relocation_type::RELATIVE_UNSIGNED, symbol, addend};
-			Relocations::add(reloc);
+			auto symbol = s->target->get_symbol();
+			if (s->section_index == Symbols::get_section(symbol)) { //  Label deve pertencer à mesma secção
+				string symbol = s->target->get_symbol();
+				auto addend = s->target->get_value() - 2;
+				auto *reloc = new Relocation{&s->location, &s->target->location, s->section_index, s->section_offset,
+								LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
+								Relocation::Relocation_type::RELATIVE_UNSIGNED, symbol, addend};
+				Relocations::add(reloc);
+			} else {    // A Label pertence a outra secção. Será resolvida na fase de relocalização
+				error_report(&s->target->location,
+					string_printf( "Label \"%s\" is defined in another section", symbol.c_str()));
+			}
 		}
 		else
 			error_report(&s->target->location, "Invalid expression, must be a label");
@@ -411,7 +417,7 @@ void Code_generator::visit(Inst_movs *s)
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(MOVS_OPCODE));
 }
 
-void Code_generator::visit(Inst_compare *s) 
+void Code_generator::visit(Inst_compare *s)
 {
 	s->check_alignment();
 	if (s->rn->n > 7)
@@ -427,7 +433,7 @@ void Code_generator::visit(Inst_msr *s)
 	if (s->rd->n != CPSR && s->rd->n != SPSR)
 		error_report(&s->rd->location, "Invalid register");
 	Sections::write16(s->section_index, s->section_offset,
-		static_cast<uint16_t>(MSR_OPCODE 
+		static_cast<uint16_t>(MSR_OPCODE
 			| ((s->rd->n == SPSR) << SPSR_INDICATION_POSITION)
 			| (s->rs->n << MOV_RS_POSITION)));
 }

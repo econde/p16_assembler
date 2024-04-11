@@ -3,12 +3,12 @@
 
 	.section .startup
 	.space	64
-	b label2
+	bl main
 
 	.text
 	.space	246
-	mov	r0, #label
-label:
+	mov	r0, #main
+main:
 	.space  10
 label2:
 

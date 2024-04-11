@@ -27,7 +27,7 @@ test17	- simbolo duplamente definido
 test18	- expressões com valores indefinidos
 test19	- simbolo invocado antes de definido
 test21	- dimensao da diretiva .space definida depois de .space
-test22	- diretiva equ definida à frente
+test22	- simbolo duplamente definido com diretiva EQU
 test23	- label pertencente a outra secção
 test24	- diretivas .byte e .word sem argumentos
 test25	- diretiva .byte iniciada com valor diferente de zero na secção .bss
@@ -36,4 +36,4 @@ test27	- Valor associado a um simbolo .equ não deve exceder a capacidade de cod
 test28	- Aviso de secções vazias
 test31	- Constantes negativas nos campos immed
 test32	- ficheiro vazio
-
+test34	- label pertencente a outra secção como argumento de ldr rd, label
