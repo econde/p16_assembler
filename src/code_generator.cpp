@@ -121,7 +121,7 @@ void Code_generator::visit(Inst_load_relative *s)
 								LDR_RELATIVE_CONSTANT_POSITION, LDR_RELATIVE_CONSTANT_SIZE,
 								Relocation::Relocation_type::RELATIVE_UNSIGNED, symbol, addend};
 				Relocations::add(reloc);
-			} else {    // A Label pertence a outra secção. Será resolvida na fase de relocalização
+			} else {    // A Label pertence a outra secção.
 				error_report(&s->target->location,
 					string_printf( "Label \"%s\" is defined in another section", symbol.c_str()));
 			}
@@ -413,6 +413,10 @@ void Code_generator::visit(Inst_mov *s)
 
 void Code_generator::visit(Inst_movs *s)
 {
+	if (s->rd->n != 15) 
+		error_report(&s->rd->location,"Destination register, must be PC (R15)");
+	if (s->rn->n != 14) 
+		error_report(&s->rn->location,"Source register, must be LR (R14)");
 	s->check_alignment();
 	Sections::write16(s->section_index, s->section_offset, static_cast<uint16_t>(MOVS_OPCODE));
 }

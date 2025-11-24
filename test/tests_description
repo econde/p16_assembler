@@ -37,3 +37,5 @@ test28	- Aviso de secções vazias
 test31	- Constantes negativas nos campos immed
 test32	- ficheiro vazio
 test34	- label pertencente a outra secção como argumento de ldr rd, label
+test35	- Operandos de movs diferentes de pc, lr
+

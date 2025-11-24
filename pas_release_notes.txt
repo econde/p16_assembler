@@ -1,5 +1,7 @@
 V1.5.99
-- Não emitir frame HEX Intel no cado de secção vazia.
+- Emitir erro na instrução movs se os operandos não forem pc e lr.
+- Emitir aviso no caso de label noutra secção
+- Não emitir frame HEX Intel no caso de secção vazia.
 - Melhoramentos relacionados com EOF.
 
 V1.5
@@ -7,7 +9,8 @@ V1.5
   Mudança devida a alteração do significado da flag C nas instruções de subtração.
 - Atualização do manual de utilização.
 
-V1.4.3
+V1.4.3:q
+
 - Melhoramentos no manual.
 - Melhoramentos nas mensagens de erro.
 - Remoção de incoerências no cálculo de expressões.

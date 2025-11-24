@@ -1,3 +1,4 @@
+Começar qualquer fragmento de uma secção alinhado
 Permitir sintaxe ldr rd, [pc, imm6]
 Verificar se há código em secção não loadable
 Dar erro se for mencionada na linha de comando uma secção que não existe.
