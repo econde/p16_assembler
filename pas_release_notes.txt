@@ -1,19 +1,14 @@
 V1.5.99
+- Deixar de utilizar get_temporary_buffer
 - Emitir erro na instrução movs se os operandos não forem pc e lr.
 - Emitir aviso no caso de label noutra secção
 - Não emitir frame HEX Intel no caso de secção vazia.
-- Melhoramentos relacionados com EOF.
+- Melhoramentos relacionados com EOF.>
 
 V1.5
 - Mudança de blo/bcs e bhs/bcc para blo/bcc e bhs/bcs, respetivamente.
   Mudança devida a alteração do significado da flag C nas instruções de subtração.
-- Atualização do manual de utilização.
-
-V1.4.3:q
-
-- Melhoramentos no manual.
-- Melhoramentos nas mensagens de erro.
-- Remoção de incoerências no cálculo de expressões.
+- Atualização do manual de utilização.>memória>
 
 V1.4.2
 - Correção de erro na expressão regular da opção -s 

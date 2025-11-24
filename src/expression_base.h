@@ -17,6 +17,8 @@ limitations under the License.
 #ifndef EXPRESSION_BASE_H
 #define EXPRESSION_BASE_H
 
+#include <stdint.h>
+
 #include "value_type.h"
 #include "location.h"
 #include "visitor.h"

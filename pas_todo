@@ -1,3 +1,4 @@
+Dá erro de sintaxe se a última linha tiver comentário e não tiver ENTER
 Começar qualquer fragmento de uma secção alinhado
 Permitir sintaxe ldr rd, [pc, imm6]
 Verificar se há código em secção não loadable
