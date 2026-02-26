@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <string>
 #include <cstdarg>
+#include <cassert>
 #include <iostream>
 #include <memory>
 #include <new>
@@ -26,12 +27,14 @@ limitations under the License.
 
 std::string string_printf(const char* fmt, ...) {
 	char *buffer = new char[DEFAULT_SIZE];
+	assert(buffer != NULL);
 	va_list vl;
 	va_start(vl, fmt);
 	auto actual_size = vsnprintf(buffer, DEFAULT_SIZE, fmt, vl);
 	if (DEFAULT_SIZE <= actual_size) {
 		delete[](buffer);
 		buffer = new char[actual_size + 1];
+		assert(buffer != NULL);
 		va_start(vl, fmt);
 		vsnprintf(buffer, actual_size + 1, fmt, vl);
 	}
@@ -42,6 +45,7 @@ std::string string_printf(const char* fmt, ...) {
 
 std::ostream& ostream_printf(std::ostream& stream, const char* fmt, ...) {
 	char *buffer = new char[DEFAULT_SIZE];
+	assert(buffer != NULL);
 	va_list vl;
 	va_start(vl, fmt);
 	auto actual_size = vsnprintf(buffer, DEFAULT_SIZE, fmt, vl);
