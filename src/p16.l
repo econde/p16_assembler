@@ -29,6 +29,28 @@ int yycolumn = 0;
     yylloc.first_line = yylloc.last_line = yylineno; \
 	yylloc.first_column = yycolumn; yylloc.last_column = yycolumn + yyleng - 1; \
 	yycolumn += yyleng;
+
+int previous_char;
+
+#undef YY_INPUT
+
+#define YY_INPUT(buf, result, max_size) \
+{ \
+	int c = getc(yyin); \
+	if (c != EOF) { \
+		buf[0] = previous_char = c; \
+		result = 1; \
+	} \
+	else { \
+		if (previous_char != '\n') { \
+			buf[0] = previous_char = '\n'; \
+			result = 1; \
+		} \
+		else { \
+			result = YY_NULL; \
+		} \
+	} \
+}
 %}
 
 /* -----------------------------------------------------------------------------
@@ -205,7 +227,7 @@ BinDigit			[01]
 <COMMENT><<EOF>>	{ yyerror("Unterminated comment\n"); }
 
 "//".*\n			{ yycolumn = 0; return EOL; }
-";".*\n				{ yycolumn = 0; return EOL; }
+";".*\n				{ yycolumn = 0; return EOL; }	/* segundo a documentação também deveria funcionar com EOF */
 
 	/* ----------------------- ignore ----------------------------------------*/
 
