@@ -60,4 +60,4 @@ build/$(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(LDFLAGS) $(OBJECTS) -o $@
 
 clean:
-	rm -rf build/src build/build build/*.cpp build/p16_parser.hpp build/p16_parser.output build/$(EXECUTABLE)
+	rm -rf build/src build/build build/*.cpp build/p16_parser.hpp build/p16_parser.output
